@@ -7,4 +7,4 @@ const char* ardugirl_game_id() noexcept {
     return "microtd";
 }
 
-#include "microtd_patched.ino"
+#include "microtd/microtd.ino"

@@ -32,11 +32,11 @@ OPENOCD_INSTALL := sh "$(VENDOR_DIR)/scripts/install-openocd.sh"
 endif
 
 CPU_FLAGS := -mcpu=cortex-m0plus -mthumb
-DEFINES := -DPY32F002Ax5
+DEFINES := -DPY32F002Ax5 -DARDUINO=10819
 INCLUDES := -Iinclude -I$(BUILD_DIR)/generated -I$(ARDUGIRL_GAME_INCLUDE) \
-	-Iplatform/py32 -I$(VENDOR_DIR)/Drivers/CMSIS/Include \
-	-I$(VENDOR_DIR)/Drivers/CMSIS/Device/PY32F0xx/Include \
-	-I$(VENDOR_DIR)/Drivers/PY32F0xx_HAL_Driver/Inc
+	-Iplatform/py32 -isystem $(VENDOR_DIR)/Drivers/CMSIS/Include \
+	-isystem $(VENDOR_DIR)/Drivers/CMSIS/Device/PY32F0xx/Include \
+	-isystem $(VENDOR_DIR)/Drivers/PY32F0xx_HAL_Driver/Inc
 CXXFLAGS := $(CPU_FLAGS) -std=c++17 -Os -g3 -ffunction-sections -fdata-sections \
 	-fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-use-cxa-atexit \
 	-fsigned-char \
@@ -51,7 +51,8 @@ LDSCRIPT := $(VENDOR_DIR)/Core/Startup/py32f002a_32k_4k.ld
 OPENOCD_TARGET := $(VENDOR_DIR)/Core/OpenOCD/py32f002a_32k.cfg
 
 CPP_SOURCES := src/core/framebuffer.cpp src/compat/ATMlib.cpp \
-	src/compat/ArduboyPlaytune.cpp src/arduboy2/Arduboy2.cpp src/arduboy2/Sprites.cpp \
+	src/compat/ArduboyPlaytune.cpp src/compat/stdio.cpp \
+	src/arduboy2/Arduboy2.cpp src/arduboy2/Sprites.cpp \
 	src/compat/EEPROM.cpp platform/py32/runtime.cpp platform/py32/platform.cpp \
 	platform/py32/display_st7789.cpp $(ARDUGIRL_GAME_ENTRY)
 C_SOURCES := $(VENDOR_DIR)/Core/System/system_py32f0xx.c \

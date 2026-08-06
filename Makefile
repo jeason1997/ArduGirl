@@ -8,6 +8,7 @@ STORAGE_TEST_TARGET := $(BUILD_DIR)/storage-test
 COMPAT_TEST_TARGET := $(BUILD_DIR)/compat-test
 PLAYTUNE_TEST_TARGET := $(BUILD_DIR)/playtune-test
 ATM_TEST_TARGET := $(BUILD_DIR)/atm-test
+STDIO_TEST_TARGET := $(BUILD_DIR)/stdio-test
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -65,6 +66,9 @@ PLAYTUNE_TEST_OBJECTS := \
 ATM_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/atm_test.o \
 	$(BUILD_DIR)/src/compat/ATMlib.o
+STDIO_TEST_OBJECTS := \
+	$(BUILD_DIR)/tests/stdio_test.o \
+	$(BUILD_DIR)/src/compat/stdio.o
 
 .PHONY: all test test-terminal smoke clean check-upstream check-sdl py32 flash-py32
 
@@ -120,15 +124,22 @@ $(ATM_TEST_TARGET): $(ATM_TEST_OBJECTS)
 	@mkdir -p $(@D)
 	$(CXX) $(ATM_TEST_OBJECTS) $(LDFLAGS) -o $@
 
+$(STDIO_TEST_OBJECTS): CXXFLAGS += -fno-builtin-sprintf
+
+$(STDIO_TEST_TARGET): $(STDIO_TEST_OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(STDIO_TEST_OBJECTS) $(LDFLAGS) -o $@
+
 $(BUILD_DIR)/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 
-test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(COMPAT_TEST_TARGET) $(PLAYTUNE_TEST_TARGET) $(ATM_TEST_TARGET) $(PORT_TEST_TARGETS)
+test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(COMPAT_TEST_TARGET) $(PLAYTUNE_TEST_TARGET) $(ATM_TEST_TARGET) $(STDIO_TEST_TARGET) $(PORT_TEST_TARGETS)
 	$(TEST_TARGET)
 	$(SDL_TEST_TARGET)
 	$(STORAGE_TEST_TARGET)
 	$(COMPAT_TEST_TARGET)
 	$(PLAYTUNE_TEST_TARGET)
 	$(ATM_TEST_TARGET)
+	$(STDIO_TEST_TARGET)
 
 test-terminal: $(PORT_TERMINAL_TEST_TARGETS)
 

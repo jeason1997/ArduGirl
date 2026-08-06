@@ -51,19 +51,18 @@ $(BUILD_DIR)/replay/%.o: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DARDUINO=10819 -MMD -MP -c $< -o $@
 
-$(BUILD_DIR)/generated/microtd_patched.ino: third_party/MicroTD/microtd.ino \
-		games/microtd/patches/0001-build-selected-tower-return-true.patch
-	@mkdir -p $(@D)
-	@sed 's/\r$$//' $< > $@.base
-	@patch --silent --output=$@ $@.base < games/microtd/patches/0001-build-selected-tower-return-true.patch
-	@rm -f $@.base
+$(BUILD_DIR)/generated/microtd/microtd.ino: third_party/MicroTD/microtd.ino \
+		games/microtd/game.toml \
+		games/microtd/patches/0001-build-selected-tower-return-true.patch \
+		tools/prepare_game.py
+	python tools/prepare_game.py microtd --prepare
 
 $(BUILD_DIR)/microtd/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 $(BUILD_DIR)/terminal-microtd/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 $(BUILD_DIR)/replay/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
-$(BUILD_DIR)/microtd/games/microtd/entry.o: $(BUILD_DIR)/generated/microtd_patched.ino
-$(BUILD_DIR)/terminal-microtd/games/microtd/entry.o: $(BUILD_DIR)/generated/microtd_patched.ino
-$(BUILD_DIR)/replay/tests/microtd_replay_test.o: $(BUILD_DIR)/generated/microtd_patched.ino
+$(BUILD_DIR)/microtd/games/microtd/entry.o: $(BUILD_DIR)/generated/microtd/microtd.ino
+$(BUILD_DIR)/terminal-microtd/games/microtd/entry.o: $(BUILD_DIR)/generated/microtd/microtd.ino
+$(BUILD_DIR)/replay/tests/microtd_replay_test.o: $(BUILD_DIR)/generated/microtd/microtd.ino
 
 microtd: check-microtd-upstream check-sdl $(MICROTD_TARGET)
 	$(MICROTD_TARGET)
