@@ -1,0 +1,52 @@
+--- menu.h
++++ menu.h
+@@ -24,7 +24,7 @@
+ void showSparkles(byte x, byte y)
+ {
+   if (arduboy.everyXFrames(6))sparkleFrame++;
+-  if (arduboy.everyXFrames(2))++eyesFrame = (++eyesFrame) % 128;
++  if (arduboy.everyXFrames(2))eyesFrame = (eyesFrame + 1) % 128;
+   for (byte i = 0; i < 5; i++)
+   {
+     sprites.drawPlusMask(
+--- player.h
++++ player.h
+@@ -117,14 +117,14 @@
+       stab[nextStab].y = helena.y - 14;
+       stab[nextStab].horizontal = false;
+     }
+-    nextStab = (++nextStab) % 2;
++    nextStab = (nextStab + 1) % 2;
+   }
+ }
+
+
+ void updateHelena()
+ {
+-  if (arduboy.everyXFrames(WALKINGSPEED * 3)) helena.frame = (++helena.frame) % 4;
++  if (arduboy.everyXFrames(WALKINGSPEED * 3)) helena.frame = (helena.frame + 1) % 4;
+
+   if (helena.characteristics & 0B00100000) // if imune
+   {
+--- enemies.h
++++ enemies.h
+@@ -429,7 +429,7 @@
+       }
+       break;
+     case BADWEED_RUNNING:
+-      if (arduboy.everyXFrames(6))badWeed.weedFrame = (++badWeed.weedFrame) % 4;
++      if (arduboy.everyXFrames(6))badWeed.weedFrame = (badWeed.weedFrame + 1) % 4;
+       if (arduboy.everyXFrames(WALKINGSPEED))
+
+       {
+--- waves.h
++++ waves.h
+@@ -33,7 +33,7 @@
+   return false;
+ }
+
+-boolean checkEndWave()
++void checkEndWave()
+ {
+   byte test = 0;
+   for (byte i = 0; i < MAX_ORCS_IN_WAVE; i++) test += (orc[i].characteristics & 0B10000000) >> 7;

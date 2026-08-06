@@ -29,6 +29,8 @@
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+
+- 固定并接入 Helmets & Hordes 87d1b7e1、Fantasy Rampage 29d30d35 和 Sunfire e99fff73；三款游戏均复用公共 ATMlib 四声道解释器与 SDL 合成后端。已补齐旧版 Arduino/Arduboy API 并增加回归断言，通过各自 C++17 构建、固定输入无头运行和三阶段 framebuffer 截图。上游子模块保持 clean；完整流程和长期音乐仍标为 partial。
 - 重排 `GAME_PORTS.md`：补齐全部 21 款现有移植游戏，按 MicroTD、ArduboyWorks 批次、Ardynia、Arduventure 的实际接入顺序置顶并标记 `✅ 已移植`；其余 41 款源码可访问候选单独保留原优先级，移植状态更易识别。
 - 全量复核当前 21 个移植游戏的截图状态：MicroTD 保留 4 张验收图，Ardynia、Arduventure 与 ArduboyWorks 18 个游戏均补齐各自 `assets/` 下至少 3 张不同阶段 PNG，并在每个游戏自己的 README 中展示 Logo/菜单、剧情或出生点以及实际核心玩法；仓库现有 64 张游戏截图。自动审计确认全部图片为 128×64、游戏内哈希互不重复且 README 引用完整；从空 `build/` 执行 `make test -j4` 重建并测试全部 21 个游戏，135.5 秒退出码为 0。所有尚未完成完整流程验收的游戏继续标为 `partial`。
 - 通用 SDL2 运行入口新增可重复的 `--replay-button 帧:掩码:持续帧数` 与 `--capture-frame 帧:路径`，可按确定性输入路径导出 128×64 PGM framebuffer，为后续移植提供可复现截图证据。

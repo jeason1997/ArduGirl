@@ -1,0 +1,11 @@
+--- collectables.h
++++ collectables.h
+@@ -54,7 +54,7 @@
+   }
+ }
+
+-goldBarSetInLine(byte firstGold, byte lastGold, int x, int y, int spacingX)
++void goldBarSetInLine(byte firstGold, byte lastGold, int x, int y, int spacingX)
+ {
+   for (byte i = firstGold; i < lastGold + 1; i++)
+   {

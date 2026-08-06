@@ -1,0 +1,20 @@
+--- elements.h
++++ elements.h
+@@ -105,7 +105,7 @@
+   return levelElements[id];
+ }
+
+-level_element_update(char id, LevelElement element) {
++void level_element_update(char id, LevelElement element) {
+   levelElements[id] = element;
+ }
+
+@@ -371,7 +371,7 @@
+     return element;
+ }
+
+-missile_launch(char x, char y) {
++void missile_launch(char x, char y) {
+   danger = true;
+   LevelElement missile = level_element_get(3);
+   missile.step = 0;

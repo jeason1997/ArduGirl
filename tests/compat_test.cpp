@@ -74,6 +74,12 @@ int main() {
     delay(2);
     assert(micros() == 1236567u);
     assert(map(5, 0, 10, 0, 100) == 50);
+    constexpr std::uint8_t program_byte = 0xA5;
+    assert(pgm_read_byte_near(&program_byte) == program_byte);
+    char long_text[32]{};
+    assert(std::strcmp(ltoa(-123456L, long_text, 10), "-123456") == 0);
+    arduboy.initRandomSeed();
+    arduboy.bootLogoSpritesSelfMasked();
 
     arduboy.clear();
     arduboy.drawTriangle(1, 1, 8, 1, 4, 6);

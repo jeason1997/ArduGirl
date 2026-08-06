@@ -1,0 +1,18 @@
+id = "helmets-hordes"
+name = "Helmets & Hordes"
+source = "https://github.com/Team-ARG-Museum/ID-47-Helmets-Hordes"
+revision = "87d1b7e1cc7419be84e078404cbceba58f76a64e"
+entry = "third_party/Helmets-Hordes/HEHO_AB/HEHO_AB.ino"
+
+[compat]
+level = "C"
+status = "partial"
+libraries = ["Arduboy2", "ATMlib", "EEPROM"]
+
+[port]
+patches = ["patches/0001-host-use-native-function-pointers.patch", "patches/0002-collision-use-cxx17-initializers.patch", "patches/0003-functions-declare-return-types.patch", "patches/0004-host-remove-undefined-behavior.patch", "patches/0005-elements-remove-undefined-behavior.patch"]
+notes = [
+    "上游源码保持未修改；代码采用 MIT 许可证，美术等资产的权利边界按上游声明保留。",
+    "复用公共 ATMlib 兼容层和固定的 ATMlib revision。",
+    "补丁仅将 AVR 宽度的函数指针读取改为宿主宽度安全的 pgm_read_ptr。",
+]

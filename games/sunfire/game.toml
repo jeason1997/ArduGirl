@@ -1,0 +1,18 @@
+id = "sunfire"
+name = "Sunfire"
+source = "https://github.com/Team-ARG-Museum/ID-50-Sunfire"
+revision = "e99fff73e2d7ba974b8fbef90f7adf90c764397b"
+entry = "third_party/Sunfire/SUNF_AB/SUNF_AB.ino"
+
+[compat]
+level = "C"
+status = "partial"
+libraries = ["Arduboy2", "ATMlib", "EEPROM"]
+
+[port]
+patches = ["patches/0001-host-use-native-function-pointers.patch", "patches/0002-functions-declare-return-types.patch", "patches/0003-song-use-explicit-byte-values.patch"]
+notes = [
+    "上游源码保持未修改并采用 MIT 许可证。",
+    "复用公共 ATMlib 兼容层和固定的 ATMlib revision。",
+    "补丁仅将 AVR 宽度的函数指针读取改为宿主宽度安全的 pgm_read_ptr。",
+]

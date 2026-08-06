@@ -1,0 +1,20 @@
+--- HEHO_AB.ino
++++ HEHO_AB.ino
+@@ -59,6 +59,6 @@
+   if (!(arduboy.nextFrame())) return;
+   arduboy.pollButtons();
+   arduboy.clear();
+-  ((FunctionPointer) pgm_read_word (&mainGameLoop[gameState]))();
++  ((FunctionPointer) pgm_read_ptr (&mainGameLoop[gameState]))();
+   arduboy.display();
+ }
+--- game.h
++++ game.h
+@@ -34,7 +34,7 @@
+   updateHelena();
+   updateWallParts();
+
+-  ((FunctionPointer) pgm_read_word (&allWaves[currentWave]))();
++  ((FunctionPointer) pgm_read_ptr (&allWaves[currentWave]))();
+
+   drawWallParts();

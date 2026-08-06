@@ -21,6 +21,11 @@ inline std::uint8_t pgm_read_byte(const void* address) noexcept {
     return *static_cast<const std::uint8_t*>(address);
 }
 
+// 统一地址空间没有 AVR 的 near/far 区别，保留旧名称以兼容早期游戏源码。
+inline std::uint8_t pgm_read_byte_near(const void* address) noexcept {
+    return pgm_read_byte(address);
+}
+
 template<typename Type>
 inline Type pgm_read_word(const Type* address) noexcept {
     Type value{};
@@ -97,6 +102,24 @@ inline char* itoa(int value, char* buffer, int radix) noexcept {
         const auto digit = magnitude % static_cast<unsigned int>(radix);
         temporary[count++] = static_cast<char>(digit < 10 ? '0' + digit : 'a' + digit - 10);
         magnitude /= static_cast<unsigned int>(radix);
+    } while (magnitude != 0);
+    std::size_t output = 0;
+    if (value < 0 && radix == 10) buffer[output++] = '-';
+    while (count != 0) buffer[output++] = temporary[--count];
+    buffer[output] = '\0';
+    return buffer;
+}
+
+inline char* ltoa(long value, char* buffer, int radix) noexcept {
+    if (buffer == nullptr || radix < 2 || radix > 36) return buffer;
+    char temporary[sizeof(unsigned long) * 8u + 1u]{};
+    const auto unsigned_value = static_cast<unsigned long>(value);
+    unsigned long magnitude = value < 0 ? 0ul - unsigned_value : unsigned_value;
+    std::size_t count = 0;
+    do {
+        const auto digit = magnitude % static_cast<unsigned long>(radix);
+        temporary[count++] = static_cast<char>(digit < 10 ? '0' + digit : 'a' + digit - 10);
+        magnitude /= static_cast<unsigned long>(radix);
     } while (magnitude != 0);
     std::size_t output = 0;
     if (value < 0 && radix == 10) buffer[output++] = '-';

@@ -93,6 +93,8 @@ public:
     void begin() noexcept;
     void beginNoLogo() noexcept { begin(); }
     void boot() noexcept {}
+    void bootLogoSpritesSelfMasked() noexcept {}
+    void initRandomSeed() noexcept { randomSeed(micros()); }
     void blank() noexcept { clear(); }
     void flashlight() noexcept {}
     void systemButtons() noexcept {}

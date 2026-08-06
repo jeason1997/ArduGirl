@@ -1,0 +1,196 @@
+--- collision.h
++++ collision.h
+@@ -10,10 +10,10 @@
+ {
+   Rect helenaRect;
+   helenaRect = {
+-    .x = helena.x + HELENA_COLLISION_X_OFFSET,
+-    .y = 0,
+-    .width = HELENA_COLLISION_WIDTH,
+-    .height = HELENA_COLLISION_HEIGHT
++    helena.x + HELENA_COLLISION_X_OFFSET,
++    0,
++    HELENA_COLLISION_WIDTH,
++    HELENA_COLLISION_HEIGHT
+   };
+   if (helena.characteristics & 0B01000000) helenaRect.y = helena.y + HELENA_COLLISION_Y_OFFSET - 2 - pgm_read_byte(&helenaJumpSequence[helena.jumpSequenceCounter]);
+   else helenaRect.y = helena.y + HELENA_COLLISION_Y_OFFSET + (helena.frame % 2);
+@@ -22,10 +22,10 @@
+   ////////////////////////////////////////////////
+   Rect stabRect;
+   stabRect = {
+-    .x = stab[nextStab].x,
+-    .y = stab[nextStab].y,
+-    .width = STAB_COLLISION_WIDTH,
+-    .height = STAB_COLLISION_HEIGHT,
++    stab[nextStab].x,
++    stab[nextStab].y,
++    STAB_COLLISION_WIDTH,
++    STAB_COLLISION_HEIGHT,
+   };
+   byte currentStab = 1 - nextStab;
+
+@@ -37,10 +37,10 @@
+   {
+     enemyRect =
+     {
+-      .x = orc[i].x + 2,
+-      .y = ORC_Y - 10 + ((orcFrames + i) % 2),
+-      .width = ORC_COLLISION_WIDTH,
+-      .height = ORC_COLLISION_HEIGHT
++      orc[i].x + 2,
++      ORC_Y - 10 + ((orcFrames + i) % 2),
++      ORC_COLLISION_WIDTH,
++      ORC_COLLISION_HEIGHT
+     };
+     if (stab[currentStab].isActive)
+     {
+@@ -70,20 +70,20 @@
+     {
+       enemyRect =
+       {
+-        .x = orc[i].x - 18,
+-        .y = ORC_Y + 3 + ((orcFrames + i) % 2),
+-        .width = SPEAR_F_COLLISION_WIDTH,
+-        .height = SPEAR_F_COLLISION_HEIGHT
++        orc[i].x - 18,
++        ORC_Y + 3 + ((orcFrames + i) % 2),
++        SPEAR_F_COLLISION_WIDTH,
++        SPEAR_F_COLLISION_HEIGHT
+       };
+     }
+     if ((orc[i].characteristics & 0B00000011) == ENEMY_ORC_UP_SPEAR)
+     {
+       enemyRect =
+       {
+-        .x = orc[i].x,
+-        .y = ORC_Y - 22 + ((orcFrames + i) % 2),
+-        .width = SPEAR_U_COLLISION_WIDTH,
+-        .height = SPEAR_U_COLLISION_HEIGHT
++        orc[i].x,
++        ORC_Y - 22 + ((orcFrames + i) % 2),
++        SPEAR_U_COLLISION_WIDTH,
++        SPEAR_U_COLLISION_HEIGHT
+       };
+     }
+
+@@ -102,10 +102,10 @@
+   {
+     enemyRect =
+     {
+-      .x = spike[i].x + 4,
+-      .y = SPIKE_Y + 2,
+-      .width = SPIKE_COLLISION_WIDTH,
+-      .height = SPIKE_COLLISION_HEIGHT
++      spike[i].x + 4,
++      SPIKE_Y + 2,
++      SPIKE_COLLISION_WIDTH,
++      SPIKE_COLLISION_HEIGHT
+     };
+     if (((spike[i].characteristics & 0B00110000) == 0B00010000) && arduboy.collide(helenaRect, enemyRect))
+     {
+@@ -124,10 +124,10 @@
+   ////////////////////////////////////////////////
+   enemyRect =
+   {
+-    .x = badWalkingFlame.x + 2,
+-    .y = badWalkingFlame.y + 4,
+-    .width = BADFLAME_COLLISION_WIDTH,
+-    .height = BADFLAME_COLLISION_HEIGHT
++    badWalkingFlame.x + 2,
++    badWalkingFlame.y + 4,
++    BADFLAME_COLLISION_WIDTH,
++    BADFLAME_COLLISION_HEIGHT
+   };
+
+   if (((badWalkingFlame.characteristics & 0B00110000) == 0B00010000) && arduboy.collide(helenaRect, enemyRect))
+@@ -146,10 +146,10 @@
+
+   enemyRect =
+   {
+-    .x = badFlame.x + 2,
+-    .y = badFlame.y + 4,
+-    .width = BADFLAME_COLLISION_WIDTH,
+-    .height = BADFLAME_COLLISION_HEIGHT
++    badFlame.x + 2,
++    badFlame.y + 4,
++    BADFLAME_COLLISION_WIDTH,
++    BADFLAME_COLLISION_HEIGHT
+   };
+   if (((badFlame.characteristics & 0B00110000) == 0B00010000) && arduboy.collide(helenaRect, enemyRect))
+   {
+@@ -167,10 +167,10 @@
+   ////////////////////////////////////////////////
+   enemyRect =
+   {
+-    .x = statue.x,
+-    .y = STATUE_Y,
+-    .width = STATUE_COLLISION_WIDTH,
+-    .height = STATUE_COLLISION_HEIGHT
++    statue.x,
++    STATUE_Y,
++    STATUE_COLLISION_WIDTH,
++    STATUE_COLLISION_HEIGHT
+   };
+   if (((statue.characteristics & 0B00110000) == 0B00010000) && arduboy.collide(helenaRect, enemyRect))
+   {
+@@ -186,10 +186,10 @@
+
+   enemyRect =
+   {
+-    .x = arrow.x,
+-    .y = ARROW_Y,
+-    .width = ARROW_COLLISION_WIDTH,
+-    .height = ARROW_COLLISION_HEIGHT
++    arrow.x,
++    ARROW_Y,
++    ARROW_COLLISION_WIDTH,
++    ARROW_COLLISION_HEIGHT
+   };
+   if (((arrow.characteristics & 0B00110000) == 0B00010000) && arduboy.collide(helenaRect, enemyRect))
+   {
+@@ -207,10 +207,10 @@
+   //////////////////////////////////////////////
+   enemyRect =
+   {
+-    .x = badWeed.x + 2,
+-    .y = badWeed.y + 8,
+-    .width = BADWEED_COLLISION_WIDTH,
+-    .height = BADWEED_COLLISION_HEIGHT
++    badWeed.x + 2,
++    badWeed.y + 8,
++    BADWEED_COLLISION_WIDTH,
++    BADWEED_COLLISION_HEIGHT
+   };
+
+   if (stab[currentStab].isActive)
+@@ -242,10 +242,10 @@
+   {
+     enemyRect =
+     {
+-      .x = goldBar[i].x - 2,
+-      .y = goldBar[i].y - 2,
+-      .width = GOLDBAR_COLLISION_WIDTH,
+-      .height = GOLDBAR_COLLISION_HEIGHT
++      goldBar[i].x - 2,
++      goldBar[i].y - 2,
++      GOLDBAR_COLLISION_WIDTH,
++      GOLDBAR_COLLISION_HEIGHT
+     };
+     if (((goldBar[i].characteristics & 0B00110000) == 0B00010000) && arduboy.collide(helenaRect, enemyRect))
+     {
+@@ -258,10 +258,10 @@
+   //////////////////////////////////////////////////
+   enemyRect =
+   {
+-    .x = dungeonChests.x,
+-    .y = dungeonChests.y,
+-    .width = DUNGEON_CHEST_COLLISION_WIDTH,
+-    .height = DUNGEON_CHEST_COLLISION_HEIGHT,
++    dungeonChests.x,
++    dungeonChests.y,
++    DUNGEON_CHEST_COLLISION_WIDTH,
++    DUNGEON_CHEST_COLLISION_HEIGHT,
+   };
+   if (((dungeonChests.characteristics & 0B10010000) == 0B10010000) && arduboy.collide(helenaRect, enemyRect))
+   {

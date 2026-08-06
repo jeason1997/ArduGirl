@@ -1,0 +1,11 @@
+--- FRMP_AB.ino
++++ FRMP_AB.ino
+@@ -46,7 +46,7 @@
+   if (!(arduboy.nextFrame())) return;
+   arduboy.pollButtons();
+   arduboy.clear();
+-  ((FunctionPointer) pgm_read_word (&mainGameLoop[gameState]))();
++  ((FunctionPointer) pgm_read_ptr (&mainGameLoop[gameState]))();
+   arduboy.display();
+   if (arduboy.everyXFrames(3)) blinking = !blinking;
+ }

@@ -1,0 +1,18 @@
+id = "fantasy-rampage"
+name = "Fantasy Rampage"
+source = "https://github.com/Team-ARG-Museum/ID-48-Fantasy-Rampage"
+revision = "29d30d3574e31074aa8bb5d070c073f652b85f1a"
+entry = "third_party/Fantasy-Rampage/FRMP_AB/FRMP_AB.ino"
+
+[compat]
+level = "C"
+status = "partial"
+libraries = ["Arduboy2", "ATMlib"]
+
+[port]
+patches = ["patches/0001-host-use-native-function-pointers.patch", "patches/0002-song-use-explicit-byte-values.patch"]
+notes = [
+    "上游源码保持未修改并采用 MIT 许可证。",
+    "复用公共 ATMlib 兼容层和固定的 ATMlib revision。",
+    "补丁仅将 AVR 宽度的函数指针读取改为宿主宽度安全的 pgm_read_ptr。",
+]

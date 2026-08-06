@@ -40,6 +40,9 @@
 | 19 | ✅ 已移植 | Toyokumono | 云层生存 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/toyokumono) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
 | 20 | ✅ 已移植 | Ardynia | Zelda 式 RPG | [上游源码](https://github.com/city41/ardynia) | SDL2 冷构建、冒烟、ASan+UBSan 移动回放和三阶段截图通过 |
 | 21 | ✅ 已移植 | Arduventure | 动作 RPG | [上游源码](https://github.com/Team-ARG-Museum/ID-46-Arduventure) | SDL2 冷构建、四声道 ATMlib、剧情/房间移动回放和三阶段截图通过 |
+| 22 | ✅ 已移植 | Helmets & Hordes | 横向动作 | [上游源码](https://github.com/Team-ARG-Museum/ID-47-Helmets-Hordes) | ATMlib、固定输入冒烟和三阶段截图通过，完整流程仍为 partial |
+| 23 | ✅ 已移植 | Fantasy Rampage | 卡牌策略 | [上游源码](https://github.com/Team-ARG-Museum/ID-48-Fantasy-Rampage) | ATMlib、固定输入冒烟和三阶段截图通过，完整对局仍为 partial |
+| 24 | ✅ 已移植 | Sunfire | 太空射击 | [上游源码](https://github.com/Team-ARG-Museum/ID-50-Sunfire) | ATMlib、固定输入冒烟和三阶段截图通过，完整波次仍为 partial |
 
 以上游戏均已进入源码级移植流程并能在 ArduGirl 运行；`✅ 已移植` 不代表完整流程、全部音频和长期存档已经验收，具体完成度以各游戏 README 为准。
 

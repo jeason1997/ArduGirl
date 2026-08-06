@@ -1,0 +1,11 @@
+--- elements.h
++++ elements.h
+@@ -134,7 +134,7 @@
+ ///////////////////////
+ void updateWallParts()
+ {
+-  if (arduboy.everyXFrames(4)) flameFrame = (++flameFrame) % 4;
++  if (arduboy.everyXFrames(4)) flameFrame = (flameFrame + 1) % 4;
+   if (arduboy.everyXFrames(3))
+   {
+     for (byte i = 0; i < 3; i++)

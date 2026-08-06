@@ -10,6 +10,9 @@ ArduGirl 的主仓库通过 Git 子模块 gitlink 固定每个上游的完整 co
 | Ardynia | `third_party/Ardynia` | `860312d2c22524b2b6e96951691e4d426eb3b701` | 双声道 ArduboyPlaytune 动作 RPG 样本 | 仅按用户明确要求更新 |
 | Arduventure | `third_party/Arduventure` | `938fae770f04369ae4e4dd29c1039f7b43e7d96c` | 带 ATMlib 背景音乐的动作 RPG 样本 | 仅按用户明确要求更新 |
 | ATMlib | `third_party/ATMlib` | `952d079f573c0a9361d9f1a101134b7df884ab12` | Arduventure 使用的四声道乐谱格式与 AVR 参考实现 | 仅按用户明确要求更新 |
+| Helmets & Hordes | `third_party/Helmets-Hordes` | `87d1b7e1cc7419be84e078404cbceba58f76a64e` | ATMlib 横向地牢动作游戏 | 仅按用户明确要求更新 |
+| Fantasy Rampage | `third_party/Fantasy-Rampage` | `29d30d3574e31074aa8bb5d070c073f652b85f1a` | ATMlib 元素卡牌游戏 | 仅按用户明确要求更新 |
+| Sunfire | `third_party/Sunfire` | `e99fff73e2d7ba974b8fbef90f7adf90c764397b` | ATMlib 太空飞行射击游戏 | 仅按用户明确要求更新 |
 
 MicroTD 当前带有一份可独立重放的最小补丁：为 `buildSelectedTower()` 的成功路径补充缺失的 `true` 返回值，并显式标记预期的状态分支贯穿。该补丁只消除上游未定义行为和编译歧义，构建时应用到生成目录，子模块工作树保持 clean。
 
