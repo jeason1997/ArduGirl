@@ -20,7 +20,7 @@
 | Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；按当前决策暂停效果优化 |
 | 官方 Arduboy2 示例 | partial | 未修改的官方 HelloWorld 已构建运行；当前仅覆盖所需最小 API/字形 |
 | MicroTD | partial | CC0 上游源码未修改；主菜单已构建运行，待完整游玩和持久化验证 |
-| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调计时和 headless 固定帧测试；EEPROM 文件后端与音频待实现 |
+| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调计时和 headless 固定帧测试；已增加事件注入与 framebuffer golden test；EEPROM 文件后端与音频待实现 |
 | Arduboy2 兼容实现 | not started | 等最小 backend/runtime |
 | 游戏源码 | not started | 尚未选择，需先逐个核对许可证 |
 | 音频 | not started | Linux baseline 后实现 |
@@ -48,15 +48,15 @@
 - SDL2 窗口默认使用 1:1 像素倍率，并保留 `--scale N` 整数倍率覆盖。
 - 保留终端构建、运行和回归测试目标，但按当前决策暂停终端显示效果优化。
 - 实际操作 MicroTD 终端前端进入地图、建塔菜单和敌人波次，从 128x64 framebuffer 生成多张未缩放截图，并为 README 补充游戏简介；后续每个移植游戏都必须提供 ArduGirl 实际运行截图。
+- 为 SDL2 后端增加真实事件队列注入回归，覆盖组合按键、释放、自动重复过滤和退出；拆分无 SDL 类型的内部 framebuffer 转换函数，并以棋盘图案正常/反色 golden hash 验证 ARGB8888 输出。
 
 ## 下一步
 
 1. 确定 ArduGirl 自身开源许可证。
-2. 为 SDL2 后端增加可注入事件的输入测试和 framebuffer golden test。
-3. 为 MicroTD 增加固定输入回放，验证进入地图、建塔和波次流程。
-4. 实现按游戏隔离的 EEPROM 文件持久化。
-5. 添加更完整的 golden test 和 sanitizers。
-6. 在 SDL Linux 基线稳定后实现音频，再评估 MCU 后端。
+2. 为 MicroTD 增加固定输入回放，验证进入地图、建塔和波次流程。
+3. 实现按游戏隔离的 EEPROM 文件持久化。
+4. 添加更完整的 golden test 和 sanitizers。
+5. 在 SDL Linux 基线稳定后实现音频，再评估 MCU 后端。
 
 ## 未决策项
 

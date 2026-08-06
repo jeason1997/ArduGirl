@@ -4,6 +4,7 @@ TARGET := $(BUILD_DIR)/ardugirl-sdl
 TERMINAL_TARGET := $(BUILD_DIR)/ardugirl-terminal
 SMOKE_TARGET := $(BUILD_DIR)/terminal-smoke
 TEST_TARGET := $(BUILD_DIR)/framebuffer-test
+SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -16,7 +17,7 @@ RUNTIME_SOURCES := \
 	src/core/framebuffer.cpp \
 	src/runtime/main.cpp
 
-SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_sdl/sdl.cpp
+SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_sdl/sdl.cpp platform/linux_sdl/render.cpp
 TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_terminal/terminal.cpp
 
 ARDUBOY_SOURCES := \
@@ -26,7 +27,8 @@ ARDUBOY_SOURCES := \
 	src/arduboy2/Sprites.cpp \
 	games/examples/arduboy2_hello/entry.cpp
 
-TERMINAL_ARDUBOY_SOURCES := $(ARDUBOY_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp)
+TERMINAL_ARDUBOY_SOURCES := $(filter-out platform/linux_sdl/render.cpp,\
+	$(ARDUBOY_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp))
 MICROTD_TARGET := $(BUILD_DIR)/microtd-sdl
 TERMINAL_MICROTD_TARGET := $(BUILD_DIR)/microtd-terminal
 MICROTD_SOURCES := \
@@ -36,7 +38,8 @@ MICROTD_SOURCES := \
 	src/arduboy2/Sprites.cpp \
 	games/ports/microtd/entry.cpp
 
-TERMINAL_MICROTD_SOURCES := $(MICROTD_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp)
+TERMINAL_MICROTD_SOURCES := $(filter-out platform/linux_sdl/render.cpp,\
+	$(MICROTD_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp))
 SMOKE_SOURCES := \
 	$(TERMINAL_COMMON_SOURCES) \
 	tests/smoke/terminal_game.cpp
@@ -50,6 +53,11 @@ DEPENDS := $(OBJECTS:.o=.d)
 TEST_OBJECTS := \
 	$(BUILD_DIR)/src/core/framebuffer.o \
 	$(BUILD_DIR)/tests/framebuffer_test.o
+SDL_TEST_OBJECTS := \
+	$(BUILD_DIR)/tests/sdl_backend_test.o \
+	$(BUILD_DIR)/platform/linux_sdl/sdl.o \
+	$(BUILD_DIR)/platform/linux_sdl/render.o \
+	$(BUILD_DIR)/src/core/framebuffer.o
 
 .PHONY: all run demo microtd terminal run-terminal microtd-terminal test test-terminal smoke clean check-upstream check-sdl
 
@@ -136,8 +144,13 @@ $(TEST_TARGET): $(TEST_OBJECTS)
 	@mkdir -p $(@D)
 	$(CXX) $(TEST_OBJECTS) $(LDFLAGS) -o $@
 
-test: check-sdl $(TARGET) $(MICROTD_TARGET) $(TEST_TARGET)
+$(SDL_TEST_TARGET): $(SDL_TEST_OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(SDL_TEST_OBJECTS) $(LDFLAGS) $(SDL_LIBS) -o $@
+
+test: check-sdl $(TARGET) $(MICROTD_TARGET) $(TEST_TARGET) $(SDL_TEST_TARGET)
 	$(TEST_TARGET)
+	$(SDL_TEST_TARGET)
 	$(TARGET) --headless --frames 1
 	$(MICROTD_TARGET) --headless --frames 3
 

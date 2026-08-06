@@ -1,5 +1,6 @@
 #include "ardugirl/constants.hpp"
 #include "ardugirl/platform.hpp"
+#include "render.hpp"
 
 #include <SDL.h>
 
@@ -13,7 +14,7 @@ namespace {
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 SDL_Texture* texture = nullptr;
-std::array<std::uint32_t, kScreenWidth * kScreenHeight> texture_pixels{};
+detail::TexturePixels texture_pixels{};
 std::uint64_t start_counter = 0;
 std::uint64_t counter_frequency = 1;
 std::uint8_t current_buttons = 0;
@@ -38,12 +39,6 @@ std::uint8_t map_key(SDL_Keycode key) noexcept {
     case SDLK_x: case SDLK_k: return kB;
     default: return 0;
     }
-}
-
-bool framebuffer_pixel(const Framebuffer::Storage& pixels,
-                       std::size_t x, std::size_t y) noexcept {
-    const auto index = x + (y / 8u) * kScreenWidth;
-    return (pixels[index] & static_cast<std::uint8_t>(1u << (y & 7u))) != 0;
 }
 
 void release_resources() noexcept {
@@ -159,12 +154,7 @@ void present(const Framebuffer::Storage& pixels) noexcept {
     if (headless || texture == nullptr) {
         return;
     }
-    for (std::size_t y = 0; y < kScreenHeight; ++y) {
-        for (std::size_t x = 0; x < kScreenWidth; ++x) {
-            const bool lit = framebuffer_pixel(pixels, x, y) != invert;
-            texture_pixels[x + y * kScreenWidth] = lit ? 0xFFFFFFFFu : 0xFF000000u;
-        }
-    }
+    detail::convert_framebuffer(pixels, invert, texture_pixels);
     SDL_UpdateTexture(texture, nullptr, texture_pixels.data(),
                       kScreenWidth * static_cast<int>(sizeof(std::uint32_t)));
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

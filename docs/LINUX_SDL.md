@@ -62,7 +62,7 @@ SDL2 是当前默认 Linux 后端，以覆盖更多现有 Linux 发行版、开�
 
 `--mute` 和 `--save-dir` 将随音频及 EEPROM 文件后端实现。
 
-`--headless --frames N` 用于 CI smoke test，不初始化可见窗口并执行固定帧。framebuffer/hash 导出将在 golden test 阶段补充。
+`--headless --frames N` 用于 CI smoke test，不初始化可见窗口并执行固定帧。SDL 后端测试使用内部纯转换函数验证 framebuffer 的正常与反色 ARGB8888 golden hash，不向公共平台接口暴露 SDL 类型。
 
 ## 构建依赖
 
@@ -82,6 +82,8 @@ target_link_libraries(ardugirl_platform_linux_sdl2 PRIVATE SDL2::SDL2)
 
 - framebuffer 全白、棋盘、边界像素和 sprite golden images。
 - 人工事件注入验证同时按键和边沿。
+- 当前已通过 SDL 事件队列覆盖组合键、释放、自动重复过滤和退出事件。
+- 当前已通过 8x8 棋盘图案的正常与反色 ARGB8888 golden hash 验证页面布局转换。
 - fake clock 验证 30/60 FPS 以及时间回绕。
 - EEPROM 首次启动、重启保持、损坏/短文件恢复。
 - headless 模式在无显示服务器的 CI 中运行。
