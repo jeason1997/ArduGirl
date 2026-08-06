@@ -22,6 +22,9 @@ std::uint8_t current_buttons = 0;
 bool running = true;
 bool headless = false;
 bool invert = false;
+SDL_AudioDeviceID audio_device = 0;
+std::uint32_t audio_phase = 0;
+std::uint32_t audio_step = 0;
 
 constexpr std::uint8_t kLeft = 0x01;
 constexpr std::uint8_t kRight = 0x02;
@@ -43,6 +46,10 @@ std::uint8_t map_key(SDL_Keycode key) noexcept {
 }
 
 void release_resources() noexcept {
+    if (audio_device != 0) {
+        SDL_CloseAudioDevice(audio_device);
+        audio_device = 0;
+    }
     if (texture != nullptr) {
         SDL_DestroyTexture(texture);
         texture = nullptr;
@@ -54,6 +61,17 @@ void release_resources() noexcept {
     if (window != nullptr) {
         SDL_DestroyWindow(window);
         window = nullptr;
+    }
+}
+
+
+void audio_callback(void*, Uint8* stream, int length) noexcept {
+    auto* samples = reinterpret_cast<std::int16_t*>(stream);
+    const auto count = length / static_cast<int>(sizeof(std::int16_t));
+    for (int index = 0; index < count; ++index) {
+        samples[index] = audio_step == 0 ? 0 :
+            (audio_phase < 0x80000000u ? 6000 : -6000);
+        audio_phase += audio_step;
     }
 }
 
@@ -79,6 +97,20 @@ bool init(const Config& config) noexcept {
 
     counter_frequency = SDL_GetPerformanceFrequency();
     start_counter = SDL_GetPerformanceCounter();
+
+    // 音频不可用不应阻止无声游戏启动，因此音频子系统采用可选初始化。
+    if (SDL_InitSubSystem(SDL_INIT_AUDIO) == 0) {
+        SDL_AudioSpec desired{};
+        desired.freq = 48000;
+        desired.format = AUDIO_S16SYS;
+        desired.channels = 1;
+        desired.samples = 512;
+        desired.callback = audio_callback;
+        audio_device = SDL_OpenAudioDevice(nullptr, 0, &desired, nullptr, 0);
+        if (audio_device != 0) {
+            SDL_PauseAudioDevice(audio_device, 0);
+        }
+    }
     if (headless) {
         return true;
     }
@@ -152,8 +184,28 @@ std::uint32_t millis() noexcept {
     return static_cast<std::uint32_t>((elapsed * 1000u) / counter_frequency);
 }
 
+std::uint32_t micros() noexcept {
+    const auto elapsed = SDL_GetPerformanceCounter() - start_counter;
+    return static_cast<std::uint32_t>((elapsed * 1000000u) / counter_frequency);
+}
+
 void sleep_ms(std::uint32_t duration) noexcept {
     SDL_Delay(duration);
+}
+
+void set_tone(std::uint16_t frequency_hz) noexcept {
+    if (audio_device == 0) return;
+    SDL_LockAudioDevice(audio_device);
+    audio_step = static_cast<std::uint32_t>(
+        (static_cast<std::uint64_t>(frequency_hz) << 32u) / 48000u);
+    SDL_UnlockAudioDevice(audio_device);
+}
+
+void stop_tone() noexcept {
+    if (audio_device == 0) return;
+    SDL_LockAudioDevice(audio_device);
+    audio_step = 0;
+    SDL_UnlockAudioDevice(audio_device);
 }
 
 void present(const Framebuffer::Storage& pixels) noexcept {

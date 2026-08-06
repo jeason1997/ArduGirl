@@ -16,6 +16,7 @@
 #define BLACK 0
 #define WHITE 1
 #define INVERT 2
+#define CLEAR_BUFFER true
 
 #define LEFT_BUTTON  0x01
 #define RIGHT_BUTTON 0x02
@@ -84,12 +85,15 @@ public:
     void setFrameRate(std::uint8_t rate) noexcept;
     bool nextFrame() noexcept;
     void clear() noexcept;
-    void display() noexcept;
+    void display(bool clear_buffer = false) noexcept;
     void setCursor(std::int16_t x, std::int16_t y) noexcept;
     std::size_t print(const char* text) noexcept;
     std::size_t print(const __FlashStringHelper* text) noexcept {
         return print(reinterpret_cast<const char*>(text));
     }
+    std::size_t println() noexcept { return write('\n'); }
+    template<typename Value>
+    std::size_t println(Value value) noexcept { return print(value) + write('\n'); }
     template<typename Integer,
              typename = std::enable_if_t<std::is_integral_v<Integer>>>
     std::size_t print(Integer value) noexcept {
@@ -103,15 +107,22 @@ public:
     }
     std::size_t write(std::uint8_t character) noexcept;
     bool pressed(std::uint8_t buttons) const noexcept;
+    bool notPressed(std::uint8_t buttons) const noexcept;
     void pollButtons() noexcept;
     bool justPressed(std::uint8_t buttons) const noexcept;
     bool justReleased(std::uint8_t buttons) const noexcept;
     std::uint8_t buttonsState() const noexcept;
     std::uint8_t* getBuffer() noexcept;
+    std::int16_t getCursorX() const noexcept { return cursor_x; }
+    std::int16_t getCursorY() const noexcept { return cursor_y; }
     void setRGBled(std::uint8_t, std::uint8_t, std::uint8_t) noexcept {}
     void sendLCDCommand(std::uint8_t) noexcept {}
-    void setTextSize(std::uint8_t size) noexcept { textSize = size; }
+    void setTextSize(std::uint8_t size) noexcept { textSize = size == 0 ? 1 : size; }
+    std::uint8_t getTextSize() const noexcept { return textSize; }
+    void setTextWrap(bool wrap) noexcept { textWrap = wrap; }
+    bool getTextWrap() const noexcept { return textWrap; }
     std::uint8_t getTextColor() const noexcept { return text_color_; }
+    std::uint8_t getTextBackground() const noexcept { return text_background_; }
     void initAudio(std::uint8_t channels) noexcept;
     void closeAudio() noexcept;
     bool isAudioEnabled() const noexcept;
@@ -160,10 +171,33 @@ public:
     void fillCircle(std::int16_t x, std::int16_t y,
                     std::uint8_t radius,
                     std::uint8_t color = WHITE) noexcept;
+    void drawTriangle(std::int16_t x0, std::int16_t y0,
+                      std::int16_t x1, std::int16_t y1,
+                      std::int16_t x2, std::int16_t y2,
+                      std::uint8_t color = WHITE) noexcept;
+    void fillTriangle(std::int16_t x0, std::int16_t y0,
+                      std::int16_t x1, std::int16_t y1,
+                      std::int16_t x2, std::int16_t y2,
+                      std::uint8_t color = WHITE) noexcept;
+    void drawRoundRect(std::int16_t x, std::int16_t y,
+                       std::uint8_t width, std::uint8_t height,
+                       std::uint8_t radius,
+                       std::uint8_t color = WHITE) noexcept;
+    void fillRoundRect(std::int16_t x, std::int16_t y,
+                       std::uint8_t width, std::uint8_t height,
+                       std::uint8_t radius,
+                       std::uint8_t color = WHITE) noexcept;
     void drawBitmap(std::int16_t x, std::int16_t y,
                     const std::uint8_t* bitmap,
                     std::uint8_t width, std::uint8_t height,
                     std::uint8_t color = WHITE) noexcept;
+    void drawSlowXYBitmap(std::int16_t x, std::int16_t y,
+                          const std::uint8_t* bitmap,
+                          std::uint8_t width, std::uint8_t height,
+                          std::uint8_t color = WHITE) noexcept;
+    void drawCompressed(std::int16_t x, std::int16_t y,
+                        const std::uint8_t* bitmap,
+                        std::uint8_t color = WHITE) noexcept;
     void setTextColor(std::uint8_t color) noexcept;
     void setTextBackground(std::uint8_t color) noexcept;
 
@@ -184,4 +218,5 @@ private:
     std::uint8_t current_buttons_ = 0;
     std::uint8_t previous_buttons_ = 0;
     std::uint8_t audio_channels_ = 0;
+    std::uint32_t tone_end_ms_ = 0;
 };

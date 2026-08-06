@@ -213,9 +213,19 @@ std::uint32_t millis() noexcept {
     return static_cast<std::uint32_t>(elapsed);
 }
 
+std::uint32_t micros() noexcept {
+    const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
+        Clock::now() - start_time).count();
+    return static_cast<std::uint32_t>(elapsed);
+}
+
 void sleep_ms(std::uint32_t duration) noexcept {
     std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 }
+
+void set_tone(std::uint16_t) noexcept {}
+
+void stop_tone() noexcept {}
 
 void present(const Framebuffer::Storage& pixels) noexcept {
     std::string output;

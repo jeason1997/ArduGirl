@@ -39,6 +39,12 @@ int main() {
     ardugirl::platform::Config config;
     config.headless = true;
     assert(ardugirl::platform::init(config));
+    const auto before_us = ardugirl::platform::micros();
+    ardugirl::platform::sleep_ms(2);
+    assert(ardugirl::platform::micros() > before_us);
+    // 无音频设备的 CI 环境也必须安全接受音频控制调用。
+    ardugirl::platform::set_tone(440);
+    ardugirl::platform::stop_tone();
 
     push_key(SDL_KEYDOWN, SDLK_LEFT);
     push_key(SDL_KEYDOWN, SDLK_w);

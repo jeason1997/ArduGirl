@@ -5,6 +5,7 @@ SMOKE_TARGET := $(BUILD_DIR)/terminal-smoke
 TEST_TARGET := $(BUILD_DIR)/framebuffer-test
 SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
 STORAGE_TEST_TARGET := $(BUILD_DIR)/storage-test
+COMPAT_TEST_TARGET := $(BUILD_DIR)/compat-test
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -44,6 +45,12 @@ SDL_TEST_OBJECTS := \
 STORAGE_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/storage_test.o \
 	$(BUILD_DIR)/platform/linux_common/storage.o
+COMPAT_TEST_OBJECTS := \
+	$(BUILD_DIR)/tests/compat_test.o \
+	$(BUILD_DIR)/src/core/framebuffer.o \
+	$(BUILD_DIR)/src/arduboy2/Arduboy2.o \
+	$(BUILD_DIR)/src/arduboy2/Sprites.o \
+	$(BUILD_DIR)/src/compat/EEPROM.o
 
 .PHONY: all test test-terminal smoke clean check-upstream check-sdl
 
@@ -87,10 +94,17 @@ $(STORAGE_TEST_TARGET): $(STORAGE_TEST_OBJECTS)
 	@mkdir -p $(@D)
 	$(CXX) $(STORAGE_TEST_OBJECTS) $(LDFLAGS) -o $@
 
-test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(PORT_TEST_TARGETS)
+$(COMPAT_TEST_TARGET): $(COMPAT_TEST_OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(COMPAT_TEST_OBJECTS) $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
+
+test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(COMPAT_TEST_TARGET) $(PORT_TEST_TARGETS)
 	$(TEST_TARGET)
 	$(SDL_TEST_TARGET)
 	$(STORAGE_TEST_TARGET)
+	$(COMPAT_TEST_TARGET)
 
 test-terminal: $(PORT_TERMINAL_TEST_TARGETS)
 

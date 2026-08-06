@@ -56,3 +56,46 @@ void Sprites::drawPlusMask(std::int16_t x, std::int16_t y,
     }
 }
 
+void Sprites::drawExternalMask(std::int16_t x, std::int16_t y,
+                               const std::uint8_t* bitmap,
+                               const std::uint8_t* mask,
+                               std::uint8_t frame,
+                               std::uint8_t mask_frame) noexcept {
+    if (bitmap == nullptr || mask == nullptr) return;
+    const auto width = bitmap[0];
+    const auto height = bitmap[1];
+    const auto frame_size = static_cast<std::size_t>(width) * ((height + 7u) / 8u);
+    const auto* image_data = bitmap + 2u + frame_size * frame;
+    const auto* mask_data = mask + frame_size * mask_frame;
+    auto& screen = ardugirl::framebuffer();
+    for (std::uint8_t row = 0; row < height; ++row)
+        for (std::uint8_t column = 0; column < width; ++column)
+            if (sprite_bit(mask_data, width, column, row))
+                screen.set_pixel(x + column, y + row, sprite_bit(image_data, width, column, row));
+}
+
+void Sprites::drawSelfMasked(std::int16_t x, std::int16_t y,
+                             const std::uint8_t* bitmap,
+                             std::uint8_t frame) noexcept {
+    if (bitmap == nullptr) return;
+    const auto width = bitmap[0]; const auto height = bitmap[1];
+    const auto size = static_cast<std::size_t>(width) * ((height + 7u) / 8u);
+    const auto* data = bitmap + 2u + size * frame;
+    auto& screen = ardugirl::framebuffer();
+    for (std::uint8_t row = 0; row < height; ++row)
+        for (std::uint8_t column = 0; column < width; ++column)
+            if (sprite_bit(data, width, column, row)) screen.set_pixel(x + column, y + row, true);
+}
+
+void Sprites::drawErase(std::int16_t x, std::int16_t y,
+                        const std::uint8_t* bitmap,
+                        std::uint8_t frame) noexcept {
+    if (bitmap == nullptr) return;
+    const auto width = bitmap[0]; const auto height = bitmap[1];
+    const auto size = static_cast<std::size_t>(width) * ((height + 7u) / 8u);
+    const auto* data = bitmap + 2u + size * frame;
+    auto& screen = ardugirl::framebuffer();
+    for (std::uint8_t row = 0; row < height; ++row)
+        for (std::uint8_t column = 0; column < width; ++column)
+            if (sprite_bit(data, width, column, row)) screen.set_pixel(x + column, y + row, false);
+}

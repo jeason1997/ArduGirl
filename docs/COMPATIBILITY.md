@@ -15,13 +15,13 @@
 ### Arduboy2
 
 - framebuffer、clear、display、getBuffer
-- 像素和基本图元
-- bitmap、compressed bitmap
-- Sprites/SpritesB
+- 像素、直线、矩形、圆、三角形和圆角矩形图元
+- 页面布局 bitmap、XY bitmap、compressed bitmap
+- Sprites/SpritesB 的 overwrite、plus-mask、external-mask、self-mask 和 erase 模式
 - frame rate、frameCount、everyXFrames
 - pollButtons 和全部按钮查询
-- 基本文本输出
-- audio enabled 状态，以及 `initAudio`、`playTone`、`playScore`、`playWave` 和对应停止接口；Linux 音频后端接入前由 Arduboy2 兼容核心统一提供无声、非阻塞实现，游戏移植目录不得各自实现缺失的通用音频语义
+- 支持缩放、换行、光标查询、字符串和整数的基本文本输出
+- audio enabled 状态、`initAudio`、定时 `playTone` 和停止接口；SDL2 后端输出单声道方波，终端后端保持静音。`playScore`、`playWave` 和 Playtune 目前只保留非阻塞接口，尚未实现乐谱与波表解析
 
 ### Arduino
 
@@ -71,6 +71,8 @@ EEPROM.put(addr, someNativeStruct);   // padding 和字段宽度变化
 5. 由游戏样本驱动的其他库
 
 ATMlib、ArduboyPlaytune 和直接依赖 AVR timer/ISR 的库不进入第一阶段。
+
+当前 `micros()` 使用平台单调高精度计数器并按无符号 32 位自然回绕；不再由毫秒值乘 1000 模拟。Linux SDL2 音频只承诺单声道方波，不承诺模拟 AVR 定时器寄存器。
 
 ## 测试策略
 

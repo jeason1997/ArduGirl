@@ -81,9 +81,12 @@ inline USBDeviceClass USBDevice;
 
 std::uint32_t millis() noexcept;
 std::uint32_t micros() noexcept;
+void delay(unsigned long duration) noexcept;
 void randomSeed(unsigned long seed) noexcept;
 long random(long maximum) noexcept;
 long random(long minimum, long maximum) noexcept;
+long map(long value, long from_low, long from_high,
+         long to_low, long to_high) noexcept;
 
 // 使用函数而不是 Arduino 常见的宏，避免宏展开破坏 C++ 标准库中的 std::min/max。
 template<typename Left, typename Right>

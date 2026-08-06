@@ -44,7 +44,7 @@ SDL2 是当前默认 Linux 后端，以覆盖更多现有 Linux 发行版、开�
 
 ### M4：音频
 
-第一版允许静音 stub，但 API 不能阻塞。下一阶段以 SDL2 audio callback/queue 实现单声道方波，先覆盖 Arduboy2Beep/ArduboyTones 的需求。音频回调不得访问或修改游戏对象。
+SDL2 audio callback 以 48 kHz、16 位单声道输出方波。游戏线程只通过加锁后的频率状态启动或停止声音，音频回调不得访问或修改游戏对象。无音频设备时初始化继续成功并静音降级。当前覆盖定时 tone 和 Arduboy2Beep；乐谱、波表、ArduboyTones、Playtune 与 ATMlib 仍需单独实现格式和调度语义。
 
 ## 命令行接口
 
