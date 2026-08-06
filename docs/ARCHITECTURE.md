@@ -113,6 +113,8 @@ Runtime 顺序：初始化平台 → `setup()` 一次 → 事件泵 → `loop()`
 
 根目录 Makefile 只负责选择平台 Makefile 和转发用户目标，不声明编译器参数、平台源码、公共测试对象或游戏构建细节。Linux 构建实现位于 `platform/linux/Makefile`，PY32 构建实现位于 `platform/py32/Makefile`。平台 Makefile 提供公共契约和扩展挂载点；每个独立游戏或同仓库游戏集合在自己的 `port.mk` 中声明源码、目标、上游检查和测试，并通过 `PORT_BUILD_TARGETS`、`PORT_TEST_TARGETS`、`PORT_TERMINAL_TEST_TARGETS` 与 `PORT_DEPENDS` 接入对应平台流程。
 
+单游戏选择必须发生在加载移植模块之前。指定 `GAME=<game-id>` 时，平台 Makefile 先从 `games/<game-id>/port.mk` 或 `games/*/<game-id>/game.toml` 定位直属游戏或集合，再只加载所属 `port.mk`；集合模块也只展开选中的游戏。不得先加载全部 `games/*/port.mk` 和生成的 `.d` 文件再过滤目标，因为 GNU Make 在判断目标是否最新之前就会解析这些文件，在 WSL 挂载的 Windows 文件系统上会形成显著启动延迟。未指定 `GAME` 的 `all`、`test` 等聚合目标仍按完整模块集合工作。
+
 `make`、具体游戏目标和 `make test` 默认使用 SDL2。终端后端通过带 `-terminal` 后缀的目标显式选择。当平台数量和工具链配置增长后，再评估是否加入下列 CMake targets：
 
 - `ardugirl_core`

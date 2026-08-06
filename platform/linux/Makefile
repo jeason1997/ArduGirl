@@ -33,7 +33,17 @@ PORT_BUILD_TARGETS :=
 PORT_TEST_TARGETS :=
 PORT_TERMINAL_TEST_TARGETS :=
 PORT_DEPENDS :=
+ifneq ($(strip $(GAME)),)
+DIRECT_GAME_MAKEFILE := $(wildcard games/$(GAME)/port.mk)
+COLLECTION_GAME_MANIFESTS := $(wildcard games/*/$(GAME)/game.toml)
+COLLECTION_GAME_MAKEFILES := $(foreach manifest,$(COLLECTION_GAME_MANIFESTS),$(dir $(patsubst %/,%,$(dir $(manifest))))port.mk)
+GAME_MAKEFILES := $(sort $(DIRECT_GAME_MAKEFILE) $(COLLECTION_GAME_MAKEFILES))
+ifeq ($(strip $(GAME_MAKEFILES)),)
+$(error 未找到 Linux 游戏：$(GAME))
+endif
+else
 GAME_MAKEFILES := $(wildcard games/*/port.mk)
+endif
 include $(GAME_MAKEFILES)
 
 ifneq ($(strip $(GAME)),)

@@ -1,4 +1,7 @@
 ARDUBOYWORKS_MANIFESTS := $(wildcard games/arduboyworks/*/game.toml)
+ifneq ($(strip $(GAME)),)
+ARDUBOYWORKS_MANIFESTS := $(filter %/$(GAME)/game.toml,$(ARDUBOYWORKS_MANIFESTS))
+endif
 ARDUBOYWORKS_GAMES := $(notdir $(patsubst %/,%,$(dir $(ARDUBOYWORKS_MANIFESTS))))
 ARDUBOYWORKS_TARGETS := $(ARDUBOYWORKS_GAMES:%=$(BUILD_DIR)/arduboyworks-%-sdl)
 ARDUBOYWORKS_TITLE_GAMES := $(notdir $(patsubst %/,%,$(dir $(shell grep -l 'static void drawText(const char \*p, int lines);' third_party/ArduboyWorks/*/title.cpp 2>/dev/null))))
