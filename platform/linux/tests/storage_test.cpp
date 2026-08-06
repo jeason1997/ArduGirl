@@ -1,4 +1,4 @@
-#include "../platform/linux/storage.hpp"
+#include "storage.hpp"
 
 #include <cassert>
 #include <cstdint>

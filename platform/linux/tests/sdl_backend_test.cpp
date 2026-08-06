@@ -1,5 +1,5 @@
 #include "ardugirl/platform.hpp"
-#include "../platform/linux/render.hpp"
+#include "render.hpp"
 
 #include <SDL.h>
 

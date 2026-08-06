@@ -4,13 +4,15 @@ VENDOR_DIR := platform/py32/vendor
 GAME_PREPARER := tools/prepare_game.py
 
 ifeq ($(strip $(GAME)),)
+ifneq ($(filter test,$(MAKECMDGOALS)),test)
 $(error 必须通过 GAME=<game-id> 选择游戏)
 endif
-
+else
 ARDUGIRL_GAME_ENTRY := $(shell python $(GAME_PREPARER) $(GAME) --field entry_cpp)
 ARDUGIRL_GAME_INCLUDE := $(shell python $(GAME_PREPARER) $(GAME) --field include_dir)
 ARDUGIRL_GAME_GENERATED := $(shell python $(GAME_PREPARER) $(GAME) --field generated_entry)
 ARDUGIRL_GAME_MANIFEST := $(shell python $(GAME_PREPARER) $(GAME) --field manifest)
+endif
 
 ifeq ($(OS),Windows_NT)
 TOOLCHAIN_DIR ?= C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin
@@ -34,7 +36,7 @@ endif
 CPU_FLAGS := -mcpu=cortex-m0plus -mthumb
 DEFINES := -DPY32F002Ax5 -DARDUINO=10819
 INCLUDES := -Iinclude -I$(BUILD_DIR)/generated -I$(ARDUGIRL_GAME_INCLUDE) \
-	-Iplatform/py32 -isystem $(VENDOR_DIR)/Drivers/CMSIS/Include \
+	-Iplatform/py32/include -isystem $(VENDOR_DIR)/Drivers/CMSIS/Include \
 	-isystem $(VENDOR_DIR)/Drivers/CMSIS/Device/PY32F0xx/Include \
 	-isystem $(VENDOR_DIR)/Drivers/PY32F0xx_HAL_Driver/Inc
 CXXFLAGS := $(CPU_FLAGS) -std=c++17 -Os -g3 -ffunction-sections -fdata-sections \
@@ -53,8 +55,8 @@ OPENOCD_TARGET := $(VENDOR_DIR)/Core/OpenOCD/py32f002a_32k.cfg
 CPP_SOURCES := src/core/framebuffer.cpp src/compat/ATMlib.cpp \
 	src/compat/ArduboyPlaytune.cpp src/compat/stdio.cpp \
 	src/arduboy2/Arduboy2.cpp src/arduboy2/Sprites.cpp \
-	src/compat/EEPROM.cpp platform/py32/runtime.cpp platform/py32/platform.cpp \
-	platform/py32/display_st7789.cpp $(ARDUGIRL_GAME_ENTRY)
+	src/compat/EEPROM.cpp platform/py32/src/runtime.cpp platform/py32/src/platform.cpp \
+	platform/py32/src/display_st7789.cpp $(ARDUGIRL_GAME_ENTRY)
 C_SOURCES := $(VENDOR_DIR)/Core/System/system_py32f0xx.c \
 	$(VENDOR_DIR)/Drivers/PY32F0xx_HAL_Driver/Src/py32f0xx_ll_utils.c
 CPP_OBJECTS := $(CPP_SOURCES:%.cpp=$(OBJECT_DIR)/%.o)
@@ -63,9 +65,12 @@ STARTUP_OBJECT := $(OBJECT_DIR)/$(VENDOR_DIR)/Core/Startup/startup_py32f002xx.o
 OBJECTS := $(CPP_OBJECTS) $(C_OBJECTS) $(STARTUP_OBJECT)
 DEPS := $(OBJECTS:.o=.d)
 
-.PHONY: all flash openocd clean
+.PHONY: all test flash openocd clean
 
 all: $(TARGET).elf $(TARGET).hex $(TARGET).bin
+
+test:
+	python platform/py32/tools/test_games.py
 
 $(ARDUGIRL_GAME_GENERATED): $(ARDUGIRL_GAME_MANIFEST) $(GAME_PREPARER)
 	python $(GAME_PREPARER) $(GAME) --prepare

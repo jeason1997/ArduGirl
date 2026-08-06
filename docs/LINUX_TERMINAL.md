@@ -24,7 +24,7 @@
 
 ## 平台复用
 
-终端 backend 只负责 termios/ANSI 输入输出、framebuffer 字符编码、差分刷新和退出事件。Linux 平台的终端、SDL2 和共享存储实现统一放在 `platform/linux/`，共享代码由两个前端复用。
+终端 backend 只负责 termios/ANSI 输入输出、framebuffer 字符编码、差分刷新和退出事件。Linux 平台的终端、SDL2 和共享存储实现统一放在 `platform/linux/src/`，平台私有头文件与测试分别位于 `include/` 和 `tests/`，共享代码由两个前端复用。
 
 终端前端第一阶段不提供音频；可以使用 terminal bell 作为显式调试选项，但不能作为 ArduboyTones 的兼容实现。
 

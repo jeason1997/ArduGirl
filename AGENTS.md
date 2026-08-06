@@ -20,6 +20,7 @@ game -> compat/arduboy2 -> core/platform API -> platform backend
 - `src/arduboy2/` 不得包含 SDL 或 MCU HAL。
 - `src/compat/` 只实现 Arduino/AVR 源码兼容，不驱动硬件。
 - `platform/*` 不得包含游戏逻辑，也不得修改 Arduboy framebuffer 的格式。
+- 平台相关实现代码、专用测试、详细构建规则和辅助脚本只能放在对应的 `platform/<platform>/` 目录下，不得散放到根目录、`tools/`、`tests/`、`src/` 或游戏目录；根构建文件只能保留通用的平台选择与目标转发。
 - SDL 类型不能出现在公共平台接口中。
 - 平台差异优先在后端解决；只有真实 API 差异才能进入兼容层。
 

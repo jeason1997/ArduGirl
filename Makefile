@@ -3,16 +3,10 @@ PLATFORM_MAKEFILE := platform/$(PLATFORM)/Makefile
 
 .DEFAULT_GOAL := all
 
-.PHONY: all test test-terminal smoke clean py32 flash-py32
+.PHONY: all
 
-all test test-terminal smoke clean:
+all:
 	$(MAKE) -f $(PLATFORM_MAKEFILE) $@
 
-py32:
-	$(MAKE) -f platform/py32/Makefile GAME=$(PY32_GAME)
-
-flash-py32:
-	$(MAKE) -f platform/py32/Makefile GAME=$(PY32_GAME) flash
-
-%:
+.DEFAULT:
 	$(MAKE) -f $(PLATFORM_MAKEFILE) $@

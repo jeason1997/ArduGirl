@@ -12,7 +12,7 @@ STDIO_TEST_TARGET := $(BUILD_DIR)/stdio-test
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
-CPPFLAGS := -Iinclude -I$(BUILD_DIR)/generated
+CPPFLAGS := -Iinclude -I$(BUILD_DIR)/generated -Iplatform/linux/include
 CXXFLAGS ?= -O2
 CXXFLAGS += -std=c++17 -Wall -Wextra -Wpedantic
 LDFLAGS ?=
@@ -24,10 +24,10 @@ RUNTIME_SOURCES := \
 	src/compat/ArduboyPlaytune.cpp \
 	src/runtime/main.cpp
 
-LINUX_STORAGE_SOURCE := platform/linux/storage.cpp
-LINUX_CRASH_SOURCE := platform/linux/crash.cpp
-SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/sdl.cpp platform/linux/render.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
-TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/terminal.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
+LINUX_STORAGE_SOURCE := platform/linux/src/storage.cpp
+LINUX_CRASH_SOURCE := platform/linux/src/crash.cpp
+SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/src/sdl.cpp platform/linux/src/render.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
+TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/src/terminal.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
 
 PORT_BUILD_TARGETS :=
 PORT_TEST_TARGETS :=
@@ -37,22 +37,22 @@ GAME_MAKEFILES := $(wildcard games/*/port.mk)
 include $(GAME_MAKEFILES)
 SMOKE_SOURCES := \
 	$(TERMINAL_COMMON_SOURCES) \
-	tests/smoke/terminal_game.cpp
+	platform/linux/tests/terminal_game.cpp
 
 SMOKE_OBJECTS := $(SMOKE_SOURCES:%.cpp=$(BUILD_DIR)/smoke/%.o)
 TEST_OBJECTS := \
 	$(BUILD_DIR)/src/core/framebuffer.o \
 	$(BUILD_DIR)/tests/framebuffer_test.o
 SDL_TEST_OBJECTS := \
-	$(BUILD_DIR)/tests/sdl_backend_test.o \
-	$(BUILD_DIR)/platform/linux/sdl.o \
-	$(BUILD_DIR)/platform/linux/crash.o \
-	$(BUILD_DIR)/platform/linux/render.o \
-	$(BUILD_DIR)/platform/linux/storage.o \
+	$(BUILD_DIR)/platform/linux/tests/sdl_backend_test.o \
+	$(BUILD_DIR)/platform/linux/src/sdl.o \
+	$(BUILD_DIR)/platform/linux/src/crash.o \
+	$(BUILD_DIR)/platform/linux/src/render.o \
+	$(BUILD_DIR)/platform/linux/src/storage.o \
 	$(BUILD_DIR)/src/core/framebuffer.o
 STORAGE_TEST_OBJECTS := \
-	$(BUILD_DIR)/tests/storage_test.o \
-	$(BUILD_DIR)/platform/linux/storage.o
+	$(BUILD_DIR)/platform/linux/tests/storage_test.o \
+	$(BUILD_DIR)/platform/linux/src/storage.o
 COMPAT_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/compat_test.o \
 	$(BUILD_DIR)/src/core/framebuffer.o \
