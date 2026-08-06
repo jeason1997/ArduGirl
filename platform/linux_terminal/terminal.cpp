@@ -26,6 +26,15 @@ bool plain_output = false;
 const char* game_title = "ArduGirl";
 std::uint8_t current_buttons = 0;
 Clock::time_point buttons_expire;
+Clock::time_point escape_expire;
+
+enum class EscapeState : std::uint8_t {
+    None,
+    Escape,
+    Prefix,
+};
+
+EscapeState escape_state = EscapeState::None;
 
 constexpr std::uint8_t kLeft = 0x01;
 constexpr std::uint8_t kRight = 0x02;
@@ -79,6 +88,54 @@ std::uint8_t map_key(char key) noexcept {
     }
 }
 
+void hold_button(std::uint8_t button) noexcept {
+    if (button == 0) {
+        return;
+    }
+    current_buttons = button;
+    // TTY 输入只能报告字节，没有可靠的按键释放事件。短暂保持按键状态
+    // 可以让游戏观察到轻触，同时避免旧输入一直处于按下状态。
+    buttons_expire = Clock::now() + std::chrono::milliseconds(100);
+}
+
+void consume_input(char key) noexcept {
+    if (escape_state == EscapeState::Escape) {
+        // 常见终端使用 ESC [ 作为方向键前缀，部分终端使用 ESC O。
+        if (key == '[' || key == 'O') {
+            escape_state = EscapeState::Prefix;
+            return;
+        }
+        running = false;
+        escape_state = EscapeState::None;
+        return;
+    }
+
+    if (escape_state == EscapeState::Prefix) {
+        switch (key) {
+        case 'A': hold_button(kUp); break;
+        case 'B': hold_button(kDown); break;
+        case 'C': hold_button(kRight); break;
+        case 'D': hold_button(kLeft); break;
+        default: break;
+        }
+        escape_state = EscapeState::None;
+        return;
+    }
+
+    if (key == 27) {
+        // 单独的 Escape 和方向键共享第一个字节，必须等待一个很短的窗口，
+        // 确认没有 '[' 或 'O' 后才能把它解释为退出。
+        escape_state = EscapeState::Escape;
+        escape_expire = Clock::now() + std::chrono::milliseconds(30);
+        return;
+    }
+    if (key == 'q' || key == 'Q') {
+        running = false;
+        return;
+    }
+    hold_button(map_key(key));
+}
+
 } // 匿名命名空间
 
 bool init(const Config& config) noexcept {
@@ -129,16 +186,11 @@ void shutdown() noexcept {
 bool pump_events() noexcept {
     char key = 0;
     while (read(STDIN_FILENO, &key, 1) == 1) {
-        if (key == 'q' || key == 'Q' || key == 27) {
-            running = false;
-        }
-        const auto mapped = map_key(key);
-        if (mapped != 0) {
-            current_buttons = mapped;
-            // TTY 输入只能报告字节，没有可靠的按键释放事件。短暂保持按键状态
-            // 可以让游戏观察到轻触，同时避免旧输入一直处于按下状态。
-            buttons_expire = Clock::now() + std::chrono::milliseconds(100);
-        }
+        consume_input(key);
+    }
+    if (escape_state == EscapeState::Escape && Clock::now() >= escape_expire) {
+        running = false;
+        escape_state = EscapeState::None;
     }
     if (Clock::now() >= buttons_expire) {
         current_buttons = 0;

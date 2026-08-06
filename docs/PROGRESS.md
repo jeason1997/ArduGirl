@@ -17,10 +17,10 @@
 | Agent 约束 | done | 根目录 `AGENTS.md` |
 | 构建系统 | done | GNU Make；`make`、`run`、`demo`、`test` |
 | framebuffer core | done | 1024 字节页面布局、像素、直线、矩形及单元测试 |
-| Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；待差分刷新和 PTY 测试 |
+| Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；按当前决策暂停效果优化 |
 | 官方 Arduboy2 示例 | partial | 未修改的官方 HelloWorld 已构建运行；当前仅覆盖所需最小 API/字形 |
 | MicroTD | partial | CC0 上游源码未修改；主菜单已构建运行，待完整游玩和持久化验证 |
-| Linux SDL2 backend | deferred | 终端兼容基线稳定后开始 |
+| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调计时和 headless 固定帧测试；EEPROM 文件后端与音频待实现 |
 | Arduboy2 兼容实现 | not started | 等最小 backend/runtime |
 | 游戏源码 | not started | 尚未选择，需先逐个核对许可证 |
 | 音频 | not started | Linux baseline 后实现 |
@@ -43,15 +43,19 @@
 - 确定游戏与 Arduboy2 兼容层使用 C++，未来 MCU 平台边界保持可由 C HAL 实现。
 - 引入未修改的 MicroTD `0c8958f`，补齐字体、图元、Sprites、按钮边沿、EEPROM 内存接口和静音 Beep 接口；终端主菜单已显示，注入 A 键后 framebuffer 发生预期变化。
 - 明确上游版本锁定策略：默认禁止跟踪最新分支，只有用户明确要求时才移动并重新验证固定 SHA。
+- 修复终端方向键：解析 `ESC [ A/B/C/D` 和 `ESC O A/B/C/D`，单独 Escape 延迟判定为退出，并加入回归测试。
+- 新增 SDL2 后端并设为默认构建和测试平台；HelloWorld 与 MicroTD 均可在无显示服务器的 headless 模式执行固定帧测试。
+- SDL2 窗口默认使用 1:1 像素倍率，并保留 `--scale N` 整数倍率覆盖。
+- 保留终端构建、运行和回归测试目标，但按当前决策暂停终端显示效果优化。
 
 ## 下一步
 
 1. 确定 ArduGirl 自身开源许可证。
-2. 为终端渲染器加入行级差分刷新和 pseudo-terminal 测试。
+2. 为 SDL2 后端增加可注入事件的输入测试和 framebuffer golden test。
 3. 为 MicroTD 增加固定输入回放，验证进入地图、建塔和波次流程。
 4. 实现按游戏隔离的 EEPROM 文件持久化。
 5. 添加更完整的 golden test 和 sanitizers。
-6. 终端跑通真实游戏基线后再实现 SDL2。
+6. 在 SDL Linux 基线稳定后实现音频，再评估 MCU 后端。
 
 ## 未决策项
 

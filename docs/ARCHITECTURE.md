@@ -7,7 +7,7 @@ ArduGirl 使用四层结构：
 1. **Game**：原始游戏逻辑、资源、`setup()` 和 `loop()`。
 2. **Compatibility**：Arduboy2、Sprites、Arduino 和有限 AVR 兼容 API。
 3. **Core**：统一 runtime、1024 字节 framebuffer 和平台无关服务。
-4. **Backend**：首先实现 Linux terminal，随后实现 Linux SDL2，未来再实现 PY32/STM32。
+4. **Backend**：默认使用 Linux SDL2，保留 Linux terminal 作为可选后端，未来再实现 PY32/STM32。
 
 只有下层可以被上层依赖。后端通过注册或链接时选择实现平台契约。
 
@@ -53,9 +53,12 @@ enum class Button : std::uint8_t {
 namespace ardugirl::platform {
 
 struct Config {
-    const char* app_id;
-    const char* title;
+    bool plain_output;
+    bool headless;
+    bool fullscreen;
+    bool invert;
     std::uint8_t scale;
+    const char* title;
 };
 
 bool init(const Config&) noexcept;
@@ -97,10 +100,13 @@ Runtime 顺序：初始化平台 → `setup()` 一次 → 事件泵 → `loop()`
 
 当前最小实现使用 GNU Make，生成：
 
+- `build/ardugirl-sdl`
 - `build/ardugirl-terminal`
+- `build/microtd-sdl`
+- `build/microtd-terminal`
 - `build/framebuffer-test`
 
-常用命令为 `make`、`make run`、`make demo` 和 `make test`。当平台数量和工具链配置增长后，再评估是否加入下列 CMake targets：
+`make`、`make run`、`make demo`、`make microtd` 和 `make test` 默认使用 SDL2。终端后端通过带 `-terminal` 后缀的目标显式选择。当平台数量和工具链配置增长后，再评估是否加入下列 CMake targets：
 
 - `ardugirl_core`
 - `ardugirl_arduboy2`

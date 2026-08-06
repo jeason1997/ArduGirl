@@ -17,6 +17,18 @@ bool parse_arguments(int argc, char** argv, ardugirl::platform::Config& config) 
     for (int index = 1; index < argc; ++index) {
         if (std::strcmp(argv[index], "--plain") == 0) {
             config.plain_output = true;
+        } else if (std::strcmp(argv[index], "--headless") == 0) {
+            config.headless = true;
+        } else if (std::strcmp(argv[index], "--fullscreen") == 0) {
+            config.fullscreen = true;
+        } else if (std::strcmp(argv[index], "--invert") == 0) {
+            config.invert = true;
+        } else if (std::strcmp(argv[index], "--scale") == 0 && index + 1 < argc) {
+            const auto scale = std::strtoul(argv[++index], nullptr, 10);
+            if (scale == 0 || scale > 32) {
+                return false;
+            }
+            config.scale = static_cast<std::uint8_t>(scale);
         } else if (std::strcmp(argv[index], "--frames") == 0 && index + 1 < argc) {
             frame_limit = static_cast<std::uint32_t>(std::strtoul(argv[++index], nullptr, 10));
         } else {

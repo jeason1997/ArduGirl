@@ -2,14 +2,14 @@
 
 ## 版本选择
 
-SDL2 后端在纯终端兼容基线完成后实现。图形后端选择 SDL2，以覆盖更多现有 Linux 发行版、开发环境和嵌入式 Linux 系统。平台抽象不暴露 SDL 类型，未来增加 SDL3 backend 时不修改游戏或兼容层。
+SDL2 是当前默认 Linux 后端，以覆盖更多现有 Linux 发行版、开发环境和嵌入式 Linux 系统。平台抽象不暴露 SDL 类型，未来增加 SDL3 backend 时不修改游戏或兼容层。
 
 ## 功能范围
 
 ### M0：窗口与 framebuffer
 
 - 创建标题为游戏名的窗口。
-- 默认逻辑分辨率 128x64，默认 6 倍整数缩放。
+- 默认窗口为 128x64，按 1:1 显示逻辑像素；可通过 `--scale N` 指定整数缩放倍率。
 - 使用最近邻采样，禁止模糊。
 - 默认黑底白像素；允许命令行反色但不改变核心 buffer。
 - 窗口缩放保持宽高比和整数优先的 letterbox。
@@ -48,7 +48,7 @@ SDL2 后端在纯终端兼容基线完成后实现。图形后端选择 SDL2，�
 
 ## 命令行接口
 
-计划支持：
+当前支持：
 
 ```text
 --scale N
@@ -60,7 +60,9 @@ SDL2 后端在纯终端兼容基线完成后实现。图形后端选择 SDL2，�
 --frames N
 ```
 
-`--headless --frames N` 用于 CI 和 golden tests，不初始化可见窗口，执行固定帧后导出 framebuffer/hash。
+`--mute` 和 `--save-dir` 将随音频及 EEPROM 文件后端实现。
+
+`--headless --frames N` 用于 CI smoke test，不初始化可见窗口并执行固定帧。framebuffer/hash 导出将在 golden test 阶段补充。
 
 ## 构建依赖
 

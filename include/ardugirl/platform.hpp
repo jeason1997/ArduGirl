@@ -8,6 +8,10 @@ namespace ardugirl::platform {
 
 struct Config {
     bool plain_output = false;
+    bool headless = false;
+    bool fullscreen = false;
+    bool invert = false;
+    std::uint8_t scale = 1;
     const char* title = "ArduGirl";
 };
 

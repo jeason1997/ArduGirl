@@ -1,0 +1,176 @@
+#include "ardugirl/constants.hpp"
+#include "ardugirl/platform.hpp"
+
+#include <SDL.h>
+
+#include <array>
+#include <cstdio>
+
+namespace ardugirl::platform {
+
+namespace {
+
+SDL_Window* window = nullptr;
+SDL_Renderer* renderer = nullptr;
+SDL_Texture* texture = nullptr;
+std::array<std::uint32_t, kScreenWidth * kScreenHeight> texture_pixels{};
+std::uint64_t start_counter = 0;
+std::uint64_t counter_frequency = 1;
+std::uint8_t current_buttons = 0;
+bool running = true;
+bool headless = false;
+bool invert = false;
+
+constexpr std::uint8_t kLeft = 0x01;
+constexpr std::uint8_t kRight = 0x02;
+constexpr std::uint8_t kUp = 0x04;
+constexpr std::uint8_t kDown = 0x08;
+constexpr std::uint8_t kA = 0x10;
+constexpr std::uint8_t kB = 0x20;
+
+std::uint8_t map_key(SDL_Keycode key) noexcept {
+    switch (key) {
+    case SDLK_LEFT: case SDLK_a: return kLeft;
+    case SDLK_RIGHT: case SDLK_d: return kRight;
+    case SDLK_UP: case SDLK_w: return kUp;
+    case SDLK_DOWN: case SDLK_s: return kDown;
+    case SDLK_z: case SDLK_j: return kA;
+    case SDLK_x: case SDLK_k: return kB;
+    default: return 0;
+    }
+}
+
+bool framebuffer_pixel(const Framebuffer::Storage& pixels,
+                       std::size_t x, std::size_t y) noexcept {
+    const auto index = x + (y / 8u) * kScreenWidth;
+    return (pixels[index] & static_cast<std::uint8_t>(1u << (y & 7u))) != 0;
+}
+
+void release_resources() noexcept {
+    if (texture != nullptr) {
+        SDL_DestroyTexture(texture);
+        texture = nullptr;
+    }
+    if (renderer != nullptr) {
+        SDL_DestroyRenderer(renderer);
+        renderer = nullptr;
+    }
+    if (window != nullptr) {
+        SDL_DestroyWindow(window);
+        window = nullptr;
+    }
+}
+
+} // 匿名命名空间
+
+bool init(const Config& config) noexcept {
+    running = true;
+    current_buttons = 0;
+    headless = config.headless;
+    invert = config.invert;
+
+    // 无窗口测试仍初始化 SDL 的计时与事件子系统，但不要求显示服务器。
+    const auto subsystems = static_cast<Uint32>(SDL_INIT_TIMER | SDL_INIT_EVENTS |
+                                                (headless ? 0 : SDL_INIT_VIDEO));
+    if (SDL_Init(subsystems) != 0) {
+        std::fprintf(stderr, "SDL 初始化失败：%s\n", SDL_GetError());
+        return false;
+    }
+
+    counter_frequency = SDL_GetPerformanceFrequency();
+    start_counter = SDL_GetPerformanceCounter();
+    if (headless) {
+        return true;
+    }
+
+    const auto scale = config.scale == 0 ? 1 : config.scale;
+    const auto flags = static_cast<Uint32>(SDL_WINDOW_RESIZABLE |
+        (config.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
+    window = SDL_CreateWindow(config.title, SDL_WINDOWPOS_CENTERED,
+                              SDL_WINDOWPOS_CENTERED,
+                              kScreenWidth * scale, kScreenHeight * scale, flags);
+    if (window == nullptr) {
+        std::fprintf(stderr, "SDL 窗口创建失败：%s\n", SDL_GetError());
+        shutdown();
+        return false;
+    }
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
+                                               SDL_RENDERER_PRESENTVSYNC);
+    if (renderer == nullptr) {
+        // 软件渲染可覆盖虚拟机、远程桌面和缺少 GPU 驱动的开发环境。
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+    }
+    if (renderer == nullptr || SDL_RenderSetLogicalSize(renderer, kScreenWidth,
+                                                        kScreenHeight) != 0) {
+        std::fprintf(stderr, "SDL 渲染器创建失败：%s\n", SDL_GetError());
+        shutdown();
+        return false;
+    }
+    SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+                                SDL_TEXTUREACCESS_STREAMING,
+                                kScreenWidth, kScreenHeight);
+    if (texture == nullptr) {
+        std::fprintf(stderr, "SDL 纹理创建失败：%s\n", SDL_GetError());
+        shutdown();
+        return false;
+    }
+    return true;
+}
+
+void shutdown() noexcept {
+    release_resources();
+    SDL_Quit();
+}
+
+bool pump_events() noexcept {
+    SDL_Event event{};
+    while (SDL_PollEvent(&event) != 0) {
+        if (event.type == SDL_QUIT) {
+            running = false;
+        } else if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
+            if (event.key.keysym.sym == SDLK_ESCAPE) {
+                running = false;
+            } else {
+                current_buttons |= map_key(event.key.keysym.sym);
+            }
+        } else if (event.type == SDL_KEYUP) {
+            current_buttons &= static_cast<std::uint8_t>(~map_key(event.key.keysym.sym));
+        }
+    }
+    return running;
+}
+
+std::uint8_t buttons() noexcept {
+    return current_buttons;
+}
+
+std::uint32_t millis() noexcept {
+    const auto elapsed = SDL_GetPerformanceCounter() - start_counter;
+    return static_cast<std::uint32_t>((elapsed * 1000u) / counter_frequency);
+}
+
+void sleep_ms(std::uint32_t duration) noexcept {
+    SDL_Delay(duration);
+}
+
+void present(const Framebuffer::Storage& pixels) noexcept {
+    if (headless || texture == nullptr) {
+        return;
+    }
+    for (std::size_t y = 0; y < kScreenHeight; ++y) {
+        for (std::size_t x = 0; x < kScreenWidth; ++x) {
+            const bool lit = framebuffer_pixel(pixels, x, y) != invert;
+            texture_pixels[x + y * kScreenWidth] = lit ? 0xFFFFFFFFu : 0xFF000000u;
+        }
+    }
+    SDL_UpdateTexture(texture, nullptr, texture_pixels.data(),
+                      kScreenWidth * static_cast<int>(sizeof(std::uint32_t)));
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+    SDL_RenderPresent(renderer);
+}
+
+} // 命名空间 ardugirl::platform
