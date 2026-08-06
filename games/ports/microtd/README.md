@@ -1,12 +1,26 @@
 # MicroTD
 
+MicroTD 是一款为 Arduboy 制作的微型塔防游戏。玩家选择地图、布置防御塔，并抵挡一波波来袭的敌人；它用 128x64 单色画面呈现地图、单位和状态信息。
+
+## 游戏截图
+
+| 地图选择 | 关卡地图 |
+|---|---|
+| ![MicroTD 地图选择画面](assets/screenshot.png) | ![MicroTD 关卡地图](assets/game-map.png) |
+| 建塔菜单 | 敌人波次 |
+| ![MicroTD 建塔菜单](assets/tower-menu.png) | ![MicroTD 敌人波次](assets/wave.png) |
+
+以上截图均由当前 ArduGirl 终端前端实际运行后，从 128x64 framebuffer 原始画面生成，未进行缩放或插值。
+
+## 移植状态
+
 - 上游：https://gitlab.com/drummyfish/Arduboy_TD
 - 固定 revision：`0c8958fdcf57060c1380b3ca72082ca45b7a2bb5`
 - 许可证：CC0-1.0
 - 上游修改：无
 - 当前状态：主菜单已在终端显示并可接收按键；声音静音，EEPROM 尚未跨进程保存
 
-运行目标：
+## 运行
 
 ```bash
 make microtd
