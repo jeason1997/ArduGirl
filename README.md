@@ -30,6 +30,8 @@ make demo
 
 SDL 窗口默认按 1:1 显示 128x64 单色画面，可通过 `--scale N` 指定最近邻整数缩放倍率。方向键或 `WASD` 控制方向，`J/Z` 为 A 键，`K/X` 为 B 键，按 Escape 退出。无显示服务器时可用 `--headless --frames N` 执行固定帧测试。
 
+EEPROM 默认保存在 XDG data 目录的 `ardugirl/<game-id>/eeprom.bin`。测试或便携运行可用 `--save-dir PATH` 指定存档根目录，各游戏仍会使用独立子目录。
+
 运行首个社区游戏 MicroTD：
 
 ```bash

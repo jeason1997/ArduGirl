@@ -59,6 +59,8 @@ struct Config {
     bool invert;
     std::uint8_t scale;
     const char* title;
+    const char* game_id;
+    const char* save_dir;
 };
 
 bool init(const Config&) noexcept;

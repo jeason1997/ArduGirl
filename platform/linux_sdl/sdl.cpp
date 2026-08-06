@@ -1,6 +1,7 @@
 #include "ardugirl/constants.hpp"
 #include "ardugirl/platform.hpp"
 #include "render.hpp"
+#include "../linux_common/storage.hpp"
 
 #include <SDL.h>
 
@@ -71,6 +72,10 @@ bool init(const Config& config) noexcept {
         std::fprintf(stderr, "SDL 初始化失败：%s\n", SDL_GetError());
         return false;
     }
+    if (!linux_storage::init(config.game_id, config.save_dir)) {
+        SDL_Quit();
+        return false;
+    }
 
     counter_frequency = SDL_GetPerformanceFrequency();
     start_counter = SDL_GetPerformanceCounter();
@@ -116,6 +121,7 @@ bool init(const Config& config) noexcept {
 
 void shutdown() noexcept {
     release_resources();
+    linux_storage::shutdown();
     SDL_Quit();
 }
 
@@ -161,6 +167,16 @@ void present(const Framebuffer::Storage& pixels) noexcept {
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
+}
+
+bool storage_read(std::uint16_t offset, void* destination,
+                  std::uint16_t size) noexcept {
+    return linux_storage::read(offset, destination, size);
+}
+
+bool storage_write(std::uint16_t offset, const void* source,
+                   std::uint16_t size) noexcept {
+    return linux_storage::write(offset, source, size);
 }
 
 } // 命名空间 ardugirl::platform

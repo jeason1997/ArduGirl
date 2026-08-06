@@ -3,11 +3,13 @@
 
 #include <cassert>
 #include <cstdint>
+#include <cstring>
 
 namespace {
 
 std::uint8_t replay_buttons = 0;
 std::uint32_t presented_frames = 0;
+std::uint8_t replay_storage[1024]{};
 
 } // 匿名命名空间
 
@@ -26,6 +28,28 @@ std::uint8_t buttons() noexcept {
 }
 
 } // 命名空间 ardugirl
+
+namespace ardugirl::platform {
+
+bool storage_read(std::uint16_t offset, void* destination,
+                  std::uint16_t size) noexcept {
+    if (static_cast<std::size_t>(offset) + size > sizeof(replay_storage)) {
+        return false;
+    }
+    std::memcpy(destination, replay_storage + offset, size);
+    return true;
+}
+
+bool storage_write(std::uint16_t offset, const void* source,
+                   std::uint16_t size) noexcept {
+    if (static_cast<std::size_t>(offset) + size > sizeof(replay_storage)) {
+        return false;
+    }
+    std::memcpy(replay_storage + offset, source, size);
+    return true;
+}
+
+} // 命名空间 ardugirl::platform
 
 // 测试直接编译未修改的移植入口，以便检查真实游戏状态而非复制状态机。
 #include "../games/ports/microtd/entry.cpp"

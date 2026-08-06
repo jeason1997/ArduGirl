@@ -3,4 +3,8 @@ const char* ardugirl_game_title() noexcept {
     return "Arduboy2 official HelloWorld";
 }
 
+const char* ardugirl_game_id() noexcept {
+    return "arduboy2-hello";
+}
+
 #include "../../../third_party/Arduboy2/examples/HelloWorld/HelloWorld.ino"

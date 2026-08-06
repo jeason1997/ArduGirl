@@ -6,6 +6,7 @@ SMOKE_TARGET := $(BUILD_DIR)/terminal-smoke
 TEST_TARGET := $(BUILD_DIR)/framebuffer-test
 SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
 MICROTD_REPLAY_TEST_TARGET := $(BUILD_DIR)/microtd-replay-test
+STORAGE_TEST_TARGET := $(BUILD_DIR)/storage-test
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -18,8 +19,9 @@ RUNTIME_SOURCES := \
 	src/core/framebuffer.cpp \
 	src/runtime/main.cpp
 
-SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_sdl/sdl.cpp platform/linux_sdl/render.cpp
-TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_terminal/terminal.cpp
+LINUX_STORAGE_SOURCE := platform/linux_common/storage.cpp
+SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_sdl/sdl.cpp platform/linux_sdl/render.cpp $(LINUX_STORAGE_SOURCE)
+TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_terminal/terminal.cpp $(LINUX_STORAGE_SOURCE)
 
 ARDUBOY_SOURCES := \
 	$(SDL_COMMON_SOURCES) \
@@ -28,8 +30,9 @@ ARDUBOY_SOURCES := \
 	src/arduboy2/Sprites.cpp \
 	games/examples/arduboy2_hello/entry.cpp
 
-TERMINAL_ARDUBOY_SOURCES := $(filter-out platform/linux_sdl/render.cpp,\
+TERMINAL_ARDUBOY_SOURCES := $(filter-out platform/linux_sdl/render.cpp platform/linux_common/storage.cpp,\
 	$(ARDUBOY_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp))
+TERMINAL_ARDUBOY_SOURCES += $(LINUX_STORAGE_SOURCE)
 MICROTD_TARGET := $(BUILD_DIR)/microtd-sdl
 TERMINAL_MICROTD_TARGET := $(BUILD_DIR)/microtd-terminal
 MICROTD_SOURCES := \
@@ -39,8 +42,9 @@ MICROTD_SOURCES := \
 	src/arduboy2/Sprites.cpp \
 	games/ports/microtd/entry.cpp
 
-TERMINAL_MICROTD_SOURCES := $(filter-out platform/linux_sdl/render.cpp,\
+TERMINAL_MICROTD_SOURCES := $(filter-out platform/linux_sdl/render.cpp platform/linux_common/storage.cpp,\
 	$(MICROTD_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp))
+TERMINAL_MICROTD_SOURCES += $(LINUX_STORAGE_SOURCE)
 SMOKE_SOURCES := \
 	$(TERMINAL_COMMON_SOURCES) \
 	tests/smoke/terminal_game.cpp
@@ -58,6 +62,7 @@ SDL_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/sdl_backend_test.o \
 	$(BUILD_DIR)/platform/linux_sdl/sdl.o \
 	$(BUILD_DIR)/platform/linux_sdl/render.o \
+	$(BUILD_DIR)/platform/linux_common/storage.o \
 	$(BUILD_DIR)/src/core/framebuffer.o
 MICROTD_REPLAY_TEST_SOURCES := \
 	tests/microtd_replay_test.cpp \
@@ -66,6 +71,9 @@ MICROTD_REPLAY_TEST_SOURCES := \
 	src/compat/EEPROM.cpp \
 	src/arduboy2/Sprites.cpp
 MICROTD_REPLAY_TEST_OBJECTS := $(MICROTD_REPLAY_TEST_SOURCES:%.cpp=$(BUILD_DIR)/replay/%.o)
+STORAGE_TEST_OBJECTS := \
+	$(BUILD_DIR)/tests/storage_test.o \
+	$(BUILD_DIR)/platform/linux_common/storage.o
 
 .PHONY: all run demo microtd terminal run-terminal microtd-terminal test test-terminal smoke clean check-upstream check-sdl
 
@@ -175,19 +183,28 @@ $(MICROTD_REPLAY_TEST_TARGET): $(MICROTD_REPLAY_TEST_OBJECTS)
 	@mkdir -p $(@D)
 	$(CXX) $(MICROTD_REPLAY_TEST_OBJECTS) $(LDFLAGS) -o $@
 
-test: check-sdl $(TARGET) $(MICROTD_TARGET) $(TEST_TARGET) $(SDL_TEST_TARGET) $(MICROTD_REPLAY_TEST_TARGET)
+$(STORAGE_TEST_TARGET): $(STORAGE_TEST_OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(STORAGE_TEST_OBJECTS) $(LDFLAGS) -o $@
+
+test: check-sdl $(TARGET) $(MICROTD_TARGET) $(TEST_TARGET) $(SDL_TEST_TARGET) $(MICROTD_REPLAY_TEST_TARGET) $(STORAGE_TEST_TARGET)
 	$(TEST_TARGET)
 	$(SDL_TEST_TARGET)
 	$(MICROTD_REPLAY_TEST_TARGET)
-	$(TARGET) --headless --frames 1
-	$(MICROTD_TARGET) --headless --frames 3
+	$(STORAGE_TEST_TARGET)
+	@save_dir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$save_dir"' EXIT; \
+	$(TARGET) --headless --frames 1 --save-dir "$$save_dir"; \
+	$(MICROTD_TARGET) --headless --frames 3 --save-dir "$$save_dir"
 
 test-terminal: $(TERMINAL_TARGET) $(TERMINAL_MICROTD_TARGET)
-	@output="$$($(TERMINAL_TARGET) --frames 1 --plain)"; \
-	printf '%s' "$$output" | grep -q "ArduGirl terminal"
-	@microtd_output="$$($(TERMINAL_MICROTD_TARGET) --frames 1 --plain)"; \
-	printf '%s' "$$microtd_output" | grep -q "ArduGirl terminal | MicroTD"
-	@arrow_lines="$$(printf '\033[A' | $(TERMINAL_MICROTD_TARGET) --frames 3 --plain | wc -l)"; \
+	@save_dir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$save_dir"' EXIT; \
+	output="$$($(TERMINAL_TARGET) --frames 1 --plain --save-dir "$$save_dir")"; \
+	printf '%s' "$$output" | grep -q "ArduGirl terminal"; \
+	microtd_output="$$($(TERMINAL_MICROTD_TARGET) --frames 1 --plain --save-dir "$$save_dir")"; \
+	printf '%s' "$$microtd_output" | grep -q "ArduGirl terminal | MicroTD"; \
+	arrow_lines="$$(printf '\033[A' | $(TERMINAL_MICROTD_TARGET) --frames 3 --plain --save-dir "$$save_dir" | wc -l)"; \
 	test "$$arrow_lines" -ge 70
 
 smoke: $(SMOKE_TARGET)

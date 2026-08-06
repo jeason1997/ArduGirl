@@ -1,5 +1,6 @@
 #include "ardugirl/constants.hpp"
 #include "ardugirl/platform.hpp"
+#include "../linux_common/storage.hpp"
 
 #include <chrono>
 #include <cstdio>
@@ -143,6 +144,9 @@ bool init(const Config& config) noexcept {
     buttons_expire = start_time;
     plain_output = config.plain_output || !isatty(STDOUT_FILENO);
     game_title = config.title;
+    if (!linux_storage::init(config.game_id, config.save_dir)) {
+        return false;
+    }
 
     original_flags = fcntl(STDIN_FILENO, F_GETFL, 0);
     if (original_flags >= 0 &&
@@ -181,6 +185,7 @@ void shutdown() noexcept {
         std::fputs("\x1b[?25h\x1b[0m\n", stdout);
     }
     std::fflush(stdout);
+    linux_storage::shutdown();
 }
 
 bool pump_events() noexcept {
@@ -234,6 +239,16 @@ void present(const Framebuffer::Storage& pixels) noexcept {
     output += " | Q: quit\n";
     std::fwrite(output.data(), 1, output.size(), stdout);
     std::fflush(stdout);
+}
+
+bool storage_read(std::uint16_t offset, void* destination,
+                  std::uint16_t size) noexcept {
+    return linux_storage::read(offset, destination, size);
+}
+
+bool storage_write(std::uint16_t offset, const void* source,
+                   std::uint16_t size) noexcept {
+    return linux_storage::write(offset, source, size);
 }
 
 } // 命名空间 ardugirl::platform

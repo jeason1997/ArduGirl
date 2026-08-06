@@ -20,7 +20,7 @@
 | Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；按当前决策暂停效果优化 |
 | 官方 Arduboy2 示例 | partial | 未修改的官方 HelloWorld 已构建运行；当前仅覆盖所需最小 API/字形 |
 | MicroTD | partial | CC0 子模块源码未修改；固定输入回放已验证进入地图、建塔和启动波次；待持久化和完整游玩验证 |
-| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调计时和 headless 固定帧测试；已增加事件注入与 framebuffer golden test；EEPROM 文件后端与音频待实现 |
+| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调计时、headless、事件注入、framebuffer golden test 和 EEPROM 文件后端；音频待实现 |
 | Arduboy2 兼容实现 | not started | 等最小 backend/runtime |
 | 游戏源码 | not started | 尚未选择，需先逐个核对许可证 |
 | 音频 | not started | Linux baseline 后实现 |
@@ -50,13 +50,13 @@
 - 实际操作 MicroTD 终端前端进入地图、建塔菜单和敌人波次，从 128x64 framebuffer 生成多张未缩放截图，并为 README 补充游戏简介；后续每个移植游戏都必须提供 ArduGirl 实际运行截图。
 - 为 SDL2 后端增加真实事件队列注入回归，覆盖组合按键、释放、自动重复过滤和退出；拆分无 SDL 类型的内部 framebuffer 转换函数，并以棋盘图案正常/反色 golden hash 验证 ARGB8888 输出。
 - 为 MicroTD 增加固定输入回放，验证选择地图、打开建塔菜单、建造防御塔和启动敌人波次；回放发现上游成功建塔路径缺失布尔返回值，现通过生成目录中的独立最小补丁消除未定义行为，子模块保持 clean。
+- 实现 SDL/终端共享的 Linux EEPROM 文件后端：默认使用 XDG data 目录，支持 `--save-dir` 覆盖，按稳定 game-id 隔离，并在退出时通过临时文件替换；回归测试覆盖首次启动、重启保持、游戏隔离、越界和短文件恢复。
 
 ## 下一步
 
 1. 确定 ArduGirl 自身开源许可证。
-2. 实现按游戏隔离的 EEPROM 文件持久化。
-3. 添加更完整的 golden test 和 sanitizers。
-4. 在 SDL Linux 基线稳定后实现音频，再评估 MCU 后端。
+2. 添加更完整的 golden test 和 sanitizers。
+3. 在 SDL Linux 基线稳定后实现音频，再评估 MCU 后端。
 
 ## 未决策项
 

@@ -60,7 +60,7 @@ SDL2 是当前默认 Linux 后端，以覆盖更多现有 Linux 发行版、开�
 --frames N
 ```
 
-`--mute` 和 `--save-dir` 将随音频及 EEPROM 文件后端实现。
+`--save-dir PATH` 已实现，用于覆盖 XDG data 根目录；最终文件仍按 `<game-id>/eeprom.bin` 隔离。`--mute` 将随音频后端实现。
 
 `--headless --frames N` 用于 CI smoke test，不初始化可见窗口并执行固定帧。SDL 后端测试使用内部纯转换函数验证 framebuffer 的正常与反色 ARGB8888 golden hash，不向公共平台接口暴露 SDL 类型。
 
@@ -86,6 +86,7 @@ target_link_libraries(ardugirl_platform_linux_sdl2 PRIVATE SDL2::SDL2)
 - 当前已通过 8x8 棋盘图案的正常与反色 ARGB8888 golden hash 验证页面布局转换。
 - fake clock 验证 30/60 FPS 以及时间回绕。
 - EEPROM 首次启动、重启保持、损坏/短文件恢复。
+- 当前已覆盖首次擦除态、同游戏重启保持、不同游戏隔离、越界拒绝和短文件恢复。
 - headless 模式在无显示服务器的 CI 中运行。
 - ASan/UBSan 下运行至少一个官方示例和三个真实游戏。
 

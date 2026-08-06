@@ -1,30 +1,23 @@
 #include "EEPROM.h"
-
-#include <array>
-
-namespace {
-
-std::array<std::uint8_t, 1024> storage = [] {
-    std::array<std::uint8_t, 1024> data{};
-    data.fill(0xFFu);
-    return data;
-}();
+#include "ardugirl/platform.hpp"
 
 bool valid_address(int address) noexcept {
-    return address >= 0 && address < static_cast<int>(storage.size());
+    return address >= 0 && address < 1024;
 }
-
-} // 匿名命名空间
 
 EEPROMClass EEPROM;
 
 std::uint8_t EEPROMClass::read(int address) const noexcept {
-    return valid_address(address) ? storage[static_cast<std::size_t>(address)] : 0xFFu;
+    std::uint8_t value = 0xFFu;
+    if (valid_address(address)) {
+        ardugirl::platform::storage_read(static_cast<std::uint16_t>(address), &value, 1);
+    }
+    return value;
 }
 
 void EEPROMClass::write(int address, std::uint8_t value) noexcept {
     if (valid_address(address)) {
-        storage[static_cast<std::size_t>(address)] = value;
+        ardugirl::platform::storage_write(static_cast<std::uint16_t>(address), &value, 1);
     }
 }
 
@@ -35,6 +28,5 @@ void EEPROMClass::update(int address, std::uint8_t value) noexcept {
 }
 
 int EEPROMClass::length() const noexcept {
-    return static_cast<int>(storage.size());
+    return 1024;
 }
-

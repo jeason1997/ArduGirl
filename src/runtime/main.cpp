@@ -8,6 +8,7 @@
 void setup();
 void loop();
 const char* ardugirl_game_title() noexcept;
+const char* ardugirl_game_id() noexcept;
 
 namespace {
 
@@ -31,6 +32,8 @@ bool parse_arguments(int argc, char** argv, ardugirl::platform::Config& config) 
             config.scale = static_cast<std::uint8_t>(scale);
         } else if (std::strcmp(argv[index], "--frames") == 0 && index + 1 < argc) {
             frame_limit = static_cast<std::uint32_t>(std::strtoul(argv[++index], nullptr, 10));
+        } else if (std::strcmp(argv[index], "--save-dir") == 0 && index + 1 < argc) {
+            config.save_dir = argv[++index];
         } else {
             return false;
         }
@@ -76,6 +79,7 @@ std::uint8_t buttons() noexcept {
 int main(int argc, char** argv) {
     ardugirl::platform::Config config;
     config.title = ardugirl_game_title();
+    config.game_id = ardugirl_game_id();
     if (!parse_arguments(argc, argv, config) || !ardugirl::platform::init(config)) {
         return 1;
     }

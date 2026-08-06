@@ -3,4 +3,8 @@ const char* ardugirl_game_title() noexcept {
     return "MicroTD";
 }
 
+const char* ardugirl_game_id() noexcept {
+    return "microtd";
+}
+
 #include "microtd_patched.ino"
