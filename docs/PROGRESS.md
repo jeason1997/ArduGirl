@@ -14,6 +14,7 @@
 | Linux SDL 规格 | done | `LINUX_SDL.md`；默认 SDL2 |
 | Linux terminal 规格 | done | `LINUX_TERMINAL.md`；Braille/half/ASCII |
 | 游戏导入规范 | done | `GAME_PORTING.md` |
+| 社区游戏移植清单 | done | `GAME_PORTS.md`；只收录源码可访问的游戏，47 款合并为单表并按综合移植优先级排序 |
 | Agent 约束 | done | 根目录 `AGENTS.md` |
 | 构建系统 | done | GNU Make；`make`、`run`、`demo`、`test` |
 | framebuffer core | done | 1024 字节页面布局、像素、直线、矩形及单元测试 |
@@ -51,12 +52,16 @@
 - 为 SDL2 后端增加真实事件队列注入回归，覆盖组合按键、释放、自动重复过滤和退出；拆分无 SDL 类型的内部 framebuffer 转换函数，并以棋盘图案正常/反色 golden hash 验证 ARGB8888 输出。
 - 为 MicroTD 增加固定输入回放，验证选择地图、打开建塔菜单、建造防御塔和启动敌人波次；回放发现上游成功建塔路径缺失布尔返回值，现通过生成目录中的独立最小补丁消除未定义行为，子模块保持 clean。
 - 实现 SDL/终端共享的 Linux EEPROM 文件后端：默认使用 XDG data 目录，支持 `--save-dir` 覆盖，按稳定 game-id 隔离，并在退出时通过临时文件替换；回归测试覆盖首次启动、重启保持、游戏隔离、越界和短文件恢复。
+- 调研 Arduboy 官网精选、社区热门讨论与社区游戏目录，新增 `GAME_PORTS.md`；已收集热门候选，后续按源码完整性和兼容风险重新分层。
+- 按个人研究和自用场景调整根目录 `AGENTS.md`：游戏候选改为以完整源码可获取为准，不再以许可证或再分发条件作为导入门槛；仍要求固定上游版本、记录作者和来源，并完成构建与冒烟验证。
+- 按新准入规则重整 `GAME_PORTS.md`：删除无源码候选和梯队划分，将 47 款源码可访问游戏合并为一张表，并按热度、验证价值、源码稳定性和预计工作量排序。
 
 ## 下一步
 
 1. 确定 ArduGirl 自身开源许可证。
 2. 添加更完整的 golden test 和 sanitizers。
-3. 在 SDL Linux 基线稳定后实现音频，再评估 MCU 后端。
+3. 按 `GAME_PORTS.md` 优先级引入 Twotris，并完成源码固定、构建、冒烟和截图闭环。
+4. 在 SDL Linux 基线稳定后实现音频，再评估 MCU 后端。
 
 ## 未决策项
 

@@ -49,6 +49,7 @@ make microtd
 - [架构与平台契约](docs/ARCHITECTURE.md)
 - [兼容范围](docs/COMPATIBILITY.md)
 - [游戏源码获取与导入](docs/GAME_PORTING.md)
+- [社区游戏移植清单](docs/GAME_PORTS.md)
 - [固定的上游版本](docs/UPSTREAMS.md)
 - [性能与整数模型](docs/PERFORMANCE.md)
 - [SDL2 前端](docs/LINUX_SDL.md)

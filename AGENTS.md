@@ -39,7 +39,7 @@ game -> compat/arduboy2 -> core/platform API -> platform backend
 - 核心语言基线为 C++17；保持可在无操作系统 MCU 工具链上编译。
 - 所有 ArduGirl 自有源代码注释必须使用中文，包括普通注释、文档注释、TODO、FIXME、测试说明和构建脚本注释；不得新增英文注释。
 - 代码需要详细注释接口契约、位布局、边界条件、平台差异、时间回绕、所有权和非直观优化，不要只逐句复述代码。
-- 第三方上游源码自带的英文注释可以原样保留，以维护许可证和可追溯性；ArduGirl 新增或修改的注释只能使用中文。
+- 第三方上游源码自带的英文注释可以原样保留，以维护上游可追溯性；ArduGirl 新增或修改的注释只能使用中文。
 - 头文件使用 `#pragma once`。
 - 内部命名空间使用 `ardugirl`；兼容 API 必须保持上游名称。
 - 优先 `std::uint8_t`、`std::int16_t`、`std::uint32_t`；只在重载兼容等必要位置使用普通 `int`。
@@ -50,17 +50,17 @@ game -> compat/arduboy2 -> core/platform API -> platform backend
 
 ## 游戏导入规则
 
-- 只导入有明确源码许可证且允许再分发的版本。
-- 每个游戏必须有 `game.toml`，记录上游 URL、固定 commit、许可证、依赖、补丁和兼容状态。
+- 本项目按个人研究和自用场景管理游戏移植；只要能够获取完整、可编译的源码，就可以进入候选和导入流程，不以许可证或再分发条件作为准入门槛。
+- 每个游戏必须有 `game.toml`，记录上游 URL、固定 commit、作者、依赖、补丁和兼容状态。
 - 原始源码通过固定 revision 的 Git 子模块或可验证快照引入，不得直接修改；ArduGirl 适配优先放在兼容层和外部构建入口中。
 - 默认禁止修改游戏和官方示例的上游文件。只有兼容层无法表达真实平台差异时，才能在 `patches/` 中保存可独立应用的最小补丁，并记录原因和上游 issue。
 - 更新上游 revision 时必须先在无补丁模式下构建；已有补丁需要单独验证能否继续应用，不能把补丁内容揉进上游目录。
 - 默认只能执行 `git submodule update --init --recursive`，它会检出主仓库记录的固定 commit。禁止自行执行 `git submodule update --remote`、在子模块内 `git pull`，或把子模块切到浮动分支。
 - 只有用户明确要求“更新到最新版本”或指定 tag/commit/branch 时，才能移动上游 revision。若用户指定 branch，最终仍需把当时解析到的完整 commit SHA 记录进主仓库，不能持续跟踪该 branch。
-- 每次移动上游 revision 都是独立任务：记录旧/新 SHA，重新检查许可证和依赖，确认子模块 clean，运行该游戏构建、测试和兼容审计，并更新 `game.toml`、`docs/UPSTREAMS.md` 与进度文档。
-- 不得把只有 `.hex`/`.arduboy`、没有可再分发源码许可的游戏提交到仓库。
-- 不得静默修改第三方作者或许可证信息。
-- 一次只引入一个游戏，并先通过 license、build、smoke test。
+- 每次移动上游 revision 都是独立任务：记录旧/新 SHA，重新检查源码完整性和依赖，确认子模块 clean，运行该游戏构建、测试和兼容审计，并更新 `game.toml`、`docs/UPSTREAMS.md` 与进度文档。
+- 只有 `.hex`/`.arduboy` 而无法获取完整源码的游戏不属于本项目的源码级移植范围，不得作为移植游戏导入。
+- 不得静默修改第三方作者和上游来源信息。
+- 一次只引入一个游戏，并先通过 source、build、smoke test。
 
 ## 实现顺序
 
@@ -69,7 +69,7 @@ game -> compat/arduboy2 -> core/platform API -> platform backend
 3. framebuffer 基础绘图和官方 HelloWorld 等示例。
 4. `PROGMEM`、Arduino 基础函数、按钮边沿、帧率。
 5. Sprites、Print、EEPROM 文件后端。
-6. 三个许可证清晰的真实游戏形成终端兼容基线。
+6. 三个源码完整、类型不同的真实游戏形成终端兼容基线。
 7. Linux SDL2：窗口、最近邻缩放、输入和音频。
 8. 更多音频和第三方库。
 9. Linux 基线稳定后才开始 PY32。
