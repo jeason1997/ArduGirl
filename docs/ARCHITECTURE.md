@@ -95,7 +95,12 @@ Runtime 顺序：初始化平台 → `setup()` 一次 → 事件泵 → `loop()`
 
 ## 6. 构建目标
 
-预期 CMake target：
+当前最小实现使用 GNU Make，生成：
+
+- `build/ardugirl-terminal`
+- `build/framebuffer-test`
+
+常用命令为 `make`、`make run`、`make demo` 和 `make test`。当平台数量和工具链配置增长后，再评估是否加入下列 CMake targets：
 
 - `ardugirl_core`
 - `ardugirl_arduboy2`
@@ -124,6 +129,14 @@ cmake --build build
 - 时间差使用无符号减法处理 32 位回绕。
 - EEPROM 和游戏存档是字节协议，不直接序列化带 padding 的宿主结构体。
 
-## 8. 后续 MCU 接入条件
+## 8. C++ 游戏层与 C 平台 ABI
+
+Arduboy2 游戏依赖类、方法、重载和 Arduino `Print`，所以游戏与兼容层必须使用 C++ 编译。把整个项目改写为纯 C 会迫使我们修改上游游戏源码，不符合项目目标。
+
+平台边界应保持可由 C 实现：公共结构只使用固定宽度整数、指针和普通字节缓冲区，不在 ABI 中暴露 C++ 类、模板、异常或标准库容器。PY32/STM32 后端可以使用厂商 C HAL，实现 `extern "C"` 平台函数，再由薄 C++ 包装连接到兼容层。
+
+只提供 C 编译器、完全没有 C++ 前端的平台无法直接编译原生 Arduboy 游戏，因此不列为支持目标。
+
+## 9. 后续 MCU 接入条件
 
 PY32/STM32 后端只有在 Linux golden tests 稳定后开始。每个后端仅需提供：初始化、按键、时间、present、音频和存储。显示为 SSD1306 时可以直接发送页面 buffer；RGB565 屏幕在后端转换。

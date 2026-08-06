@@ -10,7 +10,7 @@
 
 ## Phase 1：最小 Linux 可执行程序
 
-- [ ] 顶层 CMake 和 `hello` 测试游戏。
+- [x] 顶层 Makefile 和 `hello` 测试游戏。
 - [ ] 最小 Arduino `setup/loop` runtime。
 - [ ] platform API 和 fake test backend。
 - [ ] Linux terminal 的 Braille/half-block 显示和 raw input。

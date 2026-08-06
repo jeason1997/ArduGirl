@@ -64,6 +64,17 @@ notes = []
 7. 添加启动和固定输入冒烟测试。
 8. 更新游戏 README、兼容矩阵和项目进度。
 
+## 上游零修改策略
+
+优先级从高到低：
+
+1. 在 ArduGirl 的 Arduino/Arduboy2 兼容层补齐通用 API。
+2. 使用外部 `entry.cpp`、include path 和构建选项接入原始 `.ino/.cpp`。
+3. 为额外开源库提供独立兼容实现。
+4. 确实依赖 AVR 寄存器或未定义行为时，维护独立、最小、可重放补丁。
+
+禁止直接进入子模块修改游戏文件。上游目录必须保持 clean，更新流程应只是移动固定 revision，然后重新运行构建、静态审计和测试。
+
 ## 静态扫描项
 
 ```text
@@ -90,4 +101,3 @@ ArduboyPlaytune, ATMlib, ArduboyFX
 ## 上游更新
 
 游戏使用固定 commit，不自动追踪默认分支。更新时重新检查许可证、补丁能否应用、golden tests 和存档兼容性。
-

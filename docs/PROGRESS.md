@@ -15,8 +15,10 @@
 | Linux terminal 规格 | done | `LINUX_TERMINAL.md`；Braille/half/ASCII |
 | 游戏导入规范 | done | `GAME_PORTING.md` |
 | Agent 约束 | done | 根目录 `AGENTS.md` |
-| 构建系统 | not started | 仓库尚无 CMake/code |
-| Linux terminal backend | not started | 下一阶段唯一实现目标 |
+| 构建系统 | done | GNU Make；`make`、`run`、`demo`、`test` |
+| framebuffer core | done | 1024 字节页面布局、像素、直线、矩形及单元测试 |
+| Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；待差分刷新和 PTY 测试 |
+| 官方 Arduboy2 示例 | partial | 未修改的官方 HelloWorld 已构建运行；当前仅覆盖所需最小 API/字形 |
 | Linux SDL2 backend | deferred | 终端兼容基线稳定后开始 |
 | Arduboy2 兼容实现 | not started | 等最小 backend/runtime |
 | 游戏源码 | not started | 尚未选择，需先逐个核对许可证 |
@@ -31,13 +33,20 @@
 - 说明 AVR 16 位 `int` 与 32/64 位宿主 ABI 的兼容策略。
 - 规定第三方游戏的来源、许可证和版本固定方式。
 - 列出 Linux → Arduboy2 → 游戏 → 音频 → PY32 的实施顺序。
+- 在 WSL2 使用 GCC 成功构建并运行 `hello` 终端示例。
+- 实现 128x64 framebuffer 到 64x16 Unicode Braille 的转换。
+- 实现 WASD、A/B、退出键输入和非交互固定帧模式。
+- 添加 framebuffer 位布局、裁剪、矩形和清屏单元测试。
+- 以 Git 子模块固定 Arduboy2 `bc460a2`，未修改的官方 `HelloWorld.ino` 已在终端显示。
+- 自写图形示例已移出 `games/`，仅保留为底层 smoke test。
+- 确定游戏与 Arduboy2 兼容层使用 C++，未来 MCU 平台边界保持可由 C HAL 实现。
 
 ## 下一步
 
 1. 确定 ArduGirl 自身开源许可证。
-2. 创建 CMake、platform headers、fake backend 和 `games/examples/hello`。
-3. 用 hello 游戏接入 terminal framebuffer、差分输出和 raw input。
-4. 添加 headless/golden test 后再开始 Arduboy2 上游代码整理。
+2. 为终端渲染器加入行级差分刷新和 pseudo-terminal 测试。
+3. 从官方 Arduboy2 字体与绘图行为继续补齐通用兼容实现。
+4. 添加更完整的 golden test 和 sanitizers。
 5. 终端跑通真实游戏基线后再实现 SDL2。
 
 ## 未决策项
