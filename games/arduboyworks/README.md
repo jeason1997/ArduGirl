@@ -4,7 +4,7 @@
 
 18 个成品游戏均已成功生成 SDL2 可执行文件，并分别通过 180 帧无头启动冒烟。主构建文件根据本目录下一层的 `game.toml` 自动发现游戏，不维护游戏名白名单；上游存在 `MyArduboy2.h` 时自动接入符号转发，并按其声明探测可选音频接口。构建过程在生成目录中把 AVR 16 位函数指针表改写为宿主平台的原生函数指针访问；Lasers 的灰屏 AVR 汇编通过游戏目录内的编号统一 diff 补丁替换为等价 C++ 循环；Morse 的 USB HID 在 Linux 前端使用无副作用兼容接口。`MyArduboy2` 是上游自定义类，移植入口只为其重复声明提供到 Arduboy2 核心的符号转发，不承载兼容语义。上游子模块保持未修改。
 
-新增同仓库游戏时，只需创建 `games/ports/arduboyworks/<game-id>/game.toml`，并保证上游入口为 `<game-id>/<game-id>.ino`。若必须修正某个上游 `common.cpp`，补丁应放在该游戏的 `patches/` 下，并采用 `0001-common-<说明>.patch` 形式的统一 diff；构建系统会按编号顺序自动发现并应用全部匹配补丁。每个游戏仍需独立完成构建、冒烟和文档验证。
+新增同仓库游戏时，只需创建 `games/arduboyworks/<game-id>/game.toml`，并保证上游入口为 `<game-id>/<game-id>.ino`。若必须修正某个上游 `common.cpp`，补丁应放在该游戏的 `patches/` 下，并采用 `0001-common-<说明>.patch` 形式的统一 diff；构建系统会按编号顺序自动发现并应用全部匹配补丁。每个游戏仍需独立完成构建、冒烟和文档验证。
 
 构建与运行示例：
 

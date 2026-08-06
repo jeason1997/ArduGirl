@@ -56,7 +56,7 @@ bool storage_write(std::uint16_t offset, const void* source,
 } // 命名空间 ardugirl::platform
 
 // 测试直接编译未修改的移植入口，以便检查真实游戏状态而非复制状态机。
-#include "../games/ports/microtd/entry.cpp"
+#include "../games/microtd/entry.cpp"
 
 namespace {
 

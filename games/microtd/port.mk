@@ -6,7 +6,7 @@ MICROTD_SOURCES := \
 	src/arduboy2/Arduboy2.cpp \
 	src/compat/EEPROM.cpp \
 	src/arduboy2/Sprites.cpp \
-	games/ports/microtd/entry.cpp
+	games/microtd/entry.cpp
 TERMINAL_MICROTD_SOURCES := $(filter-out platform/linux_sdl/render.cpp platform/linux_common/storage.cpp,\
 	$(MICROTD_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp))
 TERMINAL_MICROTD_SOURCES += $(LINUX_STORAGE_SOURCE)
@@ -51,17 +51,17 @@ $(BUILD_DIR)/replay/%.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DARDUINO=10819 -MMD -MP -c $< -o $@
 
 $(BUILD_DIR)/generated/microtd_patched.ino: third_party/MicroTD/microtd.ino \
-		games/ports/microtd/patches/0001-build-selected-tower-return-true.patch
+		games/microtd/patches/0001-build-selected-tower-return-true.patch
 	@mkdir -p $(@D)
 	@sed 's/\r$$//' $< > $@.base
-	@patch --silent --output=$@ $@.base < games/ports/microtd/patches/0001-build-selected-tower-return-true.patch
+	@patch --silent --output=$@ $@.base < games/microtd/patches/0001-build-selected-tower-return-true.patch
 	@rm -f $@.base
 
 $(BUILD_DIR)/microtd/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 $(BUILD_DIR)/terminal-microtd/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 $(BUILD_DIR)/replay/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
-$(BUILD_DIR)/microtd/games/ports/microtd/entry.o: $(BUILD_DIR)/generated/microtd_patched.ino
-$(BUILD_DIR)/terminal-microtd/games/ports/microtd/entry.o: $(BUILD_DIR)/generated/microtd_patched.ino
+$(BUILD_DIR)/microtd/games/microtd/entry.o: $(BUILD_DIR)/generated/microtd_patched.ino
+$(BUILD_DIR)/terminal-microtd/games/microtd/entry.o: $(BUILD_DIR)/generated/microtd_patched.ino
 $(BUILD_DIR)/replay/tests/microtd_replay_test.o: $(BUILD_DIR)/generated/microtd_patched.ino
 
 microtd: check-microtd-upstream check-sdl $(MICROTD_TARGET)
@@ -86,4 +86,5 @@ test-microtd-terminal: check-microtd-upstream $(TERMINAL_MICROTD_TARGET)
 
 PORT_TEST_TARGETS += test-microtd
 PORT_TERMINAL_TEST_TARGETS += test-microtd-terminal
+PORT_BUILD_TARGETS += $(MICROTD_TARGET)
 PORT_DEPENDS += $(MICROTD_OBJECTS:.o=.d) $(TERMINAL_MICROTD_OBJECTS:.o=.d) $(MICROTD_REPLAY_TEST_OBJECTS:.o=.d)

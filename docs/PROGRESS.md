@@ -16,10 +16,9 @@
 | 游戏导入规范 | done | `GAME_PORTING.md` |
 | 社区游戏移植清单 | done | `GAME_PORTS.md`；只收录源码可访问的游戏，47 款合并为单表并按综合移植优先级排序 |
 | Agent 约束 | done | 根目录 `AGENTS.md` |
-| 构建系统 | done | GNU Make；`make`、`run`、`demo`、`test` |
+| 构建系统 | done | GNU Make；`make` 聚合全部游戏构建，`make test` 聚合公共与游戏测试 |
 | framebuffer core | done | 1024 字节页面布局、像素、直线、矩形及单元测试 |
 | Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；按当前决策暂停效果优化 |
-| 官方 Arduboy2 示例 | partial | 未修改的官方 HelloWorld 已构建运行；当前仅覆盖所需最小 API/字形 |
 | MicroTD | partial | CC0 子模块源码未修改；固定输入回放已验证进入地图、建塔和启动波次；待持久化和完整游玩验证 |
 | ArduboyWorks 游戏集 | partial | 整仓固定到 `d4b1f041`；18 个游戏均已成功构建并分别通过 180 帧 SDL2 无头冒烟；待逐游戏固定输入回放、实际画面截图和完整玩法验证 |
 | Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调计时、headless、事件注入、framebuffer golden test 和 EEPROM 文件后端；音频待实现 |
@@ -30,6 +29,7 @@
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+- 删除 `games/examples/`，不再维护官方示例构建目标；原 `games/ports/` 下的游戏已提升到 `games/` 直接子目录，根 Makefile 统一自动加载 `games/*/port.mk`。已从空 `build/` 完成全部 19 个 SDL 游戏冷构建，并通过 `make test` 与 `make test-terminal`。
 - 根目录 Makefile 已移除全部具体游戏、游戏集合、上游私有类型和游戏专用补丁规则，改为自动加载各游戏或集合自己的 `port.mk`；公共测试通过扩展目标聚合。ArduboyWorks 的自动发现和私有适配全部位于其移植目录，MicroTD 的构建、补丁及回放测试全部位于自身移植目录。Lasers 的灰屏适配已从集合级 sed 脚本迁移到游戏目录内的编号统一 diff 补丁。
 
 - 完成 obono/ArduboyWorks 全部 18 个成品游戏的 SDL2 构建和逐游戏 180 帧无头启动冒烟；兼容层覆盖旧版 Arduboy API、PROGMEM、AVR EEPROM、静音音频和无副作用 HID，生成阶段安全改写 AVR 函数指针表，并为 Lasers 的灰屏汇编保存独立转换脚本。
@@ -43,13 +43,12 @@
 - 实现 128x64 framebuffer 到 64x16 Unicode Braille 的转换。
 - 实现 WASD、A/B、退出键输入和非交互固定帧模式。
 - 添加 framebuffer 位布局、裁剪、矩形和清屏单元测试。
-- 以 Git 子模块固定 Arduboy2 `bc460a2`，未修改的官方 `HelloWorld.ino` 已在终端显示。
 - 自写图形示例已移出 `games/`，仅保留为底层 smoke test。
 - 确定游戏与 Arduboy2 兼容层使用 C++，未来 MCU 平台边界保持可由 C HAL 实现。
 - 引入未修改的 MicroTD `0c8958f`，补齐字体、图元、Sprites、按钮边沿、EEPROM 内存接口和静音 Beep 接口；终端主菜单已显示，注入 A 键后 framebuffer 发生预期变化。
 - 明确上游版本锁定策略：默认禁止跟踪最新分支，只有用户明确要求时才移动并重新验证固定 SHA。
 - 修复终端方向键：解析 `ESC [ A/B/C/D` 和 `ESC O A/B/C/D`，单独 Escape 延迟判定为退出，并加入回归测试。
-- 新增 SDL2 后端并设为默认构建和测试平台；HelloWorld 与 MicroTD 均可在无显示服务器的 headless 模式执行固定帧测试。
+- 新增 SDL2 后端并设为默认构建和测试平台；MicroTD 可在无显示服务器的 headless 模式执行固定帧测试。
 - SDL2 窗口默认使用 1:1 像素倍率，并保留 `--scale N` 整数倍率覆盖。
 - 保留终端构建、运行和回归测试目标，但按当前决策暂停终端显示效果优化。
 - 实际操作 MicroTD 终端前端进入地图、建塔菜单和敌人波次，从 128x64 framebuffer 生成多张未缩放截图，并为 README 补充游戏简介；后续每个移植游戏都必须提供 ArduGirl 实际运行截图。

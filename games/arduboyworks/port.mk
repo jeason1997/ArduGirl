@@ -1,11 +1,11 @@
-ARDUBOYWORKS_MANIFESTS := $(wildcard games/ports/arduboyworks/*/game.toml)
+ARDUBOYWORKS_MANIFESTS := $(wildcard games/arduboyworks/*/game.toml)
 ARDUBOYWORKS_GAMES := $(notdir $(patsubst %/,%,$(dir $(ARDUBOYWORKS_MANIFESTS))))
 ARDUBOYWORKS_TARGETS := $(ARDUBOYWORKS_GAMES:%=$(BUILD_DIR)/arduboyworks-%-sdl)
 
 define ARDUBOYWORKS_GAME_template
 ARDUBOYWORKS_$(1)_TITLE_SOURCE := $$(if $$(shell grep -q 'static void drawText(const char \*p, int lines);' third_party/ArduboyWorks/$(1)/title.cpp 2>/dev/null && printf yes),third_party/ArduboyWorks/$(1)/title.cpp)
-ARDUBOYWORKS_$(1)_COMMON_PATCHES := $$(wildcard games/ports/arduboyworks/$(1)/patches/[0-9][0-9][0-9][0-9]-common-*.patch)
-ARDUBOYWORKS_$(1)_ADAPTER_SOURCE := $$(if $$(wildcard third_party/ArduboyWorks/$(1)/MyArduboy2.h),games/ports/arduboyworks/upstream_adapter.cpp)
+ARDUBOYWORKS_$(1)_COMMON_PATCHES := $$(wildcard games/arduboyworks/$(1)/patches/[0-9][0-9][0-9][0-9]-common-*.patch)
+ARDUBOYWORKS_$(1)_ADAPTER_SOURCE := $$(if $$(wildcard third_party/ArduboyWorks/$(1)/MyArduboy2.h),games/arduboyworks/upstream_adapter.cpp)
 ARDUBOYWORKS_$(1)_AUDIO_FLAGS := \
 	$$(if $$(shell grep -q 'stopTone' third_party/ArduboyWorks/$(1)/MyArduboy2.h 2>/dev/null && printf yes),-DARDUBOYWORKS_HAS_STOP_TONE) \
 	$$(if $$(shell grep -q 'playWave' third_party/ArduboyWorks/$(1)/MyArduboy2.h 2>/dev/null && printf yes),-DARDUBOYWORKS_HAS_PLAY_WAVE)
@@ -18,7 +18,7 @@ ARDUBOYWORKS_$(1)_SOURCES := \
 	$$(if $$(ARDUBOYWORKS_$(1)_TITLE_SOURCE),$$(BUILD_DIR)/generated/arduboyworks/$(1)/title.cpp) \
 	$$(if $$(ARDUBOYWORKS_$(1)_COMMON_PATCHES),$$(BUILD_DIR)/generated/arduboyworks/$(1)/common.cpp) \
 	$$(ARDUBOYWORKS_$(1)_ADAPTER_SOURCE) \
-	games/ports/arduboyworks/entry.cpp
+	games/arduboyworks/entry.cpp
 ARDUBOYWORKS_$(1)_OBJECTS := $$(ARDUBOYWORKS_$(1)_SOURCES:%.cpp=$$(BUILD_DIR)/arduboyworks/$(1)/%.o)
 
 $$(BUILD_DIR)/arduboyworks/$(1)/%.o: %.cpp
@@ -48,7 +48,7 @@ $$(BUILD_DIR)/generated/arduboyworks/$(1)/common.cpp: third_party/ArduboyWorks/$
 	@for patch_file in $$(ARDUBOYWORKS_$(1)_COMMON_PATCHES); do patch --silent $$@.tmp < $$$$patch_file || { rm -f $$@.tmp; exit $$$$?; }; done
 	@mv $$@.tmp $$@
 
-$$(BUILD_DIR)/arduboyworks/$(1)/games/ports/arduboyworks/entry.o: $$(BUILD_DIR)/generated/arduboyworks/$(1).ino
+$$(BUILD_DIR)/arduboyworks/$(1)/games/arduboyworks/entry.o: $$(BUILD_DIR)/generated/arduboyworks/$(1).ino
 
 $$(BUILD_DIR)/arduboyworks-$(1)-sdl: $$(ARDUBOYWORKS_$(1)_OBJECTS)
 	@mkdir -p $$(@D)
@@ -77,4 +77,5 @@ test-arduboyworks: arduboyworks-build
 	done
 
 PORT_TEST_TARGETS += test-arduboyworks
+PORT_BUILD_TARGETS += $(ARDUBOYWORKS_TARGETS)
 PORT_DEPENDS += $(foreach game,$(ARDUBOYWORKS_GAMES),$(ARDUBOYWORKS_$(game)_OBJECTS:.o=.d))

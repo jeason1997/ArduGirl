@@ -19,12 +19,12 @@
 - 是否要求署名、相同许可证或公开修改；
 - 固定使用的 commit/release。
 
-许可证未知时，可以在文档中记录外部链接和本地构建步骤，但不得把源码复制进 `games/ports`。
+许可证未知时，可以在文档中记录外部链接和本地构建步骤，但不得把源码复制进 `games/`。
 
 ## 游戏目录格式
 
 ```text
-games/ports/<game-id>/
+games/<game-id>/
 ├── game.toml
 ├── README.md       游戏简介、截图、来源、许可证、移植状态和运行方法
 ├── LICENSES/
