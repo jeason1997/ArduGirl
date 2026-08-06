@@ -5,6 +5,7 @@ TERMINAL_TARGET := $(BUILD_DIR)/ardugirl-terminal
 SMOKE_TARGET := $(BUILD_DIR)/terminal-smoke
 TEST_TARGET := $(BUILD_DIR)/framebuffer-test
 SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
+MICROTD_REPLAY_TEST_TARGET := $(BUILD_DIR)/microtd-replay-test
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -58,6 +59,13 @@ SDL_TEST_OBJECTS := \
 	$(BUILD_DIR)/platform/linux_sdl/sdl.o \
 	$(BUILD_DIR)/platform/linux_sdl/render.o \
 	$(BUILD_DIR)/src/core/framebuffer.o
+MICROTD_REPLAY_TEST_SOURCES := \
+	tests/microtd_replay_test.cpp \
+	src/core/framebuffer.cpp \
+	src/arduboy2/Arduboy2.cpp \
+	src/compat/EEPROM.cpp \
+	src/arduboy2/Sprites.cpp
+MICROTD_REPLAY_TEST_OBJECTS := $(MICROTD_REPLAY_TEST_SOURCES:%.cpp=$(BUILD_DIR)/replay/%.o)
 
 .PHONY: all run demo microtd terminal run-terminal microtd-terminal test test-terminal smoke clean check-upstream check-sdl
 
@@ -113,14 +121,29 @@ $(BUILD_DIR)/terminal-microtd/%.o: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DARDUINO=10819 -MMD -MP -c $< -o $@
 
+$(BUILD_DIR)/replay/%.o: %.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DARDUINO=10819 -MMD -MP -c $< -o $@
+
 $(BUILD_DIR)/generated/font5x7.inc: third_party/Arduboy2/src/Arduboy2Data.cpp
 	@mkdir -p $(@D)
 	@sed -n '/font5x7\[\] = {/,/^};/p' $< | sed '1d;$$d' > $@
+
+$(BUILD_DIR)/generated/microtd_patched.ino: third_party/MicroTD/microtd.ino \
+		games/ports/microtd/patches/0001-build-selected-tower-return-true.patch
+	@mkdir -p $(@D)
+	@sed 's/\r$$//' $< > $@.base
+	@patch --silent --output=$@ $@.base < games/ports/microtd/patches/0001-build-selected-tower-return-true.patch
+	@rm -f $@.base
 
 $(BUILD_DIR)/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 $(BUILD_DIR)/microtd/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 $(BUILD_DIR)/terminal/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 $(BUILD_DIR)/terminal-microtd/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
+$(BUILD_DIR)/replay/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
+$(BUILD_DIR)/microtd/games/ports/microtd/entry.o: $(BUILD_DIR)/generated/microtd_patched.ino
+$(BUILD_DIR)/terminal-microtd/games/ports/microtd/entry.o: $(BUILD_DIR)/generated/microtd_patched.ino
+$(BUILD_DIR)/replay/tests/microtd_replay_test.o: $(BUILD_DIR)/generated/microtd_patched.ino
 
 run: check-sdl $(TARGET)
 	$(TARGET)
@@ -148,9 +171,14 @@ $(SDL_TEST_TARGET): $(SDL_TEST_OBJECTS)
 	@mkdir -p $(@D)
 	$(CXX) $(SDL_TEST_OBJECTS) $(LDFLAGS) $(SDL_LIBS) -o $@
 
-test: check-sdl $(TARGET) $(MICROTD_TARGET) $(TEST_TARGET) $(SDL_TEST_TARGET)
+$(MICROTD_REPLAY_TEST_TARGET): $(MICROTD_REPLAY_TEST_OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(MICROTD_REPLAY_TEST_OBJECTS) $(LDFLAGS) -o $@
+
+test: check-sdl $(TARGET) $(MICROTD_TARGET) $(TEST_TARGET) $(SDL_TEST_TARGET) $(MICROTD_REPLAY_TEST_TARGET)
 	$(TEST_TARGET)
 	$(SDL_TEST_TARGET)
+	$(MICROTD_REPLAY_TEST_TARGET)
 	$(TARGET) --headless --frames 1
 	$(MICROTD_TARGET) --headless --frames 3
 
@@ -170,4 +198,5 @@ clean:
 
 -include $(DEPENDS) $(TERMINAL_OBJECTS:.o=.d) $(MICROTD_OBJECTS:.o=.d) \
 	$(TERMINAL_MICROTD_OBJECTS:.o=.d) $(SMOKE_OBJECTS:.o=.d) \
-	$(BUILD_DIR)/tests/framebuffer_test.d
+	$(BUILD_DIR)/tests/framebuffer_test.d \
+	$(MICROTD_REPLAY_TEST_OBJECTS:.o=.d)

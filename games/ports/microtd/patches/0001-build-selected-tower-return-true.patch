@@ -1,0 +1,20 @@
+--- microtd.ino
++++ microtd.ino
+@@ -1507,6 +1507,8 @@
+               mCursor = mCursor.right().down();
+           }
+         }
++
++        [[fallthrough]];
+ 
+       case STATE_PLAYING_WAVE:
+         switch (button)
+@@ -1717,6 +1717,8 @@
+     mSelectedMenuItem = 0;
+ 
+     playSound(SOUND_PUT);
++
++    return true;
+   }
+ 
+   MainMenuItem getMainMenuItem(uint8_t index)

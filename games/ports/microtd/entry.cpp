@@ -3,5 +3,4 @@ const char* ardugirl_game_title() noexcept {
     return "MicroTD";
 }
 
-#include "../../../third_party/MicroTD/microtd.ino"
-
+#include "microtd_patched.ino"

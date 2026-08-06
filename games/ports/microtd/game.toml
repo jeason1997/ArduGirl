@@ -7,13 +7,14 @@ entry = "third_party/MicroTD/microtd.ino"
 
 [compat]
 level = "B"
-status = "menu-runs"
+status = "replay-tested"
 libraries = ["Arduboy2"]
 
 [port]
-patches = []
+patches = ["patches/0001-build-selected-tower-return-true.patch"]
 notes = [
-    "上游源码通过外部 entry.cpp 参与构建，未修改 microtd.ino",
+    "上游源码通过外部 entry.cpp 参与构建，子模块中的 microtd.ino 保持未修改",
+    "最小补丁为 buildSelectedTower 成功路径补充缺失的 true 返回值，并显式标记预期的状态分支贯穿",
+    "尚未向上游提交 issue；当前只记录并维护固定 revision 对应的本地补丁",
     "终端后端当前静音，EEPROM 当前仅在进程内保存"
 ]
-
