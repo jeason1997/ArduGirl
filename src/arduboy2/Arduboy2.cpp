@@ -180,8 +180,7 @@ void Arduboy2::saveAudioOnOff() noexcept {
 
 void Arduboy2::playTone(std::uint16_t frequency, std::uint16_t duration,
                         std::uint8_t priority, std::uint8_t duty_cycle) noexcept {
-    // 当前 Linux 基线尚未接入音频输出；这里保留完整调用契约和状态门控，
-    // 后续平台音频后端应在此统一转发，游戏适配层不得各自吞掉声音请求。
+    // 音频请求统一转发给平台后端，游戏适配层不得各自复制输出实现。
     if (audio.enabled() && frequency != 0 && duration != 0) {
         ardugirl::platform::set_tone(frequency);
         tone_end_ms_ = millis() + duration;

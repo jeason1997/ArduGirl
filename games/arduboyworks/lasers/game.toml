@@ -2,8 +2,6 @@ id = "lasers"
 name = "Lasers"
 source = "https://github.com/obono/ArduboyWorks"
 revision = "d4b1f041789dcd1d71907654e4025d613b4ab420"
-author = "obono"
-license = "MIT"
 entry = "third_party/ArduboyWorks/lasers/lasers.ino"
 
 [compat]

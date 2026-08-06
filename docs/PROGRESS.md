@@ -7,7 +7,7 @@
 | 领域 | 状态 | 证据/说明 |
 |---|---|---|
 | 项目方向 | done | 已确定源码直接编译，不采用模拟器 |
-| Git 仓库 | done | 本地 `main` 已初始化，`origin` 已绑定空远程仓库 |
+| Git 仓库 | done | `main` 已初始化并持续推送到固定 `origin` |
 | 架构规格 | done | `ARCHITECTURE.md` |
 | 兼容范围 | done | `COMPATIBILITY.md` |
 | 性能/整数规范 | done | `PERFORMANCE.md` |
@@ -17,11 +17,11 @@
 | 社区游戏移植清单 | done | `GAME_PORTS.md`；只收录源码可访问的游戏，47 款合并为单表并按综合移植优先级排序 |
 | Agent 约束 | done | 根目录 `AGENTS.md` |
 | 构建系统 | done | GNU Make；`make` 聚合全部游戏构建，`make test` 聚合公共与游戏测试 |
-| framebuffer core | done | 1024 字节页面布局、像素、直线、矩形及单元测试 |
+| framebuffer core | done | 1024 字节页面布局、像素、直线、矩形、圆、三角形、bitmap、compressed bitmap 及回归测试 |
 | Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；按当前决策暂停效果优化 |
-| MicroTD | partial | CC0 子模块源码未修改；固定输入回放已验证进入地图、建塔和启动波次；待持久化和完整游玩验证 |
+| MicroTD | partial | 子模块源码未修改；固定输入回放已验证进入地图、建塔和启动波次；待持久化和完整游玩验证 |
 | ArduboyWorks 游戏集 | partial | 整仓固定到 `d4b1f041`；18 个游戏均已成功构建并分别通过 180 帧 SDL2 无头冒烟；待逐游戏固定输入回放、实际画面截图和完整玩法验证 |
-| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调毫秒/微秒计时、headless、事件注入、framebuffer golden test、EEPROM 文件后端和单声道方波；窗口与长时间音频仍需人工验收 |
+| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调毫秒/微秒计时、headless、事件注入、framebuffer golden test、EEPROM 文件后端、双声道方波和波表播放；gamepad 与长时间音频仍待验证 |
 | Arduboy2 兼容实现 | partial | 已覆盖当前 19 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM 和定时 tone；尚非完整上游 API |
 | 游戏源码 | partial | 已固定并接入 MicroTD 与 ArduboyWorks 18 个游戏；后续游戏按 `GAME_PORTS.md` 继续导入 |
 | 音频 | partial | SDL2 已实现双声道方波、8 位波表混合和定时停止；Arduboy2Beep、ArduboyPlaytune 与 ArduboyWorks 音频扩展已接入。当前游戏不依赖 ArduboyTones/ATMlib，待真实样本驱动后续移植 |
@@ -39,12 +39,12 @@
 - 删除 `games/examples/`，不再维护官方示例构建目标；原 `games/ports/` 下的游戏已提升到 `games/` 直接子目录，根 Makefile 统一自动加载 `games/*/port.mk`。已从空 `build/` 完成全部 19 个 SDL 游戏冷构建，并通过 `make test` 与 `make test-terminal`。
 - 根目录 Makefile 已移除全部具体游戏、游戏集合、上游私有类型和游戏专用补丁规则，改为自动加载各游戏或集合自己的 `port.mk`；公共测试通过扩展目标聚合。ArduboyWorks 的自动发现和私有适配全部位于其移植目录，MicroTD 的构建、补丁及回放测试全部位于自身移植目录。Lasers 的灰屏适配已从集合级 sed 脚本迁移到游戏目录内的编号统一 diff 补丁。
 
-- 完成 obono/ArduboyWorks 全部 18 个成品游戏的 SDL2 构建和逐游戏 180 帧无头启动冒烟；兼容层覆盖旧版 Arduboy API、PROGMEM、AVR EEPROM、静音音频和无副作用 HID，生成阶段安全改写 AVR 函数指针表，并为 Lasers 的灰屏汇编保存独立转换脚本。
+- 完成 ArduboyWorks 全部 18 个成品游戏的 SDL2 构建和逐游戏 180 帧无头启动冒烟；兼容层覆盖旧版 Arduboy API、PROGMEM、AVR EEPROM、音频和无副作用 HID，生成阶段安全改写 AVR 函数指针表，并为 Lasers 的灰屏汇编保存独立转换脚本。
 
 - 建立项目目标、非目标和依赖边界。
 - 定义 framebuffer、按键、时间、存储和音频的平台契约。
 - 说明 AVR 16 位 `int` 与 32/64 位宿主 ABI 的兼容策略。
-- 规定第三方游戏的来源、许可证和版本固定方式。
+- 规定第三方游戏的源码位置和版本固定方式。
 - 列出 Linux → Arduboy2 → 游戏 → 音频 → PY32 的实施顺序。
 - 在 WSL2 使用 GCC 成功构建并运行 `hello` 终端示例。
 - 实现 128x64 framebuffer 到 64x16 Unicode Braille 的转换。
@@ -52,7 +52,7 @@
 - 添加 framebuffer 位布局、裁剪、矩形和清屏单元测试。
 - 自写图形示例已移出 `games/`，仅保留为底层 smoke test。
 - 确定游戏与 Arduboy2 兼容层使用 C++，未来 MCU 平台边界保持可由 C HAL 实现。
-- 引入未修改的 MicroTD `0c8958f`，补齐字体、图元、Sprites、按钮边沿、EEPROM 内存接口和静音 Beep 接口；终端主菜单已显示，注入 A 键后 framebuffer 发生预期变化。
+- 引入未修改的 MicroTD `0c8958f`，补齐字体、图元、Sprites、按钮边沿、EEPROM 内存接口和 Beep 接口；终端主菜单已显示，注入 A 键后 framebuffer 发生预期变化。
 - 明确上游版本锁定策略：默认禁止跟踪最新分支，只有用户明确要求时才移动并重新验证固定 SHA。
 - 修复终端方向键：解析 `ESC [ A/B/C/D` 和 `ESC O A/B/C/D`，单独 Escape 延迟判定为退出，并加入回归测试。
 - 新增 SDL2 后端并设为默认构建和测试平台；MicroTD 可在无显示服务器的 headless 模式执行固定帧测试。
@@ -63,21 +63,19 @@
 - 为 MicroTD 增加固定输入回放，验证选择地图、打开建塔菜单、建造防御塔和启动敌人波次；回放发现上游成功建塔路径缺失布尔返回值，现通过生成目录中的独立最小补丁消除未定义行为，子模块保持 clean。
 - 实现 SDL/终端共享的 Linux EEPROM 文件后端：默认使用 XDG data 目录，支持 `--save-dir` 覆盖，按稳定 game-id 隔离，并在退出时通过临时文件替换；回归测试覆盖首次启动、重启保持、游戏隔离、越界和短文件恢复。
 - 调研 Arduboy 官网精选、社区热门讨论与社区游戏目录，新增 `GAME_PORTS.md`；已收集热门候选，后续按源码完整性和兼容风险重新分层。
-- 按个人研究和自用场景调整根目录 `AGENTS.md`：游戏候选改为以完整源码可获取为准，不再以许可证或再分发条件作为导入门槛；仍要求固定上游版本、记录作者和来源，并完成构建与冒烟验证。
+- 调整根目录 `AGENTS.md`：游戏候选以完整源码可获取为准，要求固定上游版本并完成构建与冒烟验证。
 - 按新准入规则重整 `GAME_PORTS.md`：删除无源码候选和梯队划分，将 47 款源码可访问游戏合并为一张表，并按热度、验证价值、源码稳定性和预计工作量排序。
 
 ## 下一步
 
-1. 为 ArduboyWorks 18 个游戏补充固定输入回放、实际运行截图和完整玩法验证；当前全部游戏已达到可构建、可启动状态。
-
-1. 确定 ArduGirl 自身开源许可证。
-2. 添加更完整的 golden test 和 sanitizers。
-3. 按 `GAME_PORTS.md` 优先级引入 Twotris，并完成源码固定、构建、冒烟和截图闭环。
-4. 根据新游戏的真实依赖选择 ArduboyTones、ATMlib 或其他音频库，并为对应固定上游版本建立兼容测试；随后再评估 MCU 后端。
+1. 对照固定 Arduboy2 上游版本生成公共 API 差异清单，并补齐代表性官方示例编译测试。
+2. 为 ArduboyWorks 游戏逐个补充固定输入回放、实际运行截图和完整玩法验证；当前全部游戏已达到可构建、可启动状态。
+3. 添加 PCM、复杂压缩图片、时间回绕、GCC/Clang 和 sanitizers 测试。
+4. 增加 SDL2 gamepad 输入和键位配置。
+5. 按 `GAME_PORTS.md` 优先级引入 Twotris，并完成源码固定、构建、冒烟和截图闭环。
+6. 根据新游戏的真实依赖选择 ArduboyTones、ATMlib 或其他扩展库；随后再评估 MCU 后端。
 
 ## 未决策项
 
-- ArduGirl 自身许可证（MIT、BSD-3-Clause 等）。
 - 第一个 PY32 的确切芯片、开发板、屏幕接口和编译工具链。
-- 第三方测试游戏名单；必须先完成许可证核查。
 - Arduboy2 上游使用原始文件加平台补丁，还是维护窄范围 fork；应在 Phase 2 通过 diff 规模决定。

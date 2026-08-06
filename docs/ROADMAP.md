@@ -3,73 +3,65 @@
 ## Phase 0：规格与治理
 
 - [x] 明确源码级原生编译，不采用模拟器。
-- [x] 定义目录、分层、平台边界和游戏导入政策。
+- [x] 定义目录、分层、平台边界和游戏导入规则。
 - [x] 定义整数、内存和性能规则。
-- [x] 确定 Linux 纯终端为第一平台，SDL2 在终端基线后实现。
-- [ ] 确定 ArduGirl 自身许可证。
+- [x] 固定上游版本与零修改导入流程。
 
-## Phase 1：最小 Linux 可执行程序
+## Phase 1：Linux 运行基线
 
-- [x] 顶层 Makefile 和 `hello` 测试游戏。
-- [ ] 最小 Arduino `setup/loop` runtime。
-- [ ] platform API 和 fake test backend。
-- [ ] Linux terminal 的 Braille/half-block 显示和 raw input。
-- [ ] headless 固定帧运行。
+- [x] GNU Make 聚合构建和游戏扩展点。
+- [x] Arduino `setup/loop` runtime 和 platform API。
+- [x] Linux terminal Braille 显示、raw input 和 headless 固定帧运行。
+- [x] SDL2 窗口、键盘事件、最近邻整数缩放和 headless 模式。
+- [x] Linux EEPROM 文件后端与游戏隔离。
+- [ ] SDL2 gamepad 输入和键位配置。
 
-验收：自有 hello 游戏能在不安装 SDL2 的环境中以 terminal 目标运行、响应六键，并在 CI/headless 中产生稳定 framebuffer hash。
+## Phase 2：Arduboy2 与 Arduino 兼容
 
-## Phase 2：Arduboy2 核心兼容
+- [x] 固定 Arduboy2 上游基线。
+- [x] 128×64、1-bit、1024 字节 framebuffer。
+- [x] 高频图元、bitmap、compressed bitmap 和 Sprites 模式。
+- [x] 帧率、按钮电平与边沿、字体和基础 Print。
+- [x] PROGMEM、安全读取、时间、随机数和 EEPROM。
+- [x] framebuffer、兼容 API、SDL 和存储回归测试。
+- [ ] 对照固定上游版本完成 API 差异清单。
+- [ ] 补齐仍有价值的 Arduboy2/Print 辅助接口和官方示例编译测试。
 
-- [ ] 选择并记录 Arduboy2 上游基线 commit。
-- [ ] 分离/替换 AVR `Arduboy2Core`。
-- [ ] 基本图元、bitmap、frame timing。
-- [ ] 按钮状态和边沿。
-- [ ] 字体和 Print 基础。
-- [ ] framebuffer golden tests。
+## Phase 3：声音与扩展库
 
-验收：Arduboy2 官方 HelloWorld、Buttons、Sprites 等代表性示例通过。
-
-## Phase 3：Arduino/AVR 兼容
-
-- [ ] `PROGMEM` 和安全读取。
-- [ ] Arduino 时间、随机数和辅助宏/函数。
-- [ ] EEPROM 文件后端。
-- [ ] 兼容性审计工具。
-- [ ] GCC/Clang + sanitizers 构建矩阵。
+- [x] Arduboy2Beep 和定时 tone。
+- [x] ArduboyPlaytune 音符、等待、重复、移调和双声道调度。
+- [x] SDL2 双方波混合与 8 位波表播放。
+- [ ] 增加确定性 PCM golden test、抢占和长时间播放验证。
+- [ ] 新游戏实际依赖时再移植 ArduboyTones、ATMlib、ArdBitmap 或 ArduboyFX。
 
 ## Phase 4：真实游戏基线
 
-- [ ] 选择三个许可证清晰、复杂度递增的游戏。
-- [ ] 为每个游戏加入 `game.toml`、许可证和固定 revision。
-- [ ] 建立 build/smoke/golden tests。
-- [ ] 记录每个源码补丁及其原因。
+- [x] 接入 MicroTD 和 ArduboyWorks 18 个游戏。
+- [x] 全部 19 个游戏完成冷构建和启动冒烟。
+- [x] MicroTD 固定输入回放覆盖选图、建塔和启动波次。
+- [ ] 为 ArduboyWorks 游戏逐个增加固定输入回放、截图和玩法验证。
+- [ ] 为代表游戏增加存档往返与长时间运行验证。
+- [ ] 按 `GAME_PORTS.md` 继续导入不同依赖类型的游戏。
 
-验收：三个游戏可在 Linux 原生运行，游戏逻辑无 SDL/Linux 条件代码。
+## Phase 5：质量基线
 
-## Phase 5：SDL2 图形前端
+- [ ] 增加 GCC/Clang、Debug/Release 和 ASan/UBSan 构建矩阵。
+- [ ] 增加兼容性静态审计脚本。
+- [ ] 增加时间回绕、帧调度、音频混合和复杂压缩图片测试。
+- [ ] 清理仍依赖 `-fpermissive` 的上游适配问题。
 
-- [ ] SDL2 窗口、事件和 framebuffer 最近邻显示。
-- [ ] SDL2 键盘与 gamepad 输入。
-- [ ] 同一游戏可在 terminal 与 SDL2 目标之间切换且无需修改源码。
-- [ ] SDL2 单声道方波。
+## Phase 6：PY32
 
-## Phase 6：声音与扩展库
-
-- [ ] Arduboy2Beep。
-- [ ] ArduboyTones。
-- [ ] 根据游戏需求评估 ArdBitmap/ArduboyFX。
-
-## Phase 7：PY32
-
-- [ ] 选定具体 PY32 型号、板卡、屏幕、引脚、工具链和存储方案。
+- [ ] 选定具体芯片、开发板、屏幕、引脚、工具链和存储方案。
 - [ ] 实现 GPIO、SysTick/timer、显示、PWM 和 Flash storage backend。
 - [ ] 使用 Linux golden tests 作为像素参考。
 - [ ] 输出 Flash/RAM/栈预算和帧时间。
 
-PY32 型号未确定前不写厂商 HAL 代码，避免错误绑定外设和容量假设。
+具体硬件未确定前不写厂商 HAL 代码，避免错误绑定外设和容量假设。
 
-## Phase 8：STM32 和其他平台
+## Phase 7：STM32 和其他平台
 
 - [ ] 以相同 platform API 添加 STM32 backend。
 - [ ] 区分 SSD1306 直传和 RGB565 scanline 转换。
-- [ ] 建立每个平台的板级配置，而不是 fork 核心。
+- [ ] 建立每个平台的板级配置，不复制核心兼容实现。

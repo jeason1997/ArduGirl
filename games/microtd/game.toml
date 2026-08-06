@@ -2,7 +2,6 @@ id = "microtd"
 name = "MicroTD"
 source = "https://gitlab.com/drummyfish/Arduboy_TD"
 revision = "0c8958fdcf57060c1380b3ca72082ca45b7a2bb5"
-license = "CC0-1.0"
 entry = "third_party/MicroTD/microtd.ino"
 
 [compat]
