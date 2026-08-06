@@ -8,6 +8,10 @@ SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
 MICROTD_REPLAY_TEST_TARGET := $(BUILD_DIR)/microtd-replay-test
 STORAGE_TEST_TARGET := $(BUILD_DIR)/storage-test
 ARDUBOYWORKS_GAMES := hollow hopper chribocchi chiemagari psicolo reversi lasers quarto stairssweep pi24k samegame knightmove ardubullets evasion morse gosencho bananonsense toyokumono
+ARDUBOYWORKS_NEW_GAMES := ardubullets evasion morse gosencho bananonsense toyokumono
+ARDUBOYWORKS_TEXT_PATCH_GAMES := quarto samegame knightmove ardubullets evasion gosencho
+ARDUBOYWORKS_COMMON_PATCH_GAMES := lasers
+ARDUBOYWORKS_TARGETS := $(ARDUBOYWORKS_GAMES:%=$(BUILD_DIR)/arduboyworks-%-sdl)
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -49,15 +53,38 @@ ARDUBOYWORKS_$(1)_SOURCES := \
 	src/arduboy2/Arduboy2.cpp \
 	src/compat/EEPROM.cpp \
 	src/arduboy2/Sprites.cpp \
-	$$(filter-out third_party/ArduboyWorks/$(1)/MyArduboyPlaytune.cpp,$$(wildcard third_party/ArduboyWorks/$(1)/*.cpp)) \
+	$$(filter-out third_party/ArduboyWorks/$(1)/MyArduboyPlaytune.cpp $$(if $$(filter $(1),$$(ARDUBOYWORKS_TEXT_PATCH_GAMES)),third_party/ArduboyWorks/$(1)/title.cpp) $$(if $$(filter $(1),$$(ARDUBOYWORKS_COMMON_PATCH_GAMES)),third_party/ArduboyWorks/$(1)/common.cpp),$$(wildcard third_party/ArduboyWorks/$(1)/*.cpp)) \
+	$$(if $$(filter $(1),$$(ARDUBOYWORKS_TEXT_PATCH_GAMES)),$$(BUILD_DIR)/generated/arduboyworks/$(1)/title.cpp) \
+	$$(if $$(filter $(1),$$(ARDUBOYWORKS_COMMON_PATCH_GAMES)),$$(BUILD_DIR)/generated/arduboyworks/$(1)/common.cpp) \
+	$$(if $$(filter $(1),$$(ARDUBOYWORKS_NEW_GAMES)),games/ports/arduboyworks/upstream_adapter.cpp) \
 	games/ports/arduboyworks/entry.cpp
 ARDUBOYWORKS_$(1)_OBJECTS := $$(ARDUBOYWORKS_$(1)_SOURCES:%.cpp=$$(BUILD_DIR)/arduboyworks/$(1)/%.o)
 
 $$(BUILD_DIR)/arduboyworks/$(1)/%.o: %.cpp
 	@mkdir -p $$(@D)
 	$$(CXX) $$(CPPFLAGS) $$(SDL_CFLAGS) $$(CXXFLAGS) -fpermissive -Wno-narrowing -DARDUINO=10819 -DUSE_ARDUBOY2_LIB \
+		$$(if $$(filter $(1),morse),-DARDUBOYWORKS_HAS_STOP_TONE) \
+		$$(if $$(filter $(1),bananonsense),-DARDUBOYWORKS_HAS_PLAY_WAVE) \
 		-Ithird_party/ArduboyWorks -Ithird_party/ArduboyWorks/$(1) -DARDUBOYWORKS_GAME_ID=$(1) \
-		-DARDUBOYWORKS_ENTRY=\"$(1)/$(1).ino\" -MMD -MP -c $$< -o $$@
+		-I$$(BUILD_DIR)/generated -DARDUBOYWORKS_ENTRY=\"arduboyworks/$(1).ino\" -MMD -MP -c $$< -o $$@
+
+$$(BUILD_DIR)/generated/arduboyworks/$(1).ino: third_party/ArduboyWorks/$(1)/$(1).ino
+	@mkdir -p $$(@D)
+	@sed \
+		-e 's@^#define callInitFunc.*@#define callInitFunc(idx) (moduleTable[idx].initFunc)()@' \
+		-e 's@^#define callUpdateFunc.*@#define callUpdateFunc(idx) (moduleTable[idx].updateFunc)()@' \
+		-e 's@^#define callDrawFunc.*@#define callDrawFunc(idx) (moduleTable[idx].drawFunc)()@' \
+		$$< > $$@
+
+$$(BUILD_DIR)/generated/arduboyworks/$(1)/title.cpp: third_party/ArduboyWorks/$(1)/title.cpp
+	@mkdir -p $$(@D)
+	@sed 's/static void drawText(const char \*p, int lines);/static void drawText(const char *p, int16_t y);/' $$< > $$@
+
+$$(BUILD_DIR)/generated/arduboyworks/$(1)/common.cpp: third_party/ArduboyWorks/$(1)/common.cpp games/ports/arduboyworks/patches/$(1)-common.sed
+	@mkdir -p $$(@D)
+	@sed -f games/ports/arduboyworks/patches/$(1)-common.sed $$< > $$@
+
+$$(BUILD_DIR)/arduboyworks/$(1)/games/ports/arduboyworks/entry.o: $$(BUILD_DIR)/generated/arduboyworks/$(1).ino
 
 $$(BUILD_DIR)/arduboyworks-$(1)-sdl: $$(ARDUBOYWORKS_$(1)_OBJECTS)
 	@mkdir -p $$(@D)
@@ -103,7 +130,7 @@ STORAGE_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/storage_test.o \
 	$(BUILD_DIR)/platform/linux_common/storage.o
 
-.PHONY: all run demo microtd terminal run-terminal microtd-terminal test test-terminal smoke clean check-upstream check-sdl
+.PHONY: all run demo microtd terminal run-terminal microtd-terminal test test-terminal smoke clean check-upstream check-sdl arduboyworks-build test-arduboyworks
 
 all: check-upstream check-sdl $(TARGET)
 
@@ -112,6 +139,8 @@ check-upstream:
 		(printf '%s\n' '缺少 Arduboy2 子模块，请运行：git submodule update --init --recursive' && false)
 	@test -f third_party/MicroTD/microtd.ino || \
 		(printf '%s\n' '缺少 MicroTD 子模块，请运行：git submodule update --init --recursive' && false)
+	@test -f third_party/ArduboyWorks/README.md || \
+		(printf '%s\n' '缺少 ArduboyWorks 子模块，请运行：git submodule update --init --recursive' && false)
 
 check-sdl:
 	@pkg-config --exists sdl2 || \
@@ -237,6 +266,15 @@ test-terminal: $(TERMINAL_TARGET) $(TERMINAL_MICROTD_TARGET)
 
 smoke: $(SMOKE_TARGET)
 	$(SMOKE_TARGET)
+
+arduboyworks-build: check-upstream check-sdl $(ARDUBOYWORKS_TARGETS)
+
+test-arduboyworks: arduboyworks-build
+	@save_dir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$save_dir"' EXIT; \
+	for game in $(ARDUBOYWORKS_GAMES); do \
+		$(BUILD_DIR)/arduboyworks-$$game-sdl --headless --frames 180 --save-dir "$$save_dir" || exit $$?; \
+	done
 
 clean:
 	rm -rf $(BUILD_DIR)

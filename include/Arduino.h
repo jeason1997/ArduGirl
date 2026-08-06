@@ -53,6 +53,7 @@ inline Type pgm_read_ptr(const Type* address) noexcept {
 #define bitRead(value, bit_index) (((value) >> (bit_index)) & 0x01u)
 #define bitSet(value, bit_index) ((value) |= (1UL << (bit_index)))
 #define bitClear(value, bit_index) ((value) &= ~(1UL << (bit_index)))
+#define bitToggle(value, bit_index) ((value) ^= (1UL << (bit_index)))
 #define bit(bit_index) (1UL << (bit_index))
 #define strlen_P std::strlen
 
@@ -68,6 +69,15 @@ using uint_farptr_t = std::uintptr_t;
 inline std::size_t strlen_PF(uint_farptr_t address) noexcept {
     return std::strlen(reinterpret_cast<const char*>(address));
 }
+
+#define _BV(bit_index) (1u << (bit_index))
+inline std::uint8_t USBSTA = 0;
+inline constexpr std::uint8_t VBUS = 0;
+class USBDeviceClass {
+public:
+    bool configured() const noexcept { return false; }
+};
+inline USBDeviceClass USBDevice;
 
 std::uint32_t millis() noexcept;
 std::uint32_t micros() noexcept;

@@ -21,7 +21,7 @@
 - frame rate、frameCount、everyXFrames
 - pollButtons 和全部按钮查询
 - 基本文本输出
-- audio enabled 状态；实际音频可后置
+- audio enabled 状态，以及 `initAudio`、`playTone`、`playScore`、`playWave` 和对应停止接口；Linux 音频后端接入前由 Arduboy2 兼容核心统一提供无声、非阻塞实现，游戏移植目录不得各自实现缺失的通用音频语义
 
 ### Arduino
 
@@ -79,4 +79,3 @@ ATMlib、ArduboyPlaytune 和直接依赖 AVR timer/ISR 的库不进入第一阶�
 - 编译矩阵：Debug、Release、ASan+UBSan；GCC 与 Clang。
 - 游戏冒烟：启动、标题画面、模拟固定输入、EEPROM 往返。
 - 差异审计：导入脚本搜索 AVR 寄存器、ISR、汇编、直接 SPI 和危险类型假设。
-

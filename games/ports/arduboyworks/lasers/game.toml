@@ -8,9 +8,9 @@ entry = "third_party/ArduboyWorks/lasers/lasers.ino"
 
 [compat]
 level = "B"
-status = "imported"
+status = "smoke"
 libraries = ["Arduboy2"]
 
 [port]
-patches = []
-notes = ["共享 ArduboyWorks 构建入口；上游子模块保持未修改。"]
+patches = ["../patches/lasers-common.sed"]
+notes = ["共享 ArduboyWorks 构建入口；用等价 C++ 循环替换仅适用于 AVR 的灰屏汇编，上游子模块保持未修改。"]

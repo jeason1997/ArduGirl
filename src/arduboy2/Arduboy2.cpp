@@ -121,6 +121,59 @@ bool Arduboy2::collide(std::int16_t x1, std::int16_t y1, std::uint8_t w1, std::u
     return x1 < x2 + w2 && x2 < x1 + w1 && y1 < y2 + h2 && y2 < y1 + h1;
 }
 
+void Arduboy2::initAudio(std::uint8_t channels) noexcept {
+    audio_channels_ = channels;
+}
+
+void Arduboy2::closeAudio() noexcept {
+    audio_channels_ = 0;
+}
+
+bool Arduboy2::isAudioEnabled() const noexcept {
+    return audio.enabled();
+}
+
+void Arduboy2::setAudioEnabled(bool enabled) noexcept {
+    enabled ? audio.on() : audio.off();
+}
+
+void Arduboy2::toggleAudioEnabled() noexcept {
+    audio.toggle();
+}
+
+void Arduboy2::saveAudioOnOff() noexcept {
+    audio.saveOnOff();
+}
+
+void Arduboy2::playTone(std::uint16_t frequency, std::uint16_t duration,
+                        std::uint8_t priority, std::uint8_t duty_cycle) noexcept {
+    // 当前 Linux 基线尚未接入音频输出；这里保留完整调用契约和状态门控，
+    // 后续平台音频后端应在此统一转发，游戏适配层不得各自吞掉声音请求。
+    (void) frequency;
+    (void) duration;
+    (void) priority;
+    (void) duty_cycle;
+}
+
+void Arduboy2::stopTone() noexcept {}
+
+void Arduboy2::playScore(const byte* score, std::uint8_t priority,
+                         std::int8_t pitch) noexcept {
+    (void) score;
+    (void) priority;
+    (void) pitch;
+}
+
+void Arduboy2::playWave(std::uint16_t frequency, const byte* wave,
+                        std::uint16_t samples, std::uint8_t priority) noexcept {
+    (void) frequency;
+    (void) wave;
+    (void) samples;
+    (void) priority;
+}
+
+void Arduboy2::stopScore() noexcept {}
+
 void Arduboy2::drawPixel(std::int16_t x, std::int16_t y,
                          std::uint8_t color) noexcept {
     auto& screen = ardugirl::framebuffer();

@@ -30,8 +30,21 @@
 #define OLED_PIXELS_NORMAL 0xA6
 #define OLED_PIXELS_INVERTED 0xA7
 
-struct Point { std::int16_t x; std::int16_t y; };
-struct Rect { std::int16_t x; std::int16_t y; std::uint8_t width; std::uint8_t height; };
+struct Point {
+    constexpr Point(std::int16_t x_value = 0, std::int16_t y_value = 0) noexcept
+        : x(x_value), y(y_value) {}
+    std::int16_t x;
+    std::int16_t y;
+};
+struct Rect {
+    constexpr Rect(std::int16_t x_value = 0, std::int16_t y_value = 0,
+                   std::uint8_t width_value = 0, std::uint8_t height_value = 0) noexcept
+        : x(x_value), y(y_value), width(width_value), height(height_value) {}
+    std::int16_t x;
+    std::int16_t y;
+    std::uint8_t width;
+    std::uint8_t height;
+};
 
 class Arduboy2 {
 public:
@@ -99,8 +112,30 @@ public:
     void sendLCDCommand(std::uint8_t) noexcept {}
     void setTextSize(std::uint8_t size) noexcept { textSize = size; }
     std::uint8_t getTextColor() const noexcept { return text_color_; }
+    void initAudio(std::uint8_t channels) noexcept;
+    void closeAudio() noexcept;
+    bool isAudioEnabled() const noexcept;
+    void setAudioEnabled(bool enabled) noexcept;
+    void toggleAudioEnabled() noexcept;
+    void saveAudioOnOff() noexcept;
+    void playTone(std::uint16_t frequency, std::uint16_t duration,
+                  std::uint8_t priority = 0xFF, std::uint8_t duty_cycle = 2) noexcept;
+    void stopTone() noexcept;
+    void playScore(const byte* score, std::uint8_t priority = 0,
+                   std::int8_t pitch = 0) noexcept;
+    void playWave(std::uint16_t frequency, const byte* wave,
+                  std::uint16_t samples, std::uint8_t priority = 0) noexcept;
+    void stopScore() noexcept;
     static bool collide(std::int16_t x1, std::int16_t y1, std::uint8_t w1, std::uint8_t h1,
                         std::int16_t x2, std::int16_t y2, std::uint8_t w2, std::uint8_t h2) noexcept;
+    static bool collide(Point point, Rect rect) noexcept {
+        return point.x >= rect.x && point.x < rect.x + rect.width &&
+               point.y >= rect.y && point.y < rect.y + rect.height;
+    }
+    static bool collide(Rect first, Rect second) noexcept {
+        return collide(first.x, first.y, first.width, first.height,
+                       second.x, second.y, second.width, second.height);
+    }
 
     void drawPixel(std::int16_t x, std::int16_t y,
                    std::uint8_t color = WHITE) noexcept;
@@ -148,4 +183,5 @@ private:
     std::uint8_t text_background_ = BLACK;
     std::uint8_t current_buttons_ = 0;
     std::uint8_t previous_buttons_ = 0;
+    std::uint8_t audio_channels_ = 0;
 };

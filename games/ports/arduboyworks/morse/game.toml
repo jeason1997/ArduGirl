@@ -8,7 +8,7 @@ entry = "third_party/ArduboyWorks/morse/morse.ino"
 
 [compat]
 level = "B"
-status = "imported"
+status = "smoke"
 libraries = ["Arduboy2"]
 
 [port]
