@@ -66,7 +66,7 @@ ATM_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/atm_test.o \
 	$(BUILD_DIR)/src/compat/ATMlib.o
 
-.PHONY: all test test-terminal smoke clean check-upstream check-sdl
+.PHONY: all test test-terminal smoke clean check-upstream check-sdl py32 flash-py32
 
 all: check-upstream check-sdl $(PORT_BUILD_TARGETS)
 
@@ -134,6 +134,12 @@ test-terminal: $(PORT_TERMINAL_TEST_TARGETS)
 
 smoke: $(SMOKE_TARGET)
 	$(SMOKE_TARGET)
+
+py32:
+	$(MAKE) -f platform/py32/Makefile GAME=$(PY32_GAME)
+
+flash-py32:
+	$(MAKE) -f platform/py32/Makefile GAME=$(PY32_GAME) flash
 
 clean:
 	rm -rf $(BUILD_DIR)

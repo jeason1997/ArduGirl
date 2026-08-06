@@ -25,10 +25,16 @@
 | Arduboy2 兼容实现 | partial | 已覆盖当前 21 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM、静态音频控制和定时 tone；尚非完整上游 API |
 | 游戏源码 | partial | 已固定并接入 MicroTD、ArduboyWorks 18 个游戏、Ardynia 与 Arduventure；后续游戏按 `GAME_PORTS.md` 继续导入 |
 | 音频 | partial | SDL2 已实现双声道方波、8 位波表和四声道 ATM 合成；Arduboy2Beep、ArduboyPlaytune、ArduboyWorks 音频扩展与 ATMlib 已接入，Arduventure 标题音乐回放通过。ArduboyTones 与长时间音乐仍待真实样本验证 |
-| PY32 | planned | 需先指定芯片/板卡/屏幕 |
+| PY32 | partial | PY32F002A + ST7789 首版已构建、烧录并进入 Arduventure 绘制循环；按钮、蜂鸣器待实机交互验收，Flash EEPROM 尚未实现 |
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+
+- 完成首次 PY32 移植错误复盘，记录平台代码污染游戏目录、厂商库误放根 `third_party/`、直接修改上游游戏、建立“平台 × 游戏”组合构建文件、遗留无关构建目录、GPIO 多引脚误用导致黑屏、全仓清理导致 WSL 构建缓慢，以及遗漏 AVR/ARM `char` 符号差异八类问题；对应纠正方式和后续 MCU 平台检查表已保存至 `docs/PY32_PORTING_RETROSPECTIVE.md`。
+- 建立 PY32F002A 首版后端与独立显示驱动边界：ST7789 仅在具体驱动中实现，128×64 framebuffer 不缩放显示于 240×240 屏幕中央；板级按钮和蜂鸣器引脚集中配置。Arduventure 交叉链接结果为 text 28436、data 52、bss 2588 字节，已通过 CMSIS-DAP/OpenOCD 写入和校验。复位运行两秒后帧计数为 42，PC 位于 `Sprites::drawSelfMasked`，MSP 为 `0x20000f88`。蜂鸣器已实现四声道到单声部的软件 DDS 输出；按钮、声音听感和画面方向仍待实机交互验收，EEPROM 暂不持久化，因此平台继续标为 `partial`。
+- 纠正首版 PY32 构建边界：`games/arduventure/` 保持本次任务前的内容，不承载任何 PY32 改动；删除“平台×游戏”专用目标文件，改由 `tools/prepare_game.py` 通用读取已有 `game.toml` 并生成源码快照，根 Makefile 只暴露通用 `PY32_GAME` 扩展点。CMSIS、PY32F002Ax5 设备头、LL、系统文件、启动汇编、链接脚本和 OpenOCD 配置已作为固定快照收口到 `platform/py32/vendor/`，不占用游戏与 Arduboy 上游专用的根 `third_party/`，构建与烧录也不再依赖开发机参考工程的绝对路径。重构后从空 `build/` 完成通用准备和 PY32 固件构建，尺寸保持不变。
+- 修复 PY32 ST7789 无输出：PY32 LL 的 GPIO 单元接口一次只允许一个引脚，原实现错误地把多个引脚组合传入，导致 PA5/PA7 SPI 复用配置无效；现已逐引脚配置显示和六个按钮，并补齐参考驱动的上下拉、Gamma 表及 SPI 使能顺序。修复后固件 text 为 28652 字节，已重新烧录校验；运行三秒帧计数为 58，GPIOA MODER=`0xEBFFBB5F`、SPI1 CR1=`0xC347`、MSP=`0x20000f80`，确认应用持续运行且显示总线寄存器配置正确。
+- 修复 Sunfire 的 PY32 构建失败：Arm GCC 默认无符号 `char`，与该 AVR 游戏依赖的有符号 `char` 语义不一致，既导致负数位图表发生窄化错误，也会改变俯仰和滚转判断。PY32 的统一 C++ 编译契约现使用 `-fsigned-char`，未修改游戏源码，也未增加游戏专用构建文件。Sunfire 冷构建结果为 text 17376、data 368、bss 2832 字节，并已通过 CMSIS-DAP/OpenOCD 写入和校验。
 
 - 固定并接入 Helmets & Hordes 87d1b7e1、Fantasy Rampage 29d30d35 和 Sunfire e99fff73；三款游戏均复用公共 ATMlib 四声道解释器与 SDL 合成后端。已补齐旧版 Arduino/Arduboy API 并增加回归断言，通过各自 C++17 构建、固定输入无头运行和三阶段 framebuffer 截图。上游子模块保持 clean；完整流程和长期音乐仍标为 partial。
 - 重排 `GAME_PORTS.md`：补齐全部 21 款现有移植游戏，按 MicroTD、ArduboyWorks 批次、Ardynia、Arduventure 的实际接入顺序置顶并标记 `✅ 已移植`；其余 41 款源码可访问候选单独保留原优先级，移植状态更易识别。

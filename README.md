@@ -59,6 +59,8 @@ make microtd
 - [固定的上游版本](docs/UPSTREAMS.md)
 - [性能与整数模型](docs/PERFORMANCE.md)
 - [SDL2 前端](docs/LINUX_SDL.md)
+- [PY32F002A 平台](docs/PY32F002A.md)
+- [PY32 移植错误复盘](docs/PY32_PORTING_RETROSPECTIVE.md)
 - [终端前端](docs/LINUX_TERMINAL.md)
 - [路线图](docs/ROADMAP.md)
 - [当前进度](docs/PROGRESS.md)

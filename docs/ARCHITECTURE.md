@@ -7,7 +7,7 @@ ArduGirl 使用四层结构：
 1. **Game**：原始游戏逻辑、资源、`setup()` 和 `loop()`。
 2. **Compatibility**：Arduboy2、Sprites、Arduino 和有限 AVR 兼容 API。
 3. **Core**：统一 runtime、1024 字节 framebuffer 和平台无关服务。
-4. **Backend**：默认使用 Linux SDL2，保留 Linux terminal 作为可选后端，未来再实现 PY32/STM32。
+4. **Backend**：默认使用 Linux SDL2，保留 Linux terminal 作为可选后端；PY32F002A 已有首版实验后端，STM32 尚未实现。
 
 只有下层可以被上层依赖。后端通过注册或链接时选择实现平台契约。
 
@@ -158,6 +158,8 @@ Arduboy2 游戏依赖类、方法、重载和 Arduino `Print`，所以游戏与�
 
 只提供 C 编译器、完全没有 C++ 前端的平台无法直接编译原生 Arduboy 游戏，因此不列为支持目标。
 
-## 9. 后续 MCU 接入条件
+## 9. MCU 接入条件
 
-PY32/STM32 后端只有在 Linux golden tests 稳定后开始。每个后端仅需提供：初始化、按键、时间、present、音频和存储。显示为 SSD1306 时可以直接发送页面 buffer；RGB565 屏幕在后端转换。
+PY32/STM32 后端只有在 Linux golden tests 稳定后开始。每个后端仅需提供：初始化、按键、时间、present、音频和存储。显示为 SSD1306 时可以直接发送页面 buffer；RGB565 屏幕在后端转换。PY32 内部另设不进入公共 API 的显示驱动接口，使具体屏幕可以在构建时替换；当前 ST7789 实现仅消费 128×64 页面 buffer，不改变核心布局。
+
+MCU 构建由对应平台目录所有。游戏的公共构建描述以既有 `game.toml` 为数据源，通用准备器负责解析上游入口、补丁和生成物；不得为每个“平台×游戏”组合增加适配文件。游戏描述不得包含芯片型号、厂商 SDK、工具链、启动文件、链接脚本、具体显示驱动或烧录器配置。MCU 厂商底层代码必须作为固定 revision 或可审计快照进入对应平台自己的 `vendor/`，不得占用仅用于游戏与 Arduboy 生态上游的根 `third_party/`，平台构建也不得依赖开发机上的绝对路径。

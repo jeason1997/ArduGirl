@@ -2,6 +2,7 @@
 /build/
 /build-*/
 /out/
+/platform/py32/vendor/tools/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
@@ -36,4 +37,3 @@ Thumbs.db
 *.profdata
 eeprom.bin
 *.sav
-
