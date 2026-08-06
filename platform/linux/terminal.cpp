@@ -1,6 +1,6 @@
 #include "ardugirl/constants.hpp"
 #include "ardugirl/platform.hpp"
-#include "../linux_common/storage.hpp"
+#include "storage.hpp"
 
 #include <chrono>
 #include <cstdio>

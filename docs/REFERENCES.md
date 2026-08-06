@@ -43,7 +43,7 @@
 - Support status: https://wiki.libsdl.org/SDL2/Support
 - 用途：Linux 窗口、输入、计时、音频和后续 gamepad 支持。
 
-SDL2 类型只能存在于 `platform/linux_sdl2` 内部。未来可增加 SDL3 backend，但不改变平台公共接口。
+SDL2 类型只能存在于 `platform/linux/` 的 SDL 实现文件内部。未来可增加 SDL3 backend，但不改变平台公共接口。
 
 ### POSIX terminal
 

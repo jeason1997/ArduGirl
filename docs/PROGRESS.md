@@ -30,6 +30,7 @@
 
 ## 已完成
 
+- 将 `platform/linux_common`、`platform/linux_sdl` 和 `platform/linux_terminal` 收拢为单一 `platform/linux/` 目录；SDL2、终端和共享存储通过文件名区分，构建目标与平台行为保持不变。
 - 补齐 Arduboy2 高频兼容接口：三角形、圆角矩形、XY/compressed bitmap、Sprites 外部遮罩/自遮罩/擦除、文本缩放与换行、`notPressed()`、`delay()`、`map()` 和真实微秒计时；新增兼容层回归测试。
 - SDL2 后端新增 48 kHz 方波输出、线程安全的频率切换和停止控制；无音频设备时安全降级，终端后端保持静音。
 - 新增独立 ArduboyPlaytune 兼容实现，以主循环非阻塞推进音符、停止、等待、标记和重复指令；SDL2 后端扩展为双声道方波混合，ArduboyWorks 私有优先级接口通过集合适配层转发。

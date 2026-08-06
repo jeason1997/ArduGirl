@@ -7,8 +7,8 @@ MICROTD_SOURCES := \
 	src/compat/EEPROM.cpp \
 	src/arduboy2/Sprites.cpp \
 	games/microtd/entry.cpp
-TERMINAL_MICROTD_SOURCES := $(filter-out platform/linux_sdl/render.cpp platform/linux_common/storage.cpp,\
-	$(MICROTD_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp))
+TERMINAL_MICROTD_SOURCES := $(filter-out platform/linux/render.cpp platform/linux/storage.cpp,\
+	$(MICROTD_SOURCES:platform/linux/sdl.cpp=platform/linux/terminal.cpp))
 TERMINAL_MICROTD_SOURCES += $(LINUX_STORAGE_SOURCE)
 MICROTD_OBJECTS := $(MICROTD_SOURCES:%.cpp=$(BUILD_DIR)/microtd/%.o)
 TERMINAL_MICROTD_OBJECTS := $(TERMINAL_MICROTD_SOURCES:%.cpp=$(BUILD_DIR)/terminal-microtd/%.o)

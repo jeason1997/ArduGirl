@@ -20,9 +20,9 @@ RUNTIME_SOURCES := \
 	src/compat/ArduboyPlaytune.cpp \
 	src/runtime/main.cpp
 
-LINUX_STORAGE_SOURCE := platform/linux_common/storage.cpp
-SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_sdl/sdl.cpp platform/linux_sdl/render.cpp $(LINUX_STORAGE_SOURCE)
-TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux_terminal/terminal.cpp $(LINUX_STORAGE_SOURCE)
+LINUX_STORAGE_SOURCE := platform/linux/storage.cpp
+SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/sdl.cpp platform/linux/render.cpp $(LINUX_STORAGE_SOURCE)
+TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/terminal.cpp $(LINUX_STORAGE_SOURCE)
 
 PORT_BUILD_TARGETS :=
 PORT_TEST_TARGETS :=
@@ -40,13 +40,13 @@ TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/framebuffer_test.o
 SDL_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/sdl_backend_test.o \
-	$(BUILD_DIR)/platform/linux_sdl/sdl.o \
-	$(BUILD_DIR)/platform/linux_sdl/render.o \
-	$(BUILD_DIR)/platform/linux_common/storage.o \
+	$(BUILD_DIR)/platform/linux/sdl.o \
+	$(BUILD_DIR)/platform/linux/render.o \
+	$(BUILD_DIR)/platform/linux/storage.o \
 	$(BUILD_DIR)/src/core/framebuffer.o
 STORAGE_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/storage_test.o \
-	$(BUILD_DIR)/platform/linux_common/storage.o
+	$(BUILD_DIR)/platform/linux/storage.o
 COMPAT_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/compat_test.o \
 	$(BUILD_DIR)/src/core/framebuffer.o \

@@ -1,7 +1,7 @@
 #include "ardugirl/constants.hpp"
 #include "ardugirl/platform.hpp"
 #include "render.hpp"
-#include "../linux_common/storage.hpp"
+#include "storage.hpp"
 
 #include <SDL.h>
 
