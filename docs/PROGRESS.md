@@ -20,7 +20,7 @@
 | framebuffer core | done | 1024 字节页面布局、像素、直线、矩形、圆、三角形、bitmap、compressed bitmap 及回归测试 |
 | Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；按当前决策暂停效果优化 |
 | MicroTD | partial | 子模块源码未修改；固定输入回放已验证进入地图、建塔和启动波次；待持久化和完整游玩验证 |
-| ArduboyWorks 游戏集 | partial | 整仓固定到 `d4b1f041`；18 个游戏均已成功构建并分别通过 180 帧 SDL2 无头冒烟；待逐游戏固定输入回放、实际画面截图和完整玩法验证 |
+| ArduboyWorks 游戏集 | partial | 整仓固定到 `d4b1f041`；18 个游戏均已成功构建、通过 180 帧 SDL2 无头冒烟，并分别保存 Logo、菜单和核心玩法截图；待逐游戏完整流程、音频和存档验证 |
 | Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调毫秒/微秒计时、headless、事件注入、framebuffer golden test、EEPROM 文件后端、双声道方波、波表和四声道 ATM 合成；gamepad 与长时间音频仍待验证 |
 | Arduboy2 兼容实现 | partial | 已覆盖当前 21 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM、静态音频控制和定时 tone；尚非完整上游 API |
 | 游戏源码 | partial | 已固定并接入 MicroTD、ArduboyWorks 18 个游戏、Ardynia 与 Arduventure；后续游戏按 `GAME_PORTS.md` 继续导入 |
@@ -29,7 +29,10 @@
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
-- 统一游戏截图验收规范：每个完成移植的游戏必须在自身 `assets/` 中保存至少 3 张由当前 ArduGirl 前端生成的不同阶段截图，至少包含 1 张实际玩法画面，并在 README 中全部展示和说明；单张截图或无头冒烟只能标为 `partial`。现有 Arduventure、Ardynia 与 ArduboyWorks 的截图缺口继续列为待办。
+- 全量复核当前 21 个移植游戏的截图状态：MicroTD 保留 4 张验收图，Ardynia、Arduventure 与 ArduboyWorks 18 个游戏均补齐各自 `assets/` 下至少 3 张不同阶段 PNG，并在每个游戏自己的 README 中展示 Logo/菜单、剧情或出生点以及实际核心玩法；仓库现有 64 张游戏截图。自动审计确认全部图片为 128×64、游戏内哈希互不重复且 README 引用完整；从空 `build/` 执行 `make test -j4` 重建并测试全部 21 个游戏，135.5 秒退出码为 0。所有尚未完成完整流程验收的游戏继续标为 `partial`。
+- 通用 SDL2 运行入口新增可重复的 `--replay-button 帧:掩码:持续帧数` 与 `--capture-frame 帧:路径`，可按确定性输入路径导出 128×64 PGM framebuffer，为后续移植提供可复现截图证据。
+- 固定输入首次进入 Psi Colo 骰子棋盘时发现上游 `drawFloorOrBlank` 声明返回 `bool` 却不返回值；已在游戏自身保存编号最小补丁，并将 ArduboyWorks 生成阶段扩展为按编号安全应用 `game.cpp` 补丁。修复后 260 帧玩法回放和三阶段截图通过，上游子模块保持 clean。
+- 统一游戏截图验收规范：每个完成移植的游戏必须在自身 `assets/` 中保存至少 3 张由当前 ArduGirl 前端生成的不同阶段截图，至少包含 1 张实际玩法画面，并在 README 中全部展示和说明；单张截图或无头冒烟只能标为 `partial`。
 - 明确本仓库发布约束：用户要求“提交”时只使用 Git 检查、提交并推送当前分支，不依赖 GitHub CLI，也不默认创建 Pull Request。
 - 固定并接入 Arduventure `938fae77` 与 ATMlib `952d079f`：上游子模块保持 clean，公共兼容层解释四声道乐谱，SDL2 合成脉冲、三角和噪声波形；从空 `build/` 完成全仓构建，ATM 单元测试、180 帧无头启动和“标题→新游戏→剧情入口”固定回放通过，并保存 ArduGirl framebuffer 实际截图。当前仍标为 `partial`，待战斗、存档、完整剧情和长时间音乐验证。
 - 固定并接入 Ardynia `860312d2`：上游子模块保持 clean，通过外部入口和独立 `port.mk` 构建；补齐公共 `Arduboy2Base::sBuffer`、静态 `Arduboy2Audio` 与 EEPROM `get/put` 契约。修复玩家贴近屏幕顶部时依赖 AVR 16 位 `int` 回绕的 framebuffer 越界，以及蛇敌人离屏后先读瓦片造成的数组越界；“进入游戏后持续向上移动”固定回放已在 ASan+UBSan 与普通优化构建下通过。
@@ -75,7 +78,7 @@
 ## 下一步
 
 1. 对照固定 Arduboy2 上游版本生成公共 API 差异清单，并补齐代表性官方示例编译测试。
-2. 为 ArduboyWorks 游戏逐个补充固定输入回放、实际运行截图和完整玩法验证；当前全部游戏已达到可构建、可启动状态。
+2. 将本次 ArduboyWorks 截图输入时序固化为逐游戏自动回放断言，并继续验证完整流程、音频和存档；当前 18 个游戏均已有实际核心玩法截图。
 3. 添加 PCM、复杂压缩图片、时间回绕、GCC/Clang 和 sanitizers 测试。
 4. 增加 SDL2 gamepad 输入和键位配置。
 5. 按 `GAME_PORTS.md` 优先级引入 Twotris，并完成源码固定、构建、冒烟和截图闭环。

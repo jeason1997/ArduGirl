@@ -1,0 +1,20 @@
+--- game.cpp
++++ game.cpp
+@@ -97,7 +97,7 @@ static void onMenuSelectIssue(void);
+ 
+ static void drawField(void);
+ static void drawObject(int x, int y);
+-static bool drawFloorOrBlank(int x, int y, int g);
++static void drawFloorOrBlank(int x, int y, int g);
+ static bool checkNeiborDepth(OBJ_T *pObj);
+ static void drawDie(int16_t dx, int16_t dy, uint16_t type, uint16_t rotate, boolean isWhite);
+ static void drawObjectBitmap(int16_t x, int16_t y, int id, uint8_t c);
+@@ -854,7 +854,7 @@ static void drawObject(int x, int y)
+     }
+ }
+ 
+-static bool drawFloorOrBlank(int x, int y, int g)
++static void drawFloorOrBlank(int x, int y, int g)
+ {
+     int dx = x * GRID_PIXEL + 24 + DEPTH_PIXEL;
+     int dy = y * GRID_PIXEL + 4  + DEPTH_PIXEL;

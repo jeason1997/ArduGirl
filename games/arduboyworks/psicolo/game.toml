@@ -10,5 +10,5 @@ status = "smoke"
 libraries = ["Arduboy2"]
 
 [port]
-patches = []
-notes = ["共享 ArduboyWorks 构建入口；上游子模块保持未修改。"]
+patches = ["patches/0001-game-fix-floor-draw-return-type.patch"]
+notes = ["共享 ArduboyWorks 构建入口；上游子模块保持未修改。", "修正 drawFloorOrBlank 声明为 bool 却不返回值导致的桌面优化构建未定义行为。"]

@@ -5,6 +5,7 @@ ARDUBOYWORKS_TARGETS := $(ARDUBOYWORKS_GAMES:%=$(BUILD_DIR)/arduboyworks-%-sdl)
 define ARDUBOYWORKS_GAME_template
 ARDUBOYWORKS_$(1)_TITLE_SOURCE := $$(if $$(shell grep -q 'static void drawText(const char \*p, int lines);' third_party/ArduboyWorks/$(1)/title.cpp 2>/dev/null && printf yes),third_party/ArduboyWorks/$(1)/title.cpp)
 ARDUBOYWORKS_$(1)_COMMON_PATCHES := $$(wildcard games/arduboyworks/$(1)/patches/[0-9][0-9][0-9][0-9]-common-*.patch)
+ARDUBOYWORKS_$(1)_GAME_PATCHES := $$(wildcard games/arduboyworks/$(1)/patches/[0-9][0-9][0-9][0-9]-game-*.patch)
 ARDUBOYWORKS_$(1)_ADAPTER_SOURCE := $$(if $$(wildcard third_party/ArduboyWorks/$(1)/MyArduboy2.h),games/arduboyworks/upstream_adapter.cpp)
 ARDUBOYWORKS_$(1)_AUDIO_FLAGS := \
 	$$(if $$(shell grep -q 'stopTone' third_party/ArduboyWorks/$(1)/MyArduboy2.h 2>/dev/null && printf yes),-DARDUBOYWORKS_HAS_STOP_TONE) \
@@ -14,9 +15,10 @@ ARDUBOYWORKS_$(1)_SOURCES := \
 	src/arduboy2/Arduboy2.cpp \
 	src/compat/EEPROM.cpp \
 	src/arduboy2/Sprites.cpp \
-	$$(filter-out third_party/ArduboyWorks/$(1)/MyArduboyPlaytune.cpp $$(ARDUBOYWORKS_$(1)_TITLE_SOURCE) $$(if $$(ARDUBOYWORKS_$(1)_COMMON_PATCHES),third_party/ArduboyWorks/$(1)/common.cpp),$$(wildcard third_party/ArduboyWorks/$(1)/*.cpp)) \
+	$$(filter-out third_party/ArduboyWorks/$(1)/MyArduboyPlaytune.cpp $$(ARDUBOYWORKS_$(1)_TITLE_SOURCE) $$(if $$(ARDUBOYWORKS_$(1)_COMMON_PATCHES),third_party/ArduboyWorks/$(1)/common.cpp) $$(if $$(ARDUBOYWORKS_$(1)_GAME_PATCHES),third_party/ArduboyWorks/$(1)/game.cpp),$$(wildcard third_party/ArduboyWorks/$(1)/*.cpp)) \
 	$$(if $$(ARDUBOYWORKS_$(1)_TITLE_SOURCE),$$(BUILD_DIR)/generated/arduboyworks/$(1)/title.cpp) \
 	$$(if $$(ARDUBOYWORKS_$(1)_COMMON_PATCHES),$$(BUILD_DIR)/generated/arduboyworks/$(1)/common.cpp) \
+	$$(if $$(ARDUBOYWORKS_$(1)_GAME_PATCHES),$$(BUILD_DIR)/generated/arduboyworks/$(1)/game.cpp) \
 	$$(ARDUBOYWORKS_$(1)_ADAPTER_SOURCE) \
 	games/arduboyworks/entry.cpp
 ARDUBOYWORKS_$(1)_OBJECTS := $$(ARDUBOYWORKS_$(1)_SOURCES:%.cpp=$$(BUILD_DIR)/arduboyworks/$(1)/%.o)
@@ -46,6 +48,12 @@ $$(BUILD_DIR)/generated/arduboyworks/$(1)/common.cpp: third_party/ArduboyWorks/$
 	@mkdir -p $$(@D)
 	@sed 's/\r$$$$//' $$< > $$@.tmp
 	@for patch_file in $$(ARDUBOYWORKS_$(1)_COMMON_PATCHES); do patch --silent $$@.tmp < $$$$patch_file || { rm -f $$@.tmp; exit $$$$?; }; done
+	@mv $$@.tmp $$@
+
+$$(BUILD_DIR)/generated/arduboyworks/$(1)/game.cpp: third_party/ArduboyWorks/$(1)/game.cpp $$(ARDUBOYWORKS_$(1)_GAME_PATCHES)
+	@mkdir -p $$(@D)
+	@sed 's/\r$$$$//' $$< > $$@.tmp
+	@for patch_file in $$(ARDUBOYWORKS_$(1)_GAME_PATCHES); do patch --silent $$@.tmp < $$$$patch_file || { rm -f $$@.tmp; exit $$$$?; }; done
 	@mv $$@.tmp $$@
 
 $$(BUILD_DIR)/arduboyworks/$(1)/games/arduboyworks/entry.o: $$(BUILD_DIR)/generated/arduboyworks/$(1).ino

@@ -1,15 +1,19 @@
 # Ardynia
 
-Ardynia 是一款受经典俯视角动作冒险游戏启发的 Arduboy RPG，包含探索、战斗、地牢、道具和存档。本移植主要用于验证大型 Arduboy2 游戏以及 ArduboyPlaytune 双声道声音效果。
+Ardynia 是一款受经典俯视角动作冒险游戏启发的 Arduboy RPG，包含探索、战斗、地牢、道具和存档。本移植同时验证大型 Arduboy2 游戏和 ArduboyPlaytune 双声道音效路径。
 
-## 运行
+## 截图验收
+
+| 标题与开始菜单 | 新游戏出生点 | 野外移动玩法 |
+| --- | --- | --- |
+| ![Ardynia 标题与开始菜单](assets/title.png) | ![Ardynia 新游戏出生点](assets/game-start.png) | ![Ardynia 野外移动玩法](assets/gameplay.png) |
+
+## 状态与运行
+
+当前状态为 `partial`：Linux SDL2 冷构建、无头启动、ASan+UBSan 固定回放和截图路径已通过；截图证明已进入核心探索玩法，但完整战斗、地牢、道具、存档和音频流程仍未逐项验收。
 
 ```bash
 make ardynia
 ```
 
 方向键或 WASD 控制移动，J/Z 对应 A 键，K/X 对应 B 键，Escape 退出。
-
-## 当前状态
-
-上游源码固定为 `860312d2c22524b2b6e96951691e4d426eb3b701`，并保持未修改。当前完成 Linux SDL2 冷构建、无头启动冒烟，以及“进入游戏后持续向上移动”的 ASan+UBSan 固定回放；实际运行截图和完整玩法验证尚未完成，因此状态仍为 `partial`。
