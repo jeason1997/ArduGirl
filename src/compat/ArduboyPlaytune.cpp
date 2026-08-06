@@ -39,12 +39,14 @@ void ArduboyPlaytune::initChannel(std::uint8_t channel) noexcept {
     (void) channel;
 }
 
-void ArduboyPlaytune::playScore(const byte* score) noexcept {
+void ArduboyPlaytune::playScore(const byte* score, std::int8_t pitch) noexcept {
     stopScore();
     if (score == nullptr) return;
     score_start_ = score;
     score_cursor_ = score;
     repeat_count_ = 0;
+    default_pitch_ = pitch;
+    pitch_ = pitch;
     playing_ = true;
     stepScore();
 }
@@ -82,12 +84,19 @@ void ArduboyPlaytune::stepScore() noexcept {
             return;
         } else if (opcode == 0xC0u) {
             score_start_ = score_cursor_ - 1;
+            if (repeat_count_ > 0) {
+                constexpr std::int8_t pitch_steps[] = {
+                    0, 1, 2, 3, 4, 6, 8, 12, 0, -12, -8, -6, -4, -3, -2, -1
+                };
+                pitch_ = static_cast<std::int8_t>(pitch_ + pitch_steps[operand]);
+            }
         } else if (opcode == 0xD0u) {
             if (operand == 0 || ++repeat_count_ < (1u << operand)) {
                 score_cursor_ = score_start_;
             } else {
                 score_start_ = score_cursor_;
                 repeat_count_ = 0;
+                pitch_ = default_pitch_;
             }
         } else if (opcode == 0xF0u) {
             stopScore();
@@ -98,7 +107,10 @@ void ArduboyPlaytune::stepScore() noexcept {
 void ArduboyPlaytune::playNote(std::uint8_t channel, std::uint8_t note) noexcept {
     if (channel >= channel_count_ || channel >= 2) return;
     if (output_enabled_ != nullptr && *output_enabled_) {
-        ardugirl::platform::set_tone(midi_frequency(note), channel);
+        const auto shifted = static_cast<std::int16_t>(note) + pitch_;
+        if (shifted >= 0 && shifted <= 127) {
+            ardugirl::platform::set_tone(midi_frequency(static_cast<std::uint8_t>(shifted)), channel);
+        }
     }
 }
 

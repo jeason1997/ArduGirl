@@ -11,7 +11,7 @@ public:
 
     void initChannel(std::uint8_t channel) noexcept;
     bool playing() const noexcept { return playing_; }
-    void playScore(const byte* score) noexcept;
+    void playScore(const byte* score, std::int8_t pitch = 0) noexcept;
     void stopScore() noexcept;
     void update() noexcept;
 
@@ -26,6 +26,8 @@ private:
     std::uint32_t wait_deadline_ms_ = 0;
     std::uint8_t channel_count_ = 0;
     std::uint8_t repeat_count_ = 0;
+    std::int8_t default_pitch_ = 0;
+    std::int8_t pitch_ = 0;
     bool playing_ = false;
     ArduboyPlaytune* next_ = nullptr;
 

@@ -68,5 +68,11 @@ int main() {
     ardugirl_update_playtunes();
     assert(!stereo_player.playing());
     assert(frequencies[0] == 0 && frequencies[1] == 0);
+
+    constexpr byte shifted_score[] = {0x90, 69, 0x00, 0x01, 0x80, 0xF0};
+    now_ms = 400;
+    stereo_player.playScore(shifted_score, 12);
+    assert(frequencies[0] >= 879 && frequencies[0] <= 881);
+    stereo_player.stopScore();
     return 0;
 }

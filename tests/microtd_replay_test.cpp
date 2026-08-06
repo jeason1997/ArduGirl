@@ -39,6 +39,8 @@ std::uint32_t micros() noexcept { return millis() * 1000u; }
 void sleep_ms(std::uint32_t) noexcept {}
 void set_tone(std::uint16_t, std::uint8_t) noexcept {}
 void stop_tone(std::uint8_t) noexcept {}
+void play_wave(std::uint16_t, const std::uint8_t*, std::uint16_t) noexcept {}
+void stop_wave() noexcept {}
 
 bool storage_read(std::uint16_t offset, void* destination,
                   std::uint16_t size) noexcept {

@@ -25,6 +25,10 @@ bool invert = false;
 SDL_AudioDeviceID audio_device = 0;
 std::array<std::uint32_t, 2> audio_phase{};
 std::array<std::uint32_t, 2> audio_step{};
+const std::uint8_t* wave_samples = nullptr;
+std::uint16_t wave_sample_count = 0;
+std::uint64_t wave_position = 0;
+std::uint64_t wave_step = 0;
 
 constexpr std::uint8_t kLeft = 0x01;
 constexpr std::uint8_t kRight = 0x02;
@@ -76,6 +80,18 @@ void audio_callback(void*, Uint8* stream, int length) noexcept {
                 audio_phase[channel] += audio_step[channel];
             }
         }
+        if (wave_samples != nullptr && wave_sample_count != 0) {
+            const auto sample_index = static_cast<std::uint32_t>(wave_position >> 32u);
+            if (sample_index < wave_sample_count) {
+                mixed += (static_cast<std::int32_t>(wave_samples[sample_index]) - 128) * 48;
+                wave_position += wave_step;
+            } else {
+                wave_samples = nullptr;
+                wave_sample_count = 0;
+            }
+        }
+        if (mixed > 32767) mixed = 32767;
+        if (mixed < -32768) mixed = -32768;
         samples[index] = static_cast<std::int16_t>(mixed);
     }
 }
@@ -87,6 +103,12 @@ bool init(const Config& config) noexcept {
     current_buttons = 0;
     headless = config.headless;
     invert = config.invert;
+    audio_phase.fill(0);
+    audio_step.fill(0);
+    wave_samples = nullptr;
+    wave_sample_count = 0;
+    wave_position = 0;
+    wave_step = 0;
 
     // 无窗口测试仍初始化 SDL 的计时与事件子系统，但不要求显示服务器。
     const auto subsystems = static_cast<Uint32>(SDL_INIT_TIMER | SDL_INIT_EVENTS |
@@ -210,6 +232,25 @@ void stop_tone(std::uint8_t channel) noexcept {
     if (audio_device == 0 || channel >= audio_step.size()) return;
     SDL_LockAudioDevice(audio_device);
     audio_step[channel] = 0;
+    SDL_UnlockAudioDevice(audio_device);
+}
+
+void play_wave(std::uint16_t sample_rate_hz, const std::uint8_t* samples,
+               std::uint16_t sample_count) noexcept {
+    if (audio_device == 0 || samples == nullptr || sample_rate_hz == 0 || sample_count == 0) return;
+    SDL_LockAudioDevice(audio_device);
+    wave_samples = samples;
+    wave_sample_count = sample_count;
+    wave_position = 0;
+    wave_step = (static_cast<std::uint64_t>(sample_rate_hz) << 32u) / 48000u;
+    SDL_UnlockAudioDevice(audio_device);
+}
+
+void stop_wave() noexcept {
+    if (audio_device == 0) return;
+    SDL_LockAudioDevice(audio_device);
+    wave_samples = nullptr;
+    wave_sample_count = 0;
     SDL_UnlockAudioDevice(audio_device);
 }
 

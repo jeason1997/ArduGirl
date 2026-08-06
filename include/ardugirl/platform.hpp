@@ -26,6 +26,9 @@ std::uint32_t micros() noexcept;
 void sleep_ms(std::uint32_t duration) noexcept;
 void set_tone(std::uint16_t frequency_hz, std::uint8_t channel = 0) noexcept;
 void stop_tone(std::uint8_t channel = 0) noexcept;
+void play_wave(std::uint16_t sample_rate_hz, const std::uint8_t* samples,
+               std::uint16_t sample_count) noexcept;
+void stop_wave() noexcept;
 void present(const Framebuffer::Storage& pixels) noexcept;
 bool storage_read(std::uint16_t offset, void* destination,
                   std::uint16_t size) noexcept;

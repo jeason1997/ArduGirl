@@ -21,7 +21,7 @@
 - frame rate、frameCount、everyXFrames
 - pollButtons 和全部按钮查询
 - 支持缩放、换行、光标查询、字符串和整数的基本文本输出
-- audio enabled 状态、`initAudio`、定时 `playTone` 和停止接口；SDL2 后端输出方波，终端后端保持静音。ArduboyPlaytune 已实现音符、停止、毫秒等待、标记和重复指令，并支持两个方波声道；`playWave` 尚未实现波表采样
+- audio enabled 状态、`initAudio`、定时 `playTone` 和停止接口；SDL2 后端输出方波，终端后端保持静音。ArduboyPlaytune 已实现音符、停止、毫秒等待、标记、重复和移调，并支持两个方波声道；`playWave` 支持一次性播放 8 位无符号波表
 
 ### Arduino
 
@@ -70,7 +70,7 @@ EEPROM.put(addr, someNativeStruct);   // padding 和字段宽度变化
 4. ArduboyFX 数据读取抽象
 5. 由游戏样本驱动的其他库
 
-ArduboyPlaytune 已作为独立兼容库实现。ArduboyTones、ATMlib 和直接依赖 AVR timer/ISR 的其他库不进入第一阶段。
+ArduboyPlaytune 已作为独立兼容库实现。当前导入游戏不依赖 ArduboyTones 或 ATMlib；它们和直接依赖 AVR timer/ISR 的其他库不伪装成已支持，待真实游戏导入时按固定上游版本单独移植。
 
 当前 `micros()` 使用平台单调高精度计数器并按无符号 32 位自然回绕；不再由毫秒值乘 1000 模拟。Linux SDL2 音频只承诺单声道方波，不承诺模拟 AVR 定时器寄存器。
 

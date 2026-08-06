@@ -45,6 +45,10 @@ int main() {
     // 无音频设备的 CI 环境也必须安全接受音频控制调用。
     ardugirl::platform::set_tone(440);
     ardugirl::platform::stop_tone();
+    constexpr std::uint8_t wave[] = {0, 128, 255};
+    ardugirl::platform::play_wave(8000, wave, 3);
+    ardugirl::platform::sleep_ms(2);
+    ardugirl::platform::stop_wave();
 
     push_key(SDL_KEYDOWN, SDLK_LEFT);
     push_key(SDL_KEYDOWN, SDLK_w);

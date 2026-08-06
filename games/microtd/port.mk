@@ -16,6 +16,7 @@ MICROTD_REPLAY_TEST_SOURCES := \
 	tests/microtd_replay_test.cpp \
 	src/core/framebuffer.cpp \
 	src/arduboy2/Arduboy2.cpp \
+	src/compat/ArduboyPlaytune.cpp \
 	src/compat/EEPROM.cpp \
 	src/arduboy2/Sprites.cpp
 MICROTD_REPLAY_TEST_OBJECTS := $(MICROTD_REPLAY_TEST_SOURCES:%.cpp=$(BUILD_DIR)/replay/%.o)

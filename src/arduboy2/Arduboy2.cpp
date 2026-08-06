@@ -1,4 +1,5 @@
 #include "Arduboy2.h"
+#include "ArduboyPlaytune.h"
 
 #include "ardugirl/framebuffer.hpp"
 #include "ardugirl/platform.hpp"
@@ -10,6 +11,17 @@
 namespace {
 
 using Glyph = std::array<std::uint8_t, 5>;
+
+bool legacy_score_enabled = true;
+ArduboyPlaytune legacy_score_player(legacy_score_enabled);
+std::uint8_t legacy_score_priority = 0xFF;
+
+struct LegacyScoreChannels {
+    LegacyScoreChannels() noexcept {
+        legacy_score_player.initChannel(PIN_SPEAKER_1);
+        legacy_score_player.initChannel(PIN_SPEAKER_2);
+    }
+} legacy_score_channels;
 
 Glyph glyph_for(char character) noexcept {
     // 字体数据在构建时从固定版本的 Arduboy2 上游文件提取，既保证字符行为
@@ -145,6 +157,9 @@ void Arduboy2::initAudio(std::uint8_t channels) noexcept {
 
 void Arduboy2::closeAudio() noexcept {
     audio_channels_ = 0;
+    stopTone();
+    ardugirl::platform::stop_wave();
+    legacy_score_player.stopScore();
 }
 
 bool Arduboy2::isAudioEnabled() const noexcept {
@@ -183,20 +198,21 @@ void Arduboy2::stopTone() noexcept {
 
 void Arduboy2::playScore(const byte* score, std::uint8_t priority,
                          std::int8_t pitch) noexcept {
-    (void) score;
-    (void) priority;
-    (void) pitch;
+    if (legacy_score_player.playing() && priority > legacy_score_priority) return;
+    legacy_score_enabled = audio.enabled();
+    legacy_score_priority = priority;
+    legacy_score_player.playScore(score, pitch);
 }
 
 void Arduboy2::playWave(std::uint16_t frequency, const byte* wave,
                         std::uint16_t samples, std::uint8_t priority) noexcept {
-    (void) frequency;
-    (void) wave;
-    (void) samples;
+    if (audio.enabled() && audio_channels_ != 0) {
+        ardugirl::platform::play_wave(frequency, wave, samples);
+    }
     (void) priority;
 }
 
-void Arduboy2::stopScore() noexcept {}
+void Arduboy2::stopScore() noexcept { legacy_score_player.stopScore(); }
 
 void Arduboy2::drawPixel(std::int16_t x, std::int16_t y,
                          std::uint8_t color) noexcept {

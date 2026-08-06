@@ -34,8 +34,7 @@ void MyArduboy2::playScore(const byte* score, std::uint8_t priority, std::int8_t
     if (score_player.playing() && priority > score_priority) return;
     score_output_enabled = Arduboy2::isAudioEnabled();
     score_priority = priority;
-    score_player.playScore(score);
-    (void) pitch;
+    score_player.playScore(score, pitch);
 }
 void MyArduboy2::stopScore() { score_player.stopScore(); }
 

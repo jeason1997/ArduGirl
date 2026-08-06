@@ -51,6 +51,7 @@ COMPAT_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/compat_test.o \
 	$(BUILD_DIR)/src/core/framebuffer.o \
 	$(BUILD_DIR)/src/arduboy2/Arduboy2.o \
+	$(BUILD_DIR)/src/compat/ArduboyPlaytune.o \
 	$(BUILD_DIR)/src/arduboy2/Sprites.o \
 	$(BUILD_DIR)/src/compat/EEPROM.o
 PLAYTUNE_TEST_OBJECTS := \

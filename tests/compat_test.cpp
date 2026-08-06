@@ -9,6 +9,8 @@
 namespace {
 
 std::uint32_t clock_us = 1234567;
+std::uint16_t wave_rate = 0;
+std::uint16_t wave_count = 0;
 
 } // 匿名命名空间
 
@@ -27,6 +29,11 @@ std::uint32_t micros() noexcept { return clock_us; }
 void sleep_ms(std::uint32_t duration) noexcept { clock_us += duration * 1000u; }
 void set_tone(std::uint16_t, std::uint8_t) noexcept {}
 void stop_tone(std::uint8_t) noexcept {}
+void play_wave(std::uint16_t rate, const std::uint8_t*, std::uint16_t count) noexcept {
+    wave_rate = rate;
+    wave_count = count;
+}
+void stop_wave() noexcept { wave_count = 0; }
 bool storage_read(std::uint16_t, void*, std::uint16_t) noexcept { return false; }
 bool storage_write(std::uint16_t, const void*, std::uint16_t) noexcept { return true; }
 
@@ -34,6 +41,10 @@ bool storage_write(std::uint16_t, const void*, std::uint16_t) noexcept { return 
 
 int main() {
     Arduboy2 arduboy;
+    arduboy.initAudio(1);
+    constexpr byte wave[] = {0, 128, 255};
+    arduboy.playWave(8000, wave, 3);
+    assert(wave_rate == 8000 && wave_count == 3);
     assert(micros() == 1234567u);
     delay(2);
     assert(micros() == 1236567u);
