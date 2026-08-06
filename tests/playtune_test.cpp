@@ -51,5 +51,22 @@ int main() {
     player.playScore(score);
     assert(frequencies[0] == 0);
     player.stopScore();
+
+    bool stereo_enabled = true;
+    ArduboyPlaytune stereo_player(stereo_enabled);
+    // 官方 DevKit 用同一个扬声器引脚初始化两个逻辑声道。
+    stereo_player.initChannel(0);
+    stereo_player.initChannel(0);
+    constexpr byte stereo_score[] = {
+        0x90, 69, 0x91, 57, 0x00, 0x64, 0x80, 0x81, 0xF0
+    };
+    now_ms = 200;
+    stereo_player.playScore(stereo_score);
+    assert(frequencies[0] >= 439 && frequencies[0] <= 441);
+    assert(frequencies[1] >= 219 && frequencies[1] <= 221);
+    now_ms = 300;
+    ardugirl_update_playtunes();
+    assert(!stereo_player.playing());
+    assert(frequencies[0] == 0 && frequencies[1] == 0);
     return 0;
 }

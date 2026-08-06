@@ -10,7 +10,7 @@ std::uint8_t score_priority = 0xFF;
 struct ScoreChannels {
     ScoreChannels() noexcept {
         score_player.initChannel(0);
-        score_player.initChannel(1);
+        score_player.initChannel(0);
     }
 } score_channels;
 

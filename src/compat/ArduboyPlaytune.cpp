@@ -33,7 +33,10 @@ ArduboyPlaytune::~ArduboyPlaytune() noexcept {
 }
 
 void ArduboyPlaytune::initChannel(std::uint8_t channel) noexcept {
-    if (channel < 2 && channel_count_ <= channel) channel_count_ = channel + 1;
+    // 参数是物理扬声器引脚而非声道编号；每次调用按顺序追加一个逻辑声道。
+    // DevKit 会用相同引脚调用两次，因此不能依据引脚值去重。
+    if (channel_count_ < 2) ++channel_count_;
+    (void) channel;
 }
 
 void ArduboyPlaytune::playScore(const byte* score) noexcept {
