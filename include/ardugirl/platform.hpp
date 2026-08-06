@@ -8,6 +8,7 @@ namespace ardugirl::platform {
 
 struct Config {
     bool plain_output = false;
+    const char* title = "ArduGirl";
 };
 
 bool init(const Config& config) noexcept;

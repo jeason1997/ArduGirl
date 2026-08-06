@@ -7,6 +7,7 @@
 
 void setup();
 void loop();
+const char* ardugirl_game_title() noexcept;
 
 namespace {
 
@@ -62,6 +63,7 @@ std::uint8_t buttons() noexcept {
 
 int main(int argc, char** argv) {
     ardugirl::platform::Config config;
+    config.title = ardugirl_game_title();
     if (!parse_arguments(argc, argv, config) || !ardugirl::platform::init(config)) {
         return 1;
     }

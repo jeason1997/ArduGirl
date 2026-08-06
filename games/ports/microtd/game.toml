@@ -1,0 +1,19 @@
+id = "microtd"
+name = "MicroTD"
+source = "https://gitlab.com/drummyfish/Arduboy_TD"
+revision = "0c8958fdcf57060c1380b3ca72082ca45b7a2bb5"
+license = "CC0-1.0"
+entry = "third_party/MicroTD/microtd.ino"
+
+[compat]
+level = "B"
+status = "menu-runs"
+libraries = ["Arduboy2"]
+
+[port]
+patches = []
+notes = [
+    "上游源码通过外部 entry.cpp 参与构建，未修改 microtd.ino",
+    "终端后端当前静音，EEPROM 当前仅在进程内保存"
+]
+

@@ -30,6 +30,12 @@ make demo
 
 终端使用 Unicode 盲文字符显示完整的 128x64 单色画面。按 `Q` 或 Escape 退出。
 
+运行首个社区游戏 MicroTD：
+
+```bash
+make microtd
+```
+
 ## 上游源码原则
 
 游戏和官方示例尽量保持原文件不变。ArduGirl 使用固定上游 revision、外部构建入口和兼容 API 完成移植；无法通过兼容层解决时，才允许建立可独立审查的最小补丁。
@@ -39,6 +45,7 @@ make demo
 - [架构与平台契约](docs/ARCHITECTURE.md)
 - [兼容范围](docs/COMPATIBILITY.md)
 - [游戏源码获取与导入](docs/GAME_PORTING.md)
+- [固定的上游版本](docs/UPSTREAMS.md)
 - [性能与整数模型](docs/PERFORMANCE.md)
 - [终端前端](docs/LINUX_TERMINAL.md)
 - [路线图](docs/ROADMAP.md)

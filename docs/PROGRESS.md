@@ -19,6 +19,7 @@
 | framebuffer core | done | 1024 字节页面布局、像素、直线、矩形及单元测试 |
 | Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；待差分刷新和 PTY 测试 |
 | 官方 Arduboy2 示例 | partial | 未修改的官方 HelloWorld 已构建运行；当前仅覆盖所需最小 API/字形 |
+| MicroTD | partial | CC0 上游源码未修改；主菜单已构建运行，待完整游玩和持久化验证 |
 | Linux SDL2 backend | deferred | 终端兼容基线稳定后开始 |
 | Arduboy2 兼容实现 | not started | 等最小 backend/runtime |
 | 游戏源码 | not started | 尚未选择，需先逐个核对许可证 |
@@ -40,14 +41,17 @@
 - 以 Git 子模块固定 Arduboy2 `bc460a2`，未修改的官方 `HelloWorld.ino` 已在终端显示。
 - 自写图形示例已移出 `games/`，仅保留为底层 smoke test。
 - 确定游戏与 Arduboy2 兼容层使用 C++，未来 MCU 平台边界保持可由 C HAL 实现。
+- 引入未修改的 MicroTD `0c8958f`，补齐字体、图元、Sprites、按钮边沿、EEPROM 内存接口和静音 Beep 接口；终端主菜单已显示，注入 A 键后 framebuffer 发生预期变化。
+- 明确上游版本锁定策略：默认禁止跟踪最新分支，只有用户明确要求时才移动并重新验证固定 SHA。
 
 ## 下一步
 
 1. 确定 ArduGirl 自身开源许可证。
 2. 为终端渲染器加入行级差分刷新和 pseudo-terminal 测试。
-3. 从官方 Arduboy2 字体与绘图行为继续补齐通用兼容实现。
-4. 添加更完整的 golden test 和 sanitizers。
-5. 终端跑通真实游戏基线后再实现 SDL2。
+3. 为 MicroTD 增加固定输入回放，验证进入地图、建塔和波次流程。
+4. 实现按游戏隔离的 EEPROM 文件持久化。
+5. 添加更完整的 golden test 和 sanitizers。
+6. 终端跑通真实游戏基线后再实现 SDL2。
 
 ## 未决策项
 

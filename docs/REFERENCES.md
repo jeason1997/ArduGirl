@@ -59,6 +59,12 @@ SDL2 类型只能存在于 `platform/linux_sdl2` 内部。未来可增加 SDL3 b
 - Arduboy Cloud: https://cloud.arduboy.com/
 - Cart Builder: https://www.bloggingadeadhorse.com/cart/CartBuilder.html
 
+### MicroTD
+
+- Repository: https://gitlab.com/drummyfish/Arduboy_TD
+- License: CC0-1.0
+- 用途：第一个真实社区游戏兼容目标，覆盖 Sprites、图元、输入边沿、EEPROM 和声音接口。
+
 这些目录适合寻找作者和 source URL，不代表其中所有游戏都允许把源码、音乐和素材复制进 ArduGirl。
 
 ## 语言和 ABI 参考

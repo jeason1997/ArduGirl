@@ -23,6 +23,7 @@ bool terminal_changed = false;
 bool input_flags_changed = false;
 bool running = true;
 bool plain_output = false;
+const char* game_title = "ArduGirl";
 std::uint8_t current_buttons = 0;
 Clock::time_point buttons_expire;
 
@@ -84,6 +85,7 @@ bool init(const Config& config) noexcept {
     start_time = Clock::now();
     buttons_expire = start_time;
     plain_output = config.plain_output || !isatty(STDOUT_FILENO);
+    game_title = config.title;
 
     original_flags = fcntl(STDIN_FILENO, F_GETFL, 0);
     if (original_flags >= 0 &&
@@ -175,7 +177,9 @@ void present(const Framebuffer::Storage& pixels) noexcept {
     }
 
     output += "+----------------------------------------------------------------+\n";
-    output += "ArduGirl terminal | Arduboy2 official HelloWorld | Q: quit\n";
+    output += "ArduGirl terminal | ";
+    output += game_title;
+    output += " | Q: quit\n";
     std::fwrite(output.data(), 1, output.size(), stdout);
     std::fflush(stdout);
 }

@@ -100,4 +100,20 @@ ArduboyPlaytune, ATMlib, ArduboyFX
 
 ## 上游更新
 
-游戏使用固定 commit，不自动追踪默认分支。更新时重新检查许可证、补丁能否应用、golden tests 和存档兼容性。
+游戏使用主仓库 gitlink 记录的完整 commit SHA，不自动追踪默认分支。日常初始化只能使用：
+
+```bash
+git submodule update --init --recursive
+```
+
+禁止日常使用 `git submodule update --remote` 或在子模块中执行 `git pull`。只有用户明确要求获取最新版本或指定版本时才能更新：
+
+1. 记录更新前 SHA。
+2. 获取用户指定的 tag/commit；“最新”表示当次任务开始时上游默认分支的 HEAD。
+3. 将结果解析并固定为完整 commit SHA，即使用户指定的是 branch。
+4. 检查许可证、源码布局和新依赖。
+5. 保持上游目录无本地修改，重新应用外部补丁（如果存在）。
+6. 运行静态审计、完整构建、单元测试、输入回放和存档兼容测试。
+7. 同步更新 `game.toml`、`docs/UPSTREAMS.md` 和兼容状态。
+
+任一步失败时保留原固定版本，除非用户明确接受未通过验证的新 revision。

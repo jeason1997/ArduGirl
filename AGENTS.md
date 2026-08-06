@@ -55,6 +55,9 @@ game -> compat/arduboy2 -> core/platform API -> platform backend
 - 原始源码通过固定 revision 的 Git 子模块或可验证快照引入，不得直接修改；ArduGirl 适配优先放在兼容层和外部构建入口中。
 - 默认禁止修改游戏和官方示例的上游文件。只有兼容层无法表达真实平台差异时，才能在 `patches/` 中保存可独立应用的最小补丁，并记录原因和上游 issue。
 - 更新上游 revision 时必须先在无补丁模式下构建；已有补丁需要单独验证能否继续应用，不能把补丁内容揉进上游目录。
+- 默认只能执行 `git submodule update --init --recursive`，它会检出主仓库记录的固定 commit。禁止自行执行 `git submodule update --remote`、在子模块内 `git pull`，或把子模块切到浮动分支。
+- 只有用户明确要求“更新到最新版本”或指定 tag/commit/branch 时，才能移动上游 revision。若用户指定 branch，最终仍需把当时解析到的完整 commit SHA 记录进主仓库，不能持续跟踪该 branch。
+- 每次移动上游 revision 都是独立任务：记录旧/新 SHA，重新检查许可证和依赖，确认子模块 clean，运行该游戏构建、测试和兼容审计，并更新 `game.toml`、`docs/UPSTREAMS.md` 与进度文档。
 - 不得把只有 `.hex`/`.arduboy`、没有可再分发源码许可的游戏提交到仓库。
 - 不得静默修改第三方作者或许可证信息。
 - 一次只引入一个游戏，并先通过 license、build、smoke test。
