@@ -1,0 +1,29 @@
+--- third_party/ArduboyWorks/lasers/common.cpp
++++ third_party/ArduboyWorks/lasers/common.cpp
+@@ -171,22 +171,4 @@ void clearScreenGray(void)
+-    asm volatile (
+-        // load sBuffer pointer into Z
+-        "movw r30, %0\n\t"
+-        // counter = 0
+-        "clr __tmp_reg__ \n\t"
+-        "loopto2: \n\t"
+-        // (4x) push byte data into screen buffer,
+-        // then increment buffer position
+-        "st Z+, %1 \n\t"
+-        "st Z+, %2 \n\t"
+-        "st Z+, %1 \n\t"
+-        "st Z+, %2 \n\t"
+-        // increase counter
+-        "inc __tmp_reg__ \n\t"
+-        // repeat for 256 loops
+-        // (until counter rolls over back to 0)
+-        "brne loopto2 \n\t"
+-        // input: sBuffer, b1, b2
+-        // modified: Z (r30, r31)
+-        :
+-        : "r" (sBuffer), "r" (b1), "r" (b2)
+-    );
++    for (uint16_t index = 0; index < 1024; index += 2) {
++        sBuffer[index] = b1;
++        sBuffer[index + 1] = b2;
++    }

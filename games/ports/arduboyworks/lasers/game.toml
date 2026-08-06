@@ -12,5 +12,5 @@ status = "smoke"
 libraries = ["Arduboy2"]
 
 [port]
-patches = ["../patches/lasers-common.sed"]
-notes = ["共享 ArduboyWorks 构建入口；用等价 C++ 循环替换仅适用于 AVR 的灰屏汇编，上游子模块保持未修改。"]
+patches = ["patches/0001-common-replace-avr-gray-fill-assembly.patch"]
+notes = ["共享 ArduboyWorks 构建入口；用等价 C++ 循环替换仅适用于 AVR 的灰屏汇编，上游子模块保持未修改；这是宿主平台适配，尚未提交上游 issue。"]

@@ -108,6 +108,8 @@ Runtime 顺序：初始化平台 → `setup()` 一次 → 事件泵 → `loop()`
 - `build/microtd-terminal`
 - `build/framebuffer-test`
 
+根目录 Makefile 只定义核心、平台、公共测试和扩展挂载点。它通过通配符加载 `games/examples/*/port.mk` 与 `games/ports/*/port.mk`，不包含具体游戏名称、上游路径、私有类型或游戏专用补丁规则。每个独立游戏或同仓库游戏集合在自己的 `port.mk` 中声明源码、目标、上游检查和测试，并通过 `PORT_TEST_TARGETS`、`PORT_TERMINAL_TEST_TARGETS` 与 `PORT_DEPENDS` 接入公共流程。
+
 `make`、`make run`、`make demo`、`make microtd` 和 `make test` 默认使用 SDL2。终端后端通过带 `-terminal` 后缀的目标显式选择。当平台数量和工具链配置增长后，再评估是否加入下列 CMake targets：
 
 - `ardugirl_core`
