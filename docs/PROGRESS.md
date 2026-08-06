@@ -30,6 +30,7 @@
 
 ## 已完成
 
+- 重构 Make 分层并消除 WSL 下已完成单游戏目标的长时间等待：根 Makefile 现只选择平台构建文件并转发目标，Linux 的编译器、SDL、公共测试和移植挂载规则全部迁入 `platform/linux/Makefile`，游戏细节继续由各自 `port.mk` 管理。MicroTD 与 ArduboyWorks 集合在单独构建某个游戏时只加载该游戏自身依赖，避免在 `/mnt/e` 的 DrvFS 上读取全部移植的 124 个 `.d` 文件；完整构建、聚合测试和多目标调用仍加载全部依赖。ArduboyWorks 的源码能力探测也由逐游戏 54 次子进程合并为 3 次批量扫描。包含 PowerShell 启动 WSL 的外部计时中，`make -n microtd` 由约 7.6 秒降至约 0.85 秒。
 - 修复 MicroTD 的通用 MCU 构建入口：该游戏仍引用早期 Linux 专用生成物 `build/generated/microtd_patched.ino`，导致 PY32 通用准备器虽然成功应用补丁，却无法满足入口包含路径。MicroTD 自有入口与 `port.mk` 现统一消费 `build/generated/microtd/microtd.ino`，旧的 sed/patch 特殊生成规则已删除；PY32 的统一 Arduino 源码编译环境同时补齐 `ARDUINO=10819`，避免上游启用桌面专用 `main()`。公共兼容层新增无动态分配的整数 `sprintf` 子集，避免一次 `%d` 格式化拉入完整 newlib，固件最终为 text 21360、data 372、bss 3504 字节，并已通过 OpenOCD 写入和校验。上游子模块保持不变，PY32 Makefile 未增加游戏特判。
 - 完成首次 PY32 移植错误复盘，记录平台代码污染游戏目录、厂商库误放根 `third_party/`、直接修改上游游戏、建立“平台 × 游戏”组合构建文件、遗留无关构建目录、GPIO 多引脚误用导致黑屏、全仓清理导致 WSL 构建缓慢，以及遗漏 AVR/ARM `char` 符号差异八类问题；对应纠正方式和后续 MCU 平台检查表已保存至 `docs/PY32_PORTING_RETROSPECTIVE.md`。
 - 建立 PY32F002A 首版后端与独立显示驱动边界：ST7789 仅在具体驱动中实现，128×64 framebuffer 不缩放显示于 240×240 屏幕中央；板级按钮和蜂鸣器引脚集中配置。Arduventure 交叉链接结果为 text 28436、data 52、bss 2588 字节，已通过 CMSIS-DAP/OpenOCD 写入和校验。复位运行两秒后帧计数为 42，PC 位于 `Sprites::drawSelfMasked`，MSP 为 `0x20000f88`。蜂鸣器已实现四声道到单声部的软件 DDS 输出；按钮、声音听感和画面方向仍待实机交互验收，EEPROM 暂不持久化，因此平台继续标为 `partial`。

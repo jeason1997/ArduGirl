@@ -1,15 +1,18 @@
 ARDUBOYWORKS_MANIFESTS := $(wildcard games/arduboyworks/*/game.toml)
 ARDUBOYWORKS_GAMES := $(notdir $(patsubst %/,%,$(dir $(ARDUBOYWORKS_MANIFESTS))))
 ARDUBOYWORKS_TARGETS := $(ARDUBOYWORKS_GAMES:%=$(BUILD_DIR)/arduboyworks-%-sdl)
+ARDUBOYWORKS_TITLE_GAMES := $(notdir $(patsubst %/,%,$(dir $(shell grep -l 'static void drawText(const char \*p, int lines);' third_party/ArduboyWorks/*/title.cpp 2>/dev/null))))
+ARDUBOYWORKS_STOP_TONE_GAMES := $(notdir $(patsubst %/,%,$(dir $(shell grep -l stopTone third_party/ArduboyWorks/*/MyArduboy2.h 2>/dev/null))))
+ARDUBOYWORKS_PLAY_WAVE_GAMES := $(notdir $(patsubst %/,%,$(dir $(shell grep -l playWave third_party/ArduboyWorks/*/MyArduboy2.h 2>/dev/null))))
 
 define ARDUBOYWORKS_GAME_template
-ARDUBOYWORKS_$(1)_TITLE_SOURCE := $$(if $$(shell grep -q 'static void drawText(const char \*p, int lines);' third_party/ArduboyWorks/$(1)/title.cpp 2>/dev/null && printf yes),third_party/ArduboyWorks/$(1)/title.cpp)
+ARDUBOYWORKS_$(1)_TITLE_SOURCE := $$(if $$(filter $(1),$$(ARDUBOYWORKS_TITLE_GAMES)),third_party/ArduboyWorks/$(1)/title.cpp)
 ARDUBOYWORKS_$(1)_COMMON_PATCHES := $$(wildcard games/arduboyworks/$(1)/patches/[0-9][0-9][0-9][0-9]-common-*.patch)
 ARDUBOYWORKS_$(1)_GAME_PATCHES := $$(wildcard games/arduboyworks/$(1)/patches/[0-9][0-9][0-9][0-9]-game-*.patch)
 ARDUBOYWORKS_$(1)_ADAPTER_SOURCE := $$(if $$(wildcard third_party/ArduboyWorks/$(1)/MyArduboy2.h),games/arduboyworks/upstream_adapter.cpp)
 ARDUBOYWORKS_$(1)_AUDIO_FLAGS := \
-	$$(if $$(shell grep -q 'stopTone' third_party/ArduboyWorks/$(1)/MyArduboy2.h 2>/dev/null && printf yes),-DARDUBOYWORKS_HAS_STOP_TONE) \
-	$$(if $$(shell grep -q 'playWave' third_party/ArduboyWorks/$(1)/MyArduboy2.h 2>/dev/null && printf yes),-DARDUBOYWORKS_HAS_PLAY_WAVE)
+	$$(if $$(filter $(1),$$(ARDUBOYWORKS_STOP_TONE_GAMES)),-DARDUBOYWORKS_HAS_STOP_TONE) \
+	$$(if $$(filter $(1),$$(ARDUBOYWORKS_PLAY_WAVE_GAMES)),-DARDUBOYWORKS_HAS_PLAY_WAVE)
 ARDUBOYWORKS_$(1)_SOURCES := \
 	$$(SDL_COMMON_SOURCES) \
 	src/arduboy2/Arduboy2.cpp \
@@ -87,3 +90,10 @@ test-arduboyworks: arduboyworks-build
 PORT_TEST_TARGETS += test-arduboyworks
 PORT_BUILD_TARGETS += $(ARDUBOYWORKS_TARGETS)
 PORT_DEPENDS += $(foreach game,$(ARDUBOYWORKS_GAMES),$(ARDUBOYWORKS_$(game)_OBJECTS:.o=.d))
+
+ifeq ($(words $(MAKECMDGOALS)),1)
+ARDUBOYWORKS_REQUESTED_GAME := $(filter $(ARDUBOYWORKS_GAMES),$(MAKECMDGOALS))
+ifneq ($(ARDUBOYWORKS_REQUESTED_GAME),)
+PORT_DEPENDS_OVERRIDE := $(ARDUBOYWORKS_$(ARDUBOYWORKS_REQUESTED_GAME)_OBJECTS:.o=.d)
+endif
+endif
