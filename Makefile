@@ -7,6 +7,7 @@ TEST_TARGET := $(BUILD_DIR)/framebuffer-test
 SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
 MICROTD_REPLAY_TEST_TARGET := $(BUILD_DIR)/microtd-replay-test
 STORAGE_TEST_TARGET := $(BUILD_DIR)/storage-test
+ARDUBOYWORKS_GAMES := hollow hopper chribocchi chiemagari psicolo reversi lasers quarto stairssweep pi24k samegame knightmove ardubullets evasion morse gosencho bananonsense toyokumono
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -41,6 +42,33 @@ MICROTD_SOURCES := \
 	src/compat/EEPROM.cpp \
 	src/arduboy2/Sprites.cpp \
 	games/ports/microtd/entry.cpp
+
+define ARDUBOYWORKS_GAME_template
+ARDUBOYWORKS_$(1)_SOURCES := \
+	$$(SDL_COMMON_SOURCES) \
+	src/arduboy2/Arduboy2.cpp \
+	src/compat/EEPROM.cpp \
+	src/arduboy2/Sprites.cpp \
+	$$(filter-out third_party/ArduboyWorks/$(1)/MyArduboyPlaytune.cpp,$$(wildcard third_party/ArduboyWorks/$(1)/*.cpp)) \
+	games/ports/arduboyworks/entry.cpp
+ARDUBOYWORKS_$(1)_OBJECTS := $$(ARDUBOYWORKS_$(1)_SOURCES:%.cpp=$$(BUILD_DIR)/arduboyworks/$(1)/%.o)
+
+$$(BUILD_DIR)/arduboyworks/$(1)/%.o: %.cpp
+	@mkdir -p $$(@D)
+	$$(CXX) $$(CPPFLAGS) $$(SDL_CFLAGS) $$(CXXFLAGS) -fpermissive -Wno-narrowing -DARDUINO=10819 -DUSE_ARDUBOY2_LIB \
+		-Ithird_party/ArduboyWorks -Ithird_party/ArduboyWorks/$(1) -DARDUBOYWORKS_GAME_ID=$(1) \
+		-DARDUBOYWORKS_ENTRY=\"$(1)/$(1).ino\" -MMD -MP -c $$< -o $$@
+
+$$(BUILD_DIR)/arduboyworks-$(1)-sdl: $$(ARDUBOYWORKS_$(1)_OBJECTS)
+	@mkdir -p $$(@D)
+	$$(CXX) $$^ $$(LDFLAGS) $$(SDL_LIBS) -o $$@
+
+.PHONY: $(1)
+$(1): check-upstream check-sdl $$(BUILD_DIR)/arduboyworks-$(1)-sdl
+	$$(BUILD_DIR)/arduboyworks-$(1)-sdl
+endef
+
+$(foreach game,$(ARDUBOYWORKS_GAMES),$(eval $(call ARDUBOYWORKS_GAME_template,$(game))))
 
 TERMINAL_MICROTD_SOURCES := $(filter-out platform/linux_sdl/render.cpp platform/linux_common/storage.cpp,\
 	$(MICROTD_SOURCES:platform/linux_sdl/sdl.cpp=platform/linux_terminal/terminal.cpp))

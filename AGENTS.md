@@ -60,7 +60,7 @@ game -> compat/arduboy2 -> core/platform API -> platform backend
 - 每次移动上游 revision 都是独立任务：记录旧/新 SHA，重新检查源码完整性和依赖，确认子模块 clean，运行该游戏构建、测试和兼容审计，并更新 `game.toml`、`docs/UPSTREAMS.md` 与进度文档。
 - 只有 `.hex`/`.arduboy` 而无法获取完整源码的游戏不属于本项目的源码级移植范围，不得作为移植游戏导入。
 - 不得静默修改第三方作者和上游来源信息。
-- 一次只引入一个游戏，并先通过 source、build、smoke test。
+- 默认一次只引入一个游戏，并先通过 source、build、smoke test；若多个游戏来自同一上游仓库，可以整体固定该仓库并批量接入，但每个游戏仍须分别记录元数据、完成构建、冒烟、回放和截图验收。
 
 ## 实现顺序
 

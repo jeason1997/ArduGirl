@@ -1,0 +1,16 @@
+id = "pi24k"
+name = "π 24k"
+source = "https://github.com/obono/ArduboyWorks"
+revision = "d4b1f041789dcd1d71907654e4025d613b4ab420"
+author = "obono"
+license = "MIT"
+entry = "third_party/ArduboyWorks/pi24k/pi24k.ino"
+
+[compat]
+level = "B"
+status = "imported"
+libraries = ["Arduboy2"]
+
+[port]
+patches = []
+notes = ["共享 ArduboyWorks 构建入口；上游子模块保持未修改。"]

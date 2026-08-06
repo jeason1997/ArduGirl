@@ -31,6 +31,10 @@ std::uint8_t buttons() noexcept {
 
 namespace ardugirl::platform {
 
+std::uint32_t millis() noexcept {
+    return presented_frames * 16u;
+}
+
 bool storage_read(std::uint16_t offset, void* destination,
                   std::uint16_t size) noexcept {
     if (static_cast<std::size_t>(offset) + size > sizeof(replay_storage)) {

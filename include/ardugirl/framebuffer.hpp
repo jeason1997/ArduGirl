@@ -22,6 +22,7 @@ public:
                    bool white = true) noexcept;
 
     const Storage& data() const noexcept { return pixels_; }
+    Storage& data() noexcept { return pixels_; }
 
 private:
     Storage pixels_{};

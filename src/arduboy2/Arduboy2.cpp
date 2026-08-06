@@ -1,6 +1,7 @@
 #include "Arduboy2.h"
 
 #include "ardugirl/framebuffer.hpp"
+#include "ardugirl/platform.hpp"
 #include "ardugirl/runtime.hpp"
 
 #include <array>
@@ -33,6 +34,18 @@ bool color_value(std::uint8_t color, bool current) noexcept {
 
 } // 匿名命名空间
 
+std::uint32_t millis() noexcept { return ardugirl::platform::millis(); }
+std::uint32_t micros() noexcept { return ardugirl::platform::millis() * 1000u; }
+void randomSeed(unsigned long seed) noexcept { std::srand(static_cast<unsigned int>(seed)); }
+long random(long maximum) noexcept { return maximum > 0 ? std::rand() % maximum : 0; }
+long random(long minimum, long maximum) noexcept {
+    return maximum > minimum ? minimum + random(maximum - minimum) : minimum;
+}
+
+void Arduboy2::AudioControl::saveOnOff() noexcept {
+    EEPROM.update(EEPROM_STORAGE_SPACE_START, enabled ? 1 : 0);
+}
+
 void Arduboy2::begin() noexcept {
     clear();
     display();
@@ -52,8 +65,8 @@ bool Arduboy2::nextFrame() noexcept {
 
 void Arduboy2::clear() noexcept {
     ardugirl::framebuffer().clear();
-    cursor_x_ = 0;
-    cursor_y_ = 0;
+    cursor_x = 0;
+    cursor_y = 0;
 }
 
 void Arduboy2::display() noexcept {
@@ -61,8 +74,8 @@ void Arduboy2::display() noexcept {
 }
 
 void Arduboy2::setCursor(std::int16_t x, std::int16_t y) noexcept {
-    cursor_x_ = x;
-    cursor_y_ = y;
+    cursor_x = x;
+    cursor_y = y;
 }
 
 std::size_t Arduboy2::print(const char* text) noexcept {
@@ -95,6 +108,17 @@ bool Arduboy2::justPressed(std::uint8_t requested) const noexcept {
 bool Arduboy2::justReleased(std::uint8_t requested) const noexcept {
     return (current_buttons_ & requested) == 0 &&
            (previous_buttons_ & requested) != 0;
+}
+
+std::uint8_t Arduboy2::buttonsState() const noexcept { return ardugirl::buttons(); }
+
+std::uint8_t* Arduboy2::getBuffer() noexcept {
+    return ardugirl::framebuffer().data().data();
+}
+
+bool Arduboy2::collide(std::int16_t x1, std::int16_t y1, std::uint8_t w1, std::uint8_t h1,
+                       std::int16_t x2, std::int16_t y2, std::uint8_t w2, std::uint8_t h2) noexcept {
+    return x1 < x2 + w2 && x2 < x1 + w1 && y1 < y2 + h2 && y2 < y1 + h1;
 }
 
 void Arduboy2::drawPixel(std::int16_t x, std::int16_t y,
@@ -228,18 +252,18 @@ void Arduboy2::drawCharacter(char character) noexcept {
                 (glyph[static_cast<std::size_t>(column)] & mask) != 0;
             const auto color = foreground ? text_color_ : text_background_;
             if (text_color_ != text_background_ || foreground) {
-                screen.set_pixel(static_cast<std::int16_t>(cursor_x_ + column),
-                                 static_cast<std::int16_t>(cursor_y_ + row),
+                screen.set_pixel(static_cast<std::int16_t>(cursor_x + column),
+                                 static_cast<std::int16_t>(cursor_y + row),
                                  color == WHITE);
             }
         }
     }
     if (text_color_ != text_background_) {
         for (std::int16_t row = 0; row < 8; ++row) {
-            screen.set_pixel(static_cast<std::int16_t>(cursor_x_ + 5),
-                             static_cast<std::int16_t>(cursor_y_ + row),
+            screen.set_pixel(static_cast<std::int16_t>(cursor_x + 5),
+                             static_cast<std::int16_t>(cursor_y + row),
                              text_background_ == WHITE);
         }
     }
-    cursor_x_ = static_cast<std::int16_t>(cursor_x_ + 6);
+    cursor_x = static_cast<std::int16_t>(cursor_x + 6);
 }

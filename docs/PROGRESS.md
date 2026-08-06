@@ -21,6 +21,7 @@
 | Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；按当前决策暂停效果优化 |
 | 官方 Arduboy2 示例 | partial | 未修改的官方 HelloWorld 已构建运行；当前仅覆盖所需最小 API/字形 |
 | MicroTD | partial | CC0 子模块源码未修改；固定输入回放已验证进入地图、建塔和启动波次；待持久化和完整游玩验证 |
+| ArduboyWorks 游戏集 | partial | 整仓已固定到 `d4b1f041`；18 个游戏均已建立独立元数据和共享构建目标；Hollow Seeker、Hopper、Chri-Bocchi Cat 已构建并通过 180 帧 SDL2 无头冒烟，其余游戏正在补齐兼容层 |
 | Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调计时、headless、事件注入、framebuffer golden test 和 EEPROM 文件后端；音频待实现 |
 | Arduboy2 兼容实现 | not started | 等最小 backend/runtime |
 | 游戏源码 | not started | 尚未选择，需先逐个核对许可证 |
@@ -29,6 +30,8 @@
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+
+- 按多游戏同仓库的新规则整体引入 obono/ArduboyWorks，并为 README 列出的 18 个成品游戏建立独立 `game.toml` 与共享构建目标；首批 Hollow Seeker、Hopper、Chri-Bocchi Cat 已通过构建和 180 帧无头冒烟。
 
 - 建立项目目标、非目标和依赖边界。
 - 定义 framebuffer、按键、时间、存储和音频的平台契约。
@@ -57,6 +60,8 @@
 - 按新准入规则重整 `GAME_PORTS.md`：删除无源码候选和梯队划分，将 47 款源码可访问游戏合并为一张表，并按热度、验证价值、源码稳定性和预计工作量排序。
 
 ## 下一步
+
+1. 完成 ArduboyWorks 其余 15 个游戏的构建、固定输入回放和实际运行截图；重点处理 AVR 函数指针读取、Lasers 的 AVR 汇编、Morse 的 USB HID 与静音音频适配。
 
 1. 确定 ArduGirl 自身开源许可证。
 2. 添加更完整的 golden test 和 sanitizers。

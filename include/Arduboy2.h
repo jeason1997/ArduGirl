@@ -4,6 +4,7 @@
 #include "Arduboy2Beep.h"
 #include "EEPROM.h"
 #include "Sprites.h"
+#include "avr/eeprom.h"
 
 #include <charconv>
 #include <cstddef>
@@ -22,29 +23,60 @@
 #define DOWN_BUTTON  0x08
 #define A_BUTTON     0x10
 #define B_BUTTON     0x20
+#define ARDUBOY_LIB_VER 60000
+#define EEPROM_STORAGE_SPACE_START 16
+#define PIN_SPEAKER_1 0
+#define PIN_SPEAKER_2 0
+#define OLED_PIXELS_NORMAL 0xA6
+#define OLED_PIXELS_INVERTED 0xA7
+
+struct Point { std::int16_t x; std::int16_t y; };
+struct Rect { std::int16_t x; std::int16_t y; std::uint8_t width; std::uint8_t height; };
 
 class Arduboy2 {
 public:
+    class TuneControl {
+    public:
+        bool playing() const noexcept { return false; }
+        void playScore(const byte*) noexcept {}
+        void stopScore() noexcept {}
+    };
+
     class AudioControl {
     public:
-        bool enabled() const noexcept { return enabled_; }
-        void on() noexcept { enabled_ = true; }
-        void off() noexcept { enabled_ = false; }
+        class EnabledState {
+        public:
+            operator bool() const noexcept { return value; }
+            bool operator()() const noexcept { return value; }
+            bool value = true;
+        } enabled;
 
-    private:
-        bool enabled_ = true;
+        void on() noexcept { enabled.value = true; }
+        void off() noexcept { enabled.value = false; }
+        void begin() noexcept {}
+        void toggle() noexcept { enabled.value = !enabled.value; }
+        void saveOnOff() noexcept;
     };
 
     AudioControl audio;
+    TuneControl tunes;
     std::uint16_t frameCount = 0;
 
     void begin() noexcept;
+    void beginNoLogo() noexcept { begin(); }
+    void boot() noexcept {}
+    void blank() noexcept { clear(); }
+    void flashlight() noexcept {}
+    void systemButtons() noexcept {}
     void setFrameRate(std::uint8_t rate) noexcept;
     bool nextFrame() noexcept;
     void clear() noexcept;
     void display() noexcept;
     void setCursor(std::int16_t x, std::int16_t y) noexcept;
     std::size_t print(const char* text) noexcept;
+    std::size_t print(const __FlashStringHelper* text) noexcept {
+        return print(reinterpret_cast<const char*>(text));
+    }
     template<typename Integer,
              typename = std::enable_if_t<std::is_integral_v<Integer>>>
     std::size_t print(Integer value) noexcept {
@@ -61,6 +93,14 @@ public:
     void pollButtons() noexcept;
     bool justPressed(std::uint8_t buttons) const noexcept;
     bool justReleased(std::uint8_t buttons) const noexcept;
+    std::uint8_t buttonsState() const noexcept;
+    std::uint8_t* getBuffer() noexcept;
+    void setRGBled(std::uint8_t, std::uint8_t, std::uint8_t) noexcept {}
+    void sendLCDCommand(std::uint8_t) noexcept {}
+    void setTextSize(std::uint8_t size) noexcept { textSize = size; }
+    std::uint8_t getTextColor() const noexcept { return text_color_; }
+    static bool collide(std::int16_t x1, std::int16_t y1, std::uint8_t w1, std::uint8_t h1,
+                        std::int16_t x2, std::int16_t y2, std::uint8_t w2, std::uint8_t h2) noexcept;
 
     void drawPixel(std::int16_t x, std::int16_t y,
                    std::uint8_t color = WHITE) noexcept;
@@ -92,12 +132,18 @@ public:
     void setTextColor(std::uint8_t color) noexcept;
     void setTextBackground(std::uint8_t color) noexcept;
 
+protected:
+    std::int16_t cursor_x = 0;
+    std::int16_t cursor_y = 0;
+    std::uint8_t textSize = 1;
+    bool textWrap = true;
+    std::uint8_t textColor = WHITE;
+    std::uint8_t textBackground = BLACK;
+
 private:
     void drawCharacter(char character) noexcept;
 
     std::uint8_t frame_rate_ = 60;
-    std::int16_t cursor_x_ = 0;
-    std::int16_t cursor_y_ = 0;
     std::uint8_t text_color_ = WHITE;
     std::uint8_t text_background_ = BLACK;
     std::uint8_t current_buttons_ = 0;

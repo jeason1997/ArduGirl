@@ -4,3 +4,6 @@
 [submodule "third_party/MicroTD"]
 	path = third_party/MicroTD
 	url = https://gitlab.com/drummyfish/Arduboy_TD.git
+[submodule "third_party/ArduboyWorks"]
+	path = third_party/ArduboyWorks
+	url = https://github.com/obono/ArduboyWorks.git
