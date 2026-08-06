@@ -14,7 +14,7 @@
 | Linux SDL 规格 | done | `LINUX_SDL.md`；默认 SDL2 |
 | Linux terminal 规格 | done | `LINUX_TERMINAL.md`；Braille/half/ASCII |
 | 游戏导入规范 | done | `GAME_PORTING.md` |
-| 社区游戏移植清单 | done | `GAME_PORTS.md`；只收录源码可访问的游戏，47 款合并为单表并按综合移植优先级排序 |
+| 社区游戏移植清单 | done | `GAME_PORTS.md`；21 款已移植游戏按实际接入顺序以绿色勾选状态置顶，41 款待移植候选保留原综合优先级 |
 | Agent 约束 | done | 根目录 `AGENTS.md` |
 | 构建系统 | done | GNU Make；`make` 聚合全部游戏构建，`make test` 聚合公共与游戏测试 |
 | framebuffer core | done | 1024 字节页面布局、像素、直线、矩形、圆、三角形、bitmap、compressed bitmap 及回归测试 |
@@ -29,6 +29,7 @@
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+- 重排 `GAME_PORTS.md`：补齐全部 21 款现有移植游戏，按 MicroTD、ArduboyWorks 批次、Ardynia、Arduventure 的实际接入顺序置顶并标记 `✅ 已移植`；其余 41 款源码可访问候选单独保留原优先级，移植状态更易识别。
 - 全量复核当前 21 个移植游戏的截图状态：MicroTD 保留 4 张验收图，Ardynia、Arduventure 与 ArduboyWorks 18 个游戏均补齐各自 `assets/` 下至少 3 张不同阶段 PNG，并在每个游戏自己的 README 中展示 Logo/菜单、剧情或出生点以及实际核心玩法；仓库现有 64 张游戏截图。自动审计确认全部图片为 128×64、游戏内哈希互不重复且 README 引用完整；从空 `build/` 执行 `make test -j4` 重建并测试全部 21 个游戏，135.5 秒退出码为 0。所有尚未完成完整流程验收的游戏继续标为 `partial`。
 - 通用 SDL2 运行入口新增可重复的 `--replay-button 帧:掩码:持续帧数` 与 `--capture-frame 帧:路径`，可按确定性输入路径导出 128×64 PGM framebuffer，为后续移植提供可复现截图证据。
 - 固定输入首次进入 Psi Colo 骰子棋盘时发现上游 `drawFloorOrBlank` 声明返回 `bool` 却不返回值；已在游戏自身保存编号最小补丁，并将 ArduboyWorks 生成阶段扩展为按编号安全应用 `game.cpp` 补丁。修复后 260 帧玩法回放和三阶段截图通过，上游子模块保持 clean。

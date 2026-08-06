@@ -6,7 +6,7 @@
 
 本清单只收录能够直接访问完整源码的 Arduboy 游戏。只有 `.hex`、`.arduboy`、宣传页或截图而找不到源码的作品不列入。
 
-所有游戏放在同一张表中，顺序就是当前建议的移植优先级。排序综合考虑：
+清单先按实际接入顺序列出已移植游戏，再列出尚未移植的候选。待移植候选的原始优先级综合考虑：
 
 1. 社区知名度和代表性。
 2. 对 ArduGirl 当前兼容能力的验证价值。
@@ -15,23 +15,47 @@
 
 兼容等级只是源码导入前的预估；只有固定 revision、完成静态扫描并实际构建后，才能写入 `game.toml` 的正式等级。
 
-## 按优先级排序的游戏
+## 已移植游戏
 
-| 优先级 | 游戏 | 类型 | 源码 | 预估等级 | 当前移植程度与排序理由 |
+| 接入顺序 | 状态 | 游戏 | 类型 | 源码 | 当前验证程度 |
 |---:|---|---|---|---|---|
-| 1 | MicroTD | 塔防 | [上游源码](https://gitlab.com/drummyfish/Arduboy_TD) | B | **回放验证**：SDL2/终端均可构建，已进入地图、建塔并启动波次，EEPROM 持久化已验证；待完整游玩、音频和 sanitizer 验证 |
+| 1 | ✅ 已移植 | MicroTD | 塔防 | [上游源码](https://gitlab.com/drummyfish/Arduboy_TD) | SDL2/终端构建、地图、建塔、波次、EEPROM 回放和 4 张截图通过 |
+| 2 | ✅ 已移植 | ARDUBULLETs | 弹幕射击 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/ardubullets) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 3 | ✅ 已移植 | Bananonsense | 文字搜索 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/bananonsense) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 4 | ✅ 已移植 | Chie Magari Ita | 棋盘解谜 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/chiemagari) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 5 | ✅ 已移植 | Chri-Bocchi Cat | 街机动作 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/chribocchi) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 6 | ✅ 已移植 | Evasion | 闪避动作 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/evasion) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 7 | ✅ 已移植 | I want 5 quadrillion yen! | 收集动作 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/gosencho) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 8 | ✅ 已移植 | Hollow Seeker | 洞窟探索 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/hollow) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 9 | ✅ 已移植 | Hopper | 立体跳跃动作 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/hopper) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 10 | ✅ 已移植 | Knight Move | 棋盘动作谜题 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/knightmove) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 11 | ✅ 已移植 | Lasers | 生存动作 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/lasers) | ArduboyWorks 批量接入；构建、冒烟、灰阶补丁与核心玩法截图通过 |
+| 12 | ✅ 已移植 | Morse Code Trainer | 摩尔斯训练 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/morse) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 13 | ✅ 已移植 | π 24k | 数字记忆 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/pi24k) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 14 | ✅ 已移植 | Psi Colo | 骰子解谜 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/psicolo) | ArduboyWorks 批量接入；修复上游返回类型 UB 后，构建、回放与核心玩法截图通过 |
+| 15 | ✅ 已移植 | Quarto! | 抽象棋类 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/quarto) | ArduboyWorks 批量接入；构建、冒烟、CPU 对局与核心玩法截图通过 |
+| 16 | ✅ 已移植 | Reversi | 黑白棋 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/reversi) | ArduboyWorks 批量接入；构建、冒烟、CPU 对局与核心玩法截图通过 |
+| 17 | ✅ 已移植 | SameGame | 方块消除 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/samegame) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 18 | ✅ 已移植 | Stairs Sweep | 攀爬动作 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/stairssweep) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 19 | ✅ 已移植 | Toyokumono | 云层生存 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/toyokumono) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
+| 20 | ✅ 已移植 | Ardynia | Zelda 式 RPG | [上游源码](https://github.com/city41/ardynia) | SDL2 冷构建、冒烟、ASan+UBSan 移动回放和三阶段截图通过 |
+| 21 | ✅ 已移植 | Arduventure | 动作 RPG | [上游源码](https://github.com/Team-ARG-Museum/ID-46-Arduventure) | SDL2 冷构建、四声道 ATMlib、剧情/房间移动回放和三阶段截图通过 |
+
+以上游戏均已进入源码级移植流程并能在 ArduGirl 运行；`✅ 已移植` 不代表完整流程、全部音频和长期存档已经验收，具体完成度以各游戏 README 为准。
+
+## 待移植游戏
+
+| 原优先级 | 游戏 | 类型 | 源码 | 预估等级 | 排序理由 |
+|---:|---|---|---|---|---|
 | 2 | Twotris | 双人下落方块 | [上游源码](https://github.com/skaterced/Twotris) | A/B | 未导入、未构建；玩法明确、代码预计较小，并能覆盖双人组合输入，作为下一款移植的首选 |
 | 3 | Rooftop Rescue | 直升机救援 | [上游源码](https://github.com/BertVeer/Rooftop) | A/B | 未导入、未构建；轻量动作游戏，适合验证基础绘图、碰撞和按键 |
 | 4 | Ravine Despoiler | 街机投弹 | [上游源码](https://github.com/unwiredben/arduboy-ravine-despoiler) | A/B | 未导入、未构建；源码入口独立，适合作为低风险 Arduboy2 样本 |
 | 5 | Evade 2 | 街机躲避 | [上游源码](https://github.com/ArduboyCollection/evade2) | A/B | 未导入、未构建；官方精选作品，循环简单，适合验证帧率和碰撞 |
-| 6 | Quarto! | 抽象棋类 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/quarto) | B | **玩法截图验证**：随 ArduboyWorks 固定到 `d4b1f041`，构建、180 帧冒烟和 CPU 对局棋盘截图通过；待完整对局与存档验证 |
 | 7 | Blackjack | 卡牌 | [上游源码](https://github.com/Press-Play-On-Tape/Blackjack) | B | 未导入、未构建；适合验证文本、随机数、按钮边沿和存档 |
 | 8 | Waternet | 管线谜题 | [上游源码](https://github.com/joyrider3774/waternet_arduboy) | B | 未导入、未构建；玩家高频推荐，可覆盖关卡数据和 EEPROM 进度 |
 | 9 | Pipes | 连线谜题 | [上游源码](https://github.com/ArduboyCollection/LayingPipe) | B | 未导入、未构建；适合验证多尺寸棋盘、文本和 EEPROM |
 | 10 | LATE | 三合一休闲谜题 | [上游源码](https://github.com/core1024/LATE) | B | 未导入、未构建；含俄罗斯方块、1010 和 Stick Hero 三种模式，需要分别建立冒烟路径 |
-| 11 | Knight Move | 棋盘动作谜题 | [上游源码](https://github.com/obono/ArduboyWorks) | B | **玩法截图验证**：随 ArduboyWorks 固定到 `d4b1f041`，构建、180 帧冒烟和网格玩法截图通过；待完整关卡验证 |
 | 12 | Glove | 迷宫动作冒险 | [上游源码](https://github.com/ArduboyCollection/glove) | B | 未导入、未构建；官方精选，适合综合验证 Sprites、碰撞和 EEPROM |
-| 13 | Hopper | 立体跳跃动作 | [上游源码](https://github.com/ArduboyCollection/ArduboyWorks/tree/master/hopper) | B | **玩法截图验证**：随 ArduboyWorks 固定到 `d4b1f041`，构建、180 帧冒烟和跳跃玩法截图通过；待完整关卡与音效验证 |
 | 14 | Kong | Game & Watch 式街机 | [上游源码](https://github.com/Press-Play-On-Tape/Kong) | B | 未导入、未构建；状态机和动画有代表性，程序规模可控 |
 | 15 | Kong II | Game & Watch 式街机 | [上游源码](https://github.com/Press-Play-On-Tape/Kong-II) | B | 未导入、未构建；与 Kong 能复用兼容工作，排在 Kong 之后 |
 | 16 | Oh Mummy | 迷宫街机 | [上游源码](https://github.com/Mattvic79/OhMummy) | B | 未导入、未构建；可覆盖迷宫逻辑、EEPROM 和简单声音 |
@@ -47,7 +71,6 @@
 | 26 | Dark & Under | 地牢 RPG | [上游源码](https://github.com/ArduboyCollection/Dark-And-Under) | B/C | 未导入、未构建；官方精选，适合基础兼容成熟后验证大型 RPG、存档和资源布局 |
 | 27 | The Quest for Truth | RPG 平台 | [上游源码](https://github.com/GuillaumeElias/TheQuestForTruth) | B/C | 未导入、未构建；体量较大，需先核查额外库、关卡和存档 |
 | 28 | Cursed Mansion 1300 | 探索街机 | [上游源码](https://github.com/ImMrShrike/Cursed-Mansion-1300) | B | 未导入、未构建；内容规模高于轻量样本，适合中后期导入 |
-| 29 | Ardynia | Zelda 式 RPG | [上游源码](https://github.com/city41/ardynia) | C | **玩法截图验证**：源码固定为 `860312d2`，SDL2 冷构建、180 帧冒烟、ASan+UBSan 移动回放及标题/出生点/野外玩法截图通过；待战斗、地牢和存档验证 |
 | 30 | Catacombs of the Damned | 伪 3D 地牢 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/CatacombsOfTheDamned) | C/D | 未导入、未构建；官方精选和玩家热门，当前源码入口是已有平台移植副本，射线渲染与平台修改需仔细拆分 |
 | 31 | MicroCity | 城市建设 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/MicroCity-1.2) | B/C | 未导入、未构建；官方精选，当前入口为已有平台移植副本，模拟状态与存档规模较大 |
 | 32 | Lode Runner | 平台解谜 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/LodeRunner) | B/C | 未导入、未构建；包含完整 154 关，需处理大量关卡数据和声音 |
@@ -60,7 +83,6 @@
 | 39 | Space Battle: Trench Run | 射击 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/TrenchRun-Arduboy-1.0) | B/C | 未导入、未构建；射击物、场景滚动和声音使工作量较高 |
 | 40 | Rayne the Rogue | 动作冒险 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/RAYNE_THE_ROGUE-1.0) | B/C | 未导入、未构建；当前入口为已有平台移植副本 |
 | 41 | CastleBoy | 平台冒险 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/CastleBoy-master) | C | 未导入、未构建；官方精选，当前入口为已有平台移植副本，程序规模和资源较大 |
-| 42 | Arduventure | 动作 RPG | [上游源码](https://github.com/Team-ARG-Museum/ID-46-Arduventure) | C | **玩法截图验证**：源码固定为 `938fae77`，四声道 ATMlib 标题音乐、SDL2 冷构建、180 帧冒烟及“标题→新游戏→剧情→房间移动”回放和三阶段截图通过；待战斗、存档和长时间音乐验收 |
 | 43 | Circuit Dude | 线路谜题 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/CircuitDude) | C | 未导入、未构建；当前入口为已有平台移植副本，需评估平台相关改动 |
 | 44 | Omega Horizon | 平台射击 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/OMEGA_HORIZON_AB) | C | 未导入、未构建；官方精选，当前入口为已有平台移植副本，资源与音频复杂 |
 | 45 | Squario | 平台动作 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/Squario) | C | 未导入、未构建；当前入口为已有平台移植副本，需审计移植层耦合 |
