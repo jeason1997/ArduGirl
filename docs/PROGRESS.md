@@ -29,6 +29,7 @@
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+- 统一游戏截图验收规范：每个完成移植的游戏必须在自身 `assets/` 中保存至少 3 张由当前 ArduGirl 前端生成的不同阶段截图，至少包含 1 张实际玩法画面，并在 README 中全部展示和说明；单张截图或无头冒烟只能标为 `partial`。现有 Arduventure、Ardynia 与 ArduboyWorks 的截图缺口继续列为待办。
 - 明确本仓库发布约束：用户要求“提交”时只使用 Git 检查、提交并推送当前分支，不依赖 GitHub CLI，也不默认创建 Pull Request。
 - 固定并接入 Arduventure `938fae77` 与 ATMlib `952d079f`：上游子模块保持 clean，公共兼容层解释四声道乐谱，SDL2 合成脉冲、三角和噪声波形；从空 `build/` 完成全仓构建，ATM 单元测试、180 帧无头启动和“标题→新游戏→剧情入口”固定回放通过，并保存 ArduGirl framebuffer 实际截图。当前仍标为 `partial`，待战斗、存档、完整剧情和长时间音乐验证。
 - 固定并接入 Ardynia `860312d2`：上游子模块保持 clean，通过外部入口和独立 `port.mk` 构建；补齐公共 `Arduboy2Base::sBuffer`、静态 `Arduboy2Audio` 与 EEPROM `get/put` 契约。修复玩家贴近屏幕顶部时依赖 AVR 16 位 `int` 回绕的 framebuffer 越界，以及蛇敌人离屏后先读瓦片造成的数组越界；“进入游戏后持续向上移动”固定回放已在 ASan+UBSan 与普通优化构建下通过。
