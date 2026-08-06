@@ -30,6 +30,7 @@
 
 ## 已完成
 
+- 修复统一入口的 Linux 单游戏选择回归：根 Makefile 转发默认 `all` 后，Linux 平台曾忽略 `GAME` 并依赖全部 `PORT_BUILD_TARGETS`，导致 `make PLATFORM=linux GAME=microtd` 编译所有游戏。Linux 平台现从各移植模块登记的构建产物中精确选择与 `GAME` 对应的唯一目标；未指定 `GAME` 时才保持全量构建，未知或重复匹配立即报错。MicroTD 和 ArduboyWorks 的依赖文件裁剪同时识别 `GAME` 参数，避免单游戏调用重新读取无关游戏依赖。默认单游戏调用保持原有的“编译后运行”行为；`build` 目标只生成 SDL 程序，`run` 可显式启动。
 - 整理平台所有权与统一构建入口：根 Makefile 不再声明 `py32`、`flash-py32` 或 `PY32_GAME`，只按 `PLATFORM` 选择平台 Makefile，并原样转发目标和 `GAME` 等变量；PY32 统一使用 `make PLATFORM=py32 GAME=<game-id>` 构建、追加 `flash` 烧录。Linux 与 PY32 自有文件均按职责分类：实现进入 `src/`，私有头文件进入 `include/`，平台测试或工具分别进入 `tests/`、`tools/`，厂商依赖保留在 `vendor/`；平台实现和专用测试不再平铺在平台根目录或散放到公共测试目录。WSL 冷构建并执行迁移后的 SDL 后端测试和存储测试均通过；终端 smoke 的全部新路径对象可编译，但既有目标最终链接仍缺少 `Arduboy2Audio::enabled()` 与 `millis()`，未把该历史问题误记为本次整理通过。
 - 新增 PY32 全游戏编译测试：`make PLATFORM=py32 test` 由 `platform/py32/tools/test_games.py` 自动遍历全部 `game.toml`，对每款游戏定向清理 `build/py32/<game-id>/` 并独立冷构建，失败后继续检查剩余游戏，最终以汇总状态决定测试退出码。2026-08-06 首轮覆盖 24 款游戏，通过 5 款：Arduventure、Fantasy Rampage、Helmets & Hordes、MicroTD、Sunfire；18 款 ArduboyWorks 游戏因集合入口所需编译定义尚未接入通用 PY32 构建而失败，Ardynia 因现有补丁上下文不匹配而在源码准备阶段失败。测试实现与构建规则均位于 `platform/py32/`，未向游戏目录或公共兼容层加入平台逻辑。
 - 重构 Make 分层并消除 WSL 下已完成单游戏目标的长时间等待：根 Makefile 现只选择平台构建文件并转发目标，Linux 的编译器、SDL、公共测试和移植挂载规则全部迁入 `platform/linux/Makefile`，游戏细节继续由各自 `port.mk` 管理。MicroTD 与 ArduboyWorks 集合在单独构建某个游戏时只加载该游戏自身依赖，避免在 `/mnt/e` 的 DrvFS 上读取全部移植的 124 个 `.d` 文件；完整构建、聚合测试和多目标调用仍加载全部依赖。ArduboyWorks 的源码能力探测也由逐游戏 54 次子进程合并为 3 次批量扫描。包含 PowerShell 启动 WSL 的外部计时中，`make -n microtd` 由约 7.6 秒降至约 0.85 秒。

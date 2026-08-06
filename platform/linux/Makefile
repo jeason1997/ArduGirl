@@ -35,6 +35,23 @@ PORT_TERMINAL_TEST_TARGETS :=
 PORT_DEPENDS :=
 GAME_MAKEFILES := $(wildcard games/*/port.mk)
 include $(GAME_MAKEFILES)
+
+ifneq ($(strip $(GAME)),)
+SELECTED_GAME_TARGETS := $(filter $(BUILD_DIR)/%-$(GAME)-sdl $(BUILD_DIR)/$(GAME)-sdl,$(PORT_BUILD_TARGETS))
+ifeq ($(strip $(SELECTED_GAME_TARGETS)),)
+$(error 未找到 Linux 游戏：$(GAME))
+endif
+ifneq ($(words $(SELECTED_GAME_TARGETS)),1)
+$(error Linux 游戏 $(GAME) 匹配到多个构建目标：$(SELECTED_GAME_TARGETS))
+endif
+endif
+
+ifneq ($(filter build run,$(MAKECMDGOALS)),)
+ifeq ($(strip $(GAME)),)
+$(error build 和 run 目标必须通过 GAME=<game-id> 选择游戏)
+endif
+endif
+
 SMOKE_SOURCES := \
 	$(TERMINAL_COMMON_SOURCES) \
 	platform/linux/tests/terminal_game.cpp
@@ -70,9 +87,16 @@ STDIO_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/stdio_test.o \
 	$(BUILD_DIR)/src/compat/stdio.o
 
-.PHONY: all test test-terminal smoke clean check-upstream check-sdl
+.PHONY: all build run test test-terminal smoke clean check-upstream check-sdl
 
-all: check-upstream check-sdl $(PORT_BUILD_TARGETS)
+all: check-upstream check-sdl $(if $(strip $(GAME)),$(SELECTED_GAME_TARGETS),$(PORT_BUILD_TARGETS))
+	@if [ -n "$(strip $(GAME))" ]; then $(SELECTED_GAME_TARGETS); fi
+
+build: check-upstream check-sdl $(SELECTED_GAME_TARGETS)
+	@printf '%s\n' 'SDL 程序已生成：$(SELECTED_GAME_TARGETS)'
+
+run: check-upstream check-sdl $(SELECTED_GAME_TARGETS)
+	$(SELECTED_GAME_TARGETS)
 
 check-upstream:
 	@test -f third_party/Arduboy2/src/Arduboy2.h || \
