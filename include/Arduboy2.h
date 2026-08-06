@@ -47,8 +47,22 @@ struct Rect {
     std::uint8_t height;
 };
 
+class Arduboy2Audio {
+public:
+    static bool enabled() noexcept;
+    static void on() noexcept;
+    static void off() noexcept;
+    static void toggle() noexcept;
+    static void saveOnOff() noexcept;
+    static bool& enabledState() noexcept;
+};
+
 class Arduboy2 {
 public:
+    // 上游 Arduboy2Base 允许低开销绘图代码直接访问页面布局缓冲区；指针始终指向
+    // ArduGirl 唯一的 1024 字节核心 framebuffer，不建立第二份画面存储。
+    static std::uint8_t* sBuffer;
+
     class TuneControl {
     public:
         bool playing() const noexcept { return false; }
@@ -60,16 +74,15 @@ public:
     public:
         class EnabledState {
         public:
-            operator bool&() noexcept { return value; }
-            operator const bool&() const noexcept { return value; }
-            bool operator()() const noexcept { return value; }
-            bool value = true;
+            operator bool&() noexcept { return Arduboy2Audio::enabledState(); }
+            operator const bool&() const noexcept { return Arduboy2Audio::enabledState(); }
+            bool operator()() const noexcept { return Arduboy2Audio::enabled(); }
         } enabled;
 
-        void on() noexcept { enabled.value = true; }
-        void off() noexcept { enabled.value = false; }
+        void on() noexcept { Arduboy2Audio::on(); }
+        void off() noexcept { Arduboy2Audio::off(); }
         void begin() noexcept {}
-        void toggle() noexcept { enabled.value = !enabled.value; }
+        void toggle() noexcept { Arduboy2Audio::toggle(); }
         void saveOnOff() noexcept;
     };
 
@@ -221,3 +234,7 @@ private:
     std::uint8_t audio_channels_ = 0;
     std::uint32_t tone_end_ms_ = 0;
 };
+
+// 当前兼容实现没有 Print 代码体积裁剪需求，因此 Base 与完整类共享同一实现，
+// 同时保持上游源码使用 Arduboy2Base 名称和静态缓冲区入口的契约。
+using Arduboy2Base = Arduboy2;

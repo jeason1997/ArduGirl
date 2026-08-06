@@ -1,0 +1,25 @@
+id = "ardynia"
+name = "Ardynia"
+source = "https://github.com/city41/ardynia"
+revision = "860312d2c22524b2b6e96951691e4d426eb3b701"
+entry = "third_party/Ardynia/ardynia.ino"
+
+[compat]
+level = "C"
+status = "smoke-tested"
+libraries = ["Arduboy2", "ArduboyPlaytune", "EEPROM"]
+
+[port]
+patches = [
+    "patches/0001-entity-template-avoid-negative-shift.patch",
+    "patches/0002-draw-bitmap-use-signed-framebuffer-offset.patch",
+    "patches/0003-snake-check-bounds-before-tile-read.patch"
+]
+notes = [
+    "上游源码通过外部 entry.cpp 和原始 src 翻译单元参与构建，子模块保持未修改",
+    "声音效果会初始化两个 ArduboyPlaytune 逻辑声道，剑击、成功提示和首领吼声包含双声道重叠",
+    "最小补丁把负值左移改为显式无符号打包，消除宿主 C++17 常量表达式中的未定义行为",
+    "绘图补丁使用有符号 framebuffer 偏移，消除依赖 AVR 16 位 int 回绕的屏幕顶部越界访问",
+    "蛇敌人补丁在读取房间瓦片前检查坐标，避免离屏坐标索引 rooms 数组",
+    "当前先完成冷构建和启动冒烟，固定输入回放、实际截图和完整玩法验证仍待补充"
+]

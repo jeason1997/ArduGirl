@@ -46,6 +46,8 @@ bool color_value(std::uint8_t color, bool current) noexcept {
 
 } // 匿名命名空间
 
+std::uint8_t* Arduboy2::sBuffer = ardugirl::framebuffer().data().data();
+
 std::uint32_t millis() noexcept { return ardugirl::platform::millis(); }
 std::uint32_t micros() noexcept { return ardugirl::platform::micros(); }
 void delay(unsigned long duration) noexcept {
@@ -65,6 +67,19 @@ long map(long value, long from_low, long from_high,
 
 void Arduboy2::AudioControl::saveOnOff() noexcept {
     EEPROM.update(EEPROM_STORAGE_SPACE_START, enabled ? 1 : 0);
+}
+
+bool& Arduboy2Audio::enabledState() noexcept {
+    static bool state = true;
+    return state;
+}
+
+bool Arduboy2Audio::enabled() noexcept { return enabledState(); }
+void Arduboy2Audio::on() noexcept { enabledState() = true; }
+void Arduboy2Audio::off() noexcept { enabledState() = false; }
+void Arduboy2Audio::toggle() noexcept { enabledState() = !enabledState(); }
+void Arduboy2Audio::saveOnOff() noexcept {
+    EEPROM.update(EEPROM_STORAGE_SPACE_START, enabled() ? 1 : 0);
 }
 
 void Arduboy2::begin() noexcept {

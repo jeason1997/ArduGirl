@@ -52,7 +52,7 @@ $$(BUILD_DIR)/arduboyworks/$(1)/games/arduboyworks/entry.o: $$(BUILD_DIR)/genera
 
 $$(BUILD_DIR)/arduboyworks-$(1)-sdl: $$(ARDUBOYWORKS_$(1)_OBJECTS)
 	@mkdir -p $$(@D)
-	$$(CXX) $$^ $$(LDFLAGS) $$(SDL_LIBS) -o $$@
+	$$(CXX) $$^ $$(LINUX_RUNTIME_LDFLAGS) $$(SDL_LIBS) -o $$@
 
 .PHONY: $(1)
 $(1): check-arduboyworks-upstream check-sdl $$(BUILD_DIR)/arduboyworks-$(1)-sdl

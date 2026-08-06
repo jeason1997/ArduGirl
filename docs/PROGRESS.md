@@ -22,13 +22,15 @@
 | MicroTD | partial | 子模块源码未修改；固定输入回放已验证进入地图、建塔和启动波次；待持久化和完整游玩验证 |
 | ArduboyWorks 游戏集 | partial | 整仓固定到 `d4b1f041`；18 个游戏均已成功构建并分别通过 180 帧 SDL2 无头冒烟；待逐游戏固定输入回放、实际画面截图和完整玩法验证 |
 | Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调毫秒/微秒计时、headless、事件注入、framebuffer golden test、EEPROM 文件后端、双声道方波和波表播放；gamepad 与长时间音频仍待验证 |
-| Arduboy2 兼容实现 | partial | 已覆盖当前 19 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM 和定时 tone；尚非完整上游 API |
-| 游戏源码 | partial | 已固定并接入 MicroTD 与 ArduboyWorks 18 个游戏；后续游戏按 `GAME_PORTS.md` 继续导入 |
-| 音频 | partial | SDL2 已实现双声道方波、8 位波表混合和定时停止；Arduboy2Beep、ArduboyPlaytune 与 ArduboyWorks 音频扩展已接入。当前游戏不依赖 ArduboyTones/ATMlib，待真实样本驱动后续移植 |
+| Arduboy2 兼容实现 | partial | 已覆盖当前 20 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM、静态音频控制和定时 tone；尚非完整上游 API |
+| 游戏源码 | partial | 已固定并接入 MicroTD、ArduboyWorks 18 个游戏与 Ardynia；后续游戏按 `GAME_PORTS.md` 继续导入 |
+| 音频 | partial | SDL2 已实现双声道方波、8 位波表混合和定时停止；Arduboy2Beep、ArduboyPlaytune 与 ArduboyWorks 音频扩展已接入，Ardynia 已提供真实双声道音效样本。当前游戏不依赖 ArduboyTones/ATMlib，待真实样本驱动后续移植 |
 | PY32 | planned | 需先指定芯片/板卡/屏幕 |
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+- 固定并接入 Ardynia `860312d2`：上游子模块保持 clean，通过外部入口和独立 `port.mk` 构建；补齐公共 `Arduboy2Base::sBuffer`、静态 `Arduboy2Audio` 与 EEPROM `get/put` 契约。修复玩家贴近屏幕顶部时依赖 AVR 16 位 `int` 回绕的 framebuffer 越界，以及蛇敌人离屏后先读瓦片造成的数组越界；“进入游戏后持续向上移动”固定回放已在 ASan+UBSan 与普通优化构建下通过。
+- Linux SDL2 与终端运行时新增致命信号调用栈输出，可执行文件使用 `-rdynamic` 导出符号；崩溃后仍恢复默认信号行为，以保留非零退出状态和 core dump 能力。
 
 - 将 `platform/linux_common`、`platform/linux_sdl` 和 `platform/linux_terminal` 收拢为单一 `platform/linux/` 目录；SDL2、终端和共享存储通过文件名区分，构建目标与平台行为保持不变。
 - 补齐 Arduboy2 高频兼容接口：三角形、圆角矩形、XY/compressed bitmap、Sprites 外部遮罩/自遮罩/擦除、文本缩放与换行、`notPressed()`、`delay()`、`map()` 和真实微秒计时；新增兼容层回归测试。

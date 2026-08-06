@@ -47,7 +47,7 @@
 | 26 | Dark & Under | 地牢 RPG | [上游源码](https://github.com/ArduboyCollection/Dark-And-Under) | B/C | 未导入、未构建；官方精选，适合基础兼容成熟后验证大型 RPG、存档和资源布局 |
 | 27 | The Quest for Truth | RPG 平台 | [上游源码](https://github.com/GuillaumeElias/TheQuestForTruth) | B/C | 未导入、未构建；体量较大，需先核查额外库、关卡和存档 |
 | 28 | Cursed Mansion 1300 | 探索街机 | [上游源码](https://github.com/ImMrShrike/Cursed-Mansion-1300) | B | 未导入、未构建；内容规模高于轻量样本，适合中后期导入 |
-| 29 | Ardynia | Zelda 式 RPG | [上游源码](https://github.com/city41/ardynia) | B/C | 未导入、未构建；社区知名 RPG，地图、战斗、存档和资源规模带来较大工作量 |
+| 29 | Ardynia | Zelda 式 RPG | [上游源码](https://github.com/city41/ardynia) | C | **构建并启动冒烟**：源码固定为 `860312d2`，SDL2 冷构建和 180 帧无头启动通过；双声道音效路径已接入，待固定输入回放、实际截图和完整玩法验证 |
 | 30 | Catacombs of the Damned | 伪 3D 地牢 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/CatacombsOfTheDamned) | C/D | 未导入、未构建；官方精选和玩家热门，当前源码入口是已有平台移植副本，射线渲染与平台修改需仔细拆分 |
 | 31 | MicroCity | 城市建设 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/MicroCity-1.2) | B/C | 未导入、未构建；官方精选，当前入口为已有平台移植副本，模拟状态与存档规模较大 |
 | 32 | Lode Runner | 平台解谜 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/LodeRunner) | B/C | 未导入、未构建；包含完整 154 关，需处理大量关卡数据和声音 |

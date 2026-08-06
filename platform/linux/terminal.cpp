@@ -1,6 +1,7 @@
 #include "ardugirl/constants.hpp"
 #include "ardugirl/platform.hpp"
 #include "storage.hpp"
+#include "crash.hpp"
 
 #include <chrono>
 #include <cstdio>
@@ -140,6 +141,7 @@ void consume_input(char key) noexcept {
 } // 匿名命名空间
 
 bool init(const Config& config) noexcept {
+    linux_crash::install();
     start_time = Clock::now();
     buttons_expire = start_time;
     plain_output = config.plain_output || !isatty(STDOUT_FILENO);

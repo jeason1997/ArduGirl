@@ -14,6 +14,7 @@ CPPFLAGS := -Iinclude -I$(BUILD_DIR)/generated
 CXXFLAGS ?= -O2
 CXXFLAGS += -std=c++17 -Wall -Wextra -Wpedantic
 LDFLAGS ?=
+LINUX_RUNTIME_LDFLAGS := $(LDFLAGS) -rdynamic
 
 RUNTIME_SOURCES := \
 	src/core/framebuffer.cpp \
@@ -21,8 +22,9 @@ RUNTIME_SOURCES := \
 	src/runtime/main.cpp
 
 LINUX_STORAGE_SOURCE := platform/linux/storage.cpp
-SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/sdl.cpp platform/linux/render.cpp $(LINUX_STORAGE_SOURCE)
-TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/terminal.cpp $(LINUX_STORAGE_SOURCE)
+LINUX_CRASH_SOURCE := platform/linux/crash.cpp
+SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/sdl.cpp platform/linux/render.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
+TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/terminal.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
 
 PORT_BUILD_TARGETS :=
 PORT_TEST_TARGETS :=
@@ -41,6 +43,7 @@ TEST_OBJECTS := \
 SDL_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/sdl_backend_test.o \
 	$(BUILD_DIR)/platform/linux/sdl.o \
+	$(BUILD_DIR)/platform/linux/crash.o \
 	$(BUILD_DIR)/platform/linux/render.o \
 	$(BUILD_DIR)/platform/linux/storage.o \
 	$(BUILD_DIR)/src/core/framebuffer.o
@@ -72,7 +75,7 @@ check-sdl:
 
 $(SMOKE_TARGET): $(SMOKE_OBJECTS)
 	@mkdir -p $(@D)
-	$(CXX) $(SMOKE_OBJECTS) $(LDFLAGS) -o $@
+	$(CXX) $(SMOKE_OBJECTS) $(LINUX_RUNTIME_LDFLAGS) -o $@
 
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)

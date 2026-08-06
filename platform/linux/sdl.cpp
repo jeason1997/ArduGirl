@@ -2,6 +2,7 @@
 #include "ardugirl/platform.hpp"
 #include "render.hpp"
 #include "storage.hpp"
+#include "crash.hpp"
 
 #include <SDL.h>
 
@@ -99,6 +100,7 @@ void audio_callback(void*, Uint8* stream, int length) noexcept {
 } // 匿名命名空间
 
 bool init(const Config& config) noexcept {
+    linux_crash::install();
     running = true;
     current_buttons = 0;
     headless = config.headless;

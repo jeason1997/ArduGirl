@@ -1,5 +1,9 @@
 # Linux SDL2 平台规格
 
+## 崩溃诊断
+
+Linux SDL2 与终端可执行文件会安装致命信号处理器。发生 `SIGSEGV`、`SIGABRT`、`SIGBUS`、`SIGFPE` 或 `SIGILL` 时，标准错误会打印调用栈；构建使用 `-rdynamic` 保留可读符号，然后恢复默认信号行为，使 shell 仍收到非零状态并可生成 core dump。需要精确源码行号时，使用带调试信息的 AddressSanitizer/UndefinedBehaviorSanitizer 构建。
+
 ## 版本选择
 
 SDL2 是当前默认 Linux 后端，以覆盖更多现有 Linux 发行版、开发环境和嵌入式 Linux 系统。平台抽象不暴露 SDL 类型，未来增加 SDL3 backend 时不修改游戏或兼容层。

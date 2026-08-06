@@ -7,3 +7,6 @@
 [submodule "third_party/ArduboyWorks"]
 	path = third_party/ArduboyWorks
 	url = https://github.com/obono/ArduboyWorks.git
+[submodule "third_party/Ardynia"]
+	path = third_party/Ardynia
+	url = https://github.com/city41/ardynia.git

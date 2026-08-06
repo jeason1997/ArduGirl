@@ -1,0 +1,13 @@
+--- third_party/Ardynia/src/entities/snake.cpp
++++ third_party/Ardynia/src/entities/snake.cpp
+@@ -41,3 +41,8 @@
+-    TileDef currentTile = TileRoom::getTileAt(me->x, me->y);
+-    if (Util::isOffScreen(me->x, me->y, 8) || currentTile== Stone || currentTile == Water) {
++    bool blocked = Util::isOffScreen(me->x, me->y, 8);
++    if (!blocked) {
++        const TileDef currentTile = TileRoom::getTileAt(me->x, me->y);
++        blocked = currentTile == Stone || currentTile == Water;
++    }
++
++    if (blocked) {
+         me->undoMove();

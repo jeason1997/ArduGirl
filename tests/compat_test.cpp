@@ -4,6 +4,7 @@
 #include "ardugirl/runtime.hpp"
 
 #include <cassert>
+#include <cstring>
 #include <cstdint>
 
 namespace {
@@ -11,6 +12,7 @@ namespace {
 std::uint32_t clock_us = 1234567;
 std::uint16_t wave_rate = 0;
 std::uint16_t wave_count = 0;
+std::uint8_t storage[1024]{};
 
 } // 匿名命名空间
 
@@ -34,13 +36,35 @@ void play_wave(std::uint16_t rate, const std::uint8_t*, std::uint16_t count) noe
     wave_count = count;
 }
 void stop_wave() noexcept { wave_count = 0; }
-bool storage_read(std::uint16_t, void*, std::uint16_t) noexcept { return false; }
-bool storage_write(std::uint16_t, const void*, std::uint16_t) noexcept { return true; }
+bool storage_read(std::uint16_t offset, void* destination, std::uint16_t size) noexcept {
+    std::memcpy(destination, storage + offset, size);
+    return true;
+}
+bool storage_write(std::uint16_t offset, const void* source, std::uint16_t size) noexcept {
+    std::memcpy(storage + offset, source, size);
+    return true;
+}
 
 } // 命名空间 ardugirl::platform
 
 int main() {
+    static_assert(std::is_same_v<Arduboy2Base, Arduboy2>);
+    assert(Arduboy2Base::sBuffer == ardugirl::framebuffer().data().data());
+    struct SaveData {
+        std::uint8_t health;
+        std::uint16_t score;
+    };
+    static_assert(std::is_trivially_copyable_v<SaveData>);
+    const SaveData saved{3, 1200};
+    EEPROM.put(64, saved);
+    SaveData loaded{};
+    EEPROM.get(64, loaded);
+    assert(loaded.health == saved.health && loaded.score == saved.score);
     Arduboy2 arduboy;
+    Arduboy2Audio::off();
+    assert(!arduboy.audio.enabled());
+    arduboy.audio.toggle();
+    assert(Arduboy2Audio::enabled());
     arduboy.initAudio(1);
     constexpr byte wave[] = {0, 128, 255};
     arduboy.playWave(8000, wave, 3);
