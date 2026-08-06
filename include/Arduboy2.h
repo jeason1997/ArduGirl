@@ -60,7 +60,8 @@ public:
     public:
         class EnabledState {
         public:
-            operator bool() const noexcept { return value; }
+            operator bool&() noexcept { return value; }
+            operator const bool&() const noexcept { return value; }
             bool operator()() const noexcept { return value; }
             bool value = true;
         } enabled;

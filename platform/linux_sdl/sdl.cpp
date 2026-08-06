@@ -23,8 +23,8 @@ bool running = true;
 bool headless = false;
 bool invert = false;
 SDL_AudioDeviceID audio_device = 0;
-std::uint32_t audio_phase = 0;
-std::uint32_t audio_step = 0;
+std::array<std::uint32_t, 2> audio_phase{};
+std::array<std::uint32_t, 2> audio_step{};
 
 constexpr std::uint8_t kLeft = 0x01;
 constexpr std::uint8_t kRight = 0x02;
@@ -69,9 +69,14 @@ void audio_callback(void*, Uint8* stream, int length) noexcept {
     auto* samples = reinterpret_cast<std::int16_t*>(stream);
     const auto count = length / static_cast<int>(sizeof(std::int16_t));
     for (int index = 0; index < count; ++index) {
-        samples[index] = audio_step == 0 ? 0 :
-            (audio_phase < 0x80000000u ? 6000 : -6000);
-        audio_phase += audio_step;
+        std::int32_t mixed = 0;
+        for (std::size_t channel = 0; channel < audio_step.size(); ++channel) {
+            if (audio_step[channel] != 0) {
+                mixed += audio_phase[channel] < 0x80000000u ? 4000 : -4000;
+                audio_phase[channel] += audio_step[channel];
+            }
+        }
+        samples[index] = static_cast<std::int16_t>(mixed);
     }
 }
 
@@ -193,18 +198,18 @@ void sleep_ms(std::uint32_t duration) noexcept {
     SDL_Delay(duration);
 }
 
-void set_tone(std::uint16_t frequency_hz) noexcept {
-    if (audio_device == 0) return;
+void set_tone(std::uint16_t frequency_hz, std::uint8_t channel) noexcept {
+    if (audio_device == 0 || channel >= audio_step.size()) return;
     SDL_LockAudioDevice(audio_device);
-    audio_step = static_cast<std::uint32_t>(
+    audio_step[channel] = static_cast<std::uint32_t>(
         (static_cast<std::uint64_t>(frequency_hz) << 32u) / 48000u);
     SDL_UnlockAudioDevice(audio_device);
 }
 
-void stop_tone() noexcept {
-    if (audio_device == 0) return;
+void stop_tone(std::uint8_t channel) noexcept {
+    if (audio_device == 0 || channel >= audio_step.size()) return;
     SDL_LockAudioDevice(audio_device);
-    audio_step = 0;
+    audio_step[channel] = 0;
     SDL_UnlockAudioDevice(audio_device);
 }
 

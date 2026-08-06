@@ -25,8 +25,8 @@ namespace ardugirl::platform {
 std::uint32_t millis() noexcept { return clock_us / 1000u; }
 std::uint32_t micros() noexcept { return clock_us; }
 void sleep_ms(std::uint32_t duration) noexcept { clock_us += duration * 1000u; }
-void set_tone(std::uint16_t) noexcept {}
-void stop_tone() noexcept {}
+void set_tone(std::uint16_t, std::uint8_t) noexcept {}
+void stop_tone(std::uint8_t) noexcept {}
 bool storage_read(std::uint16_t, void*, std::uint16_t) noexcept { return false; }
 bool storage_write(std::uint16_t, const void*, std::uint16_t) noexcept { return true; }
 

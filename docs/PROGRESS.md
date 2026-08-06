@@ -24,14 +24,16 @@
 | Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调毫秒/微秒计时、headless、事件注入、framebuffer golden test、EEPROM 文件后端和单声道方波；窗口与长时间音频仍需人工验收 |
 | Arduboy2 兼容实现 | partial | 已覆盖当前 19 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM 和定时 tone；尚非完整上游 API |
 | 游戏源码 | partial | 已固定并接入 MicroTD 与 ArduboyWorks 18 个游戏；后续游戏按 `GAME_PORTS.md` 继续导入 |
-| 音频 | partial | SDL2 已实现单声道方波和定时停止，Arduboy2Beep 可驱动平台输出；乐谱、波表、Playtune、ArduboyTones 和 ATMlib 尚未实现 |
+| 音频 | partial | SDL2 已实现双声道方波混合和定时停止；Arduboy2Beep 与 ArduboyPlaytune 乐谱调度已接入，波表、ArduboyTones 和 ATMlib 尚未实现 |
 | PY32 | planned | 需先指定芯片/板卡/屏幕 |
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
 
 - 补齐 Arduboy2 高频兼容接口：三角形、圆角矩形、XY/compressed bitmap、Sprites 外部遮罩/自遮罩/擦除、文本缩放与换行、`notPressed()`、`delay()`、`map()` 和真实微秒计时；新增兼容层回归测试。
-- SDL2 后端新增 48 kHz 单声道方波输出、线程安全的频率切换和停止控制；无音频设备时安全降级，终端后端保持静音。
+- SDL2 后端新增 48 kHz 方波输出、线程安全的频率切换和停止控制；无音频设备时安全降级，终端后端保持静音。
+- 新增独立 ArduboyPlaytune 兼容实现，以主循环非阻塞推进音符、停止、等待、标记和重复指令；SDL2 后端扩展为双声道方波混合，ArduboyWorks 私有优先级接口通过集合适配层转发。
+- ArduboyPlaytune 回归测试已验证 MIDI 音高、毫秒等待、停止和声音开关；SameGame 已完成定向重编译与 180 帧 SDL2 无头冒烟，未按默认流程扩大运行其余游戏。
 - 删除 `games/examples/`，不再维护官方示例构建目标；原 `games/ports/` 下的游戏已提升到 `games/` 直接子目录，根 Makefile 统一自动加载 `games/*/port.mk`。已从空 `build/` 完成全部 19 个 SDL 游戏冷构建，并通过 `make test` 与 `make test-terminal`。
 - 根目录 Makefile 已移除全部具体游戏、游戏集合、上游私有类型和游戏专用补丁规则，改为自动加载各游戏或集合自己的 `port.mk`；公共测试通过扩展目标聚合。ArduboyWorks 的自动发现和私有适配全部位于其移植目录，MicroTD 的构建、补丁及回放测试全部位于自身移植目录。Lasers 的灰屏适配已从集合级 sed 脚本迁移到游戏目录内的编号统一 diff 补丁。
 
@@ -69,7 +71,7 @@
 1. 确定 ArduGirl 自身开源许可证。
 2. 添加更完整的 golden test 和 sanitizers。
 3. 按 `GAME_PORTS.md` 优先级引入 Twotris，并完成源码固定、构建、冒烟和截图闭环。
-4. 实现乐谱和波表播放，并根据新游戏需求选择 ArduboyTones、Playtune 或其他音频库；随后再评估 MCU 后端。
+4. 实现波表播放，并根据新游戏需求选择 ArduboyTones 或其他音频库；随后再评估 MCU 后端。
 
 ## 未决策项
 

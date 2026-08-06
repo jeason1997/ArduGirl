@@ -6,6 +6,7 @@ TEST_TARGET := $(BUILD_DIR)/framebuffer-test
 SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
 STORAGE_TEST_TARGET := $(BUILD_DIR)/storage-test
 COMPAT_TEST_TARGET := $(BUILD_DIR)/compat-test
+PLAYTUNE_TEST_TARGET := $(BUILD_DIR)/playtune-test
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -16,6 +17,7 @@ LDFLAGS ?=
 
 RUNTIME_SOURCES := \
 	src/core/framebuffer.cpp \
+	src/compat/ArduboyPlaytune.cpp \
 	src/runtime/main.cpp
 
 LINUX_STORAGE_SOURCE := platform/linux_common/storage.cpp
@@ -51,6 +53,9 @@ COMPAT_TEST_OBJECTS := \
 	$(BUILD_DIR)/src/arduboy2/Arduboy2.o \
 	$(BUILD_DIR)/src/arduboy2/Sprites.o \
 	$(BUILD_DIR)/src/compat/EEPROM.o
+PLAYTUNE_TEST_OBJECTS := \
+	$(BUILD_DIR)/tests/playtune_test.o \
+	$(BUILD_DIR)/src/compat/ArduboyPlaytune.o
 
 .PHONY: all test test-terminal smoke clean check-upstream check-sdl
 
@@ -98,13 +103,18 @@ $(COMPAT_TEST_TARGET): $(COMPAT_TEST_OBJECTS)
 	@mkdir -p $(@D)
 	$(CXX) $(COMPAT_TEST_OBJECTS) $(LDFLAGS) -o $@
 
+$(PLAYTUNE_TEST_TARGET): $(PLAYTUNE_TEST_OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(PLAYTUNE_TEST_OBJECTS) $(LDFLAGS) -o $@
+
 $(BUILD_DIR)/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 
-test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(COMPAT_TEST_TARGET) $(PORT_TEST_TARGETS)
+test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(COMPAT_TEST_TARGET) $(PLAYTUNE_TEST_TARGET) $(PORT_TEST_TARGETS)
 	$(TEST_TARGET)
 	$(SDL_TEST_TARGET)
 	$(STORAGE_TEST_TARGET)
 	$(COMPAT_TEST_TARGET)
+	$(PLAYTUNE_TEST_TARGET)
 
 test-terminal: $(PORT_TERMINAL_TEST_TARGETS)
 

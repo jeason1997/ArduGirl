@@ -10,6 +10,9 @@ std::int16_t velocity = 1;
 
 } // 匿名命名空间
 
+const char* ardugirl_game_title() noexcept { return "终端冒烟测试"; }
+const char* ardugirl_game_id() noexcept { return "terminal-smoke"; }
+
 void setup() {
     ardugirl::framebuffer().clear();
 }
@@ -26,4 +29,3 @@ void loop() {
     }
     ardugirl::display();
 }
-

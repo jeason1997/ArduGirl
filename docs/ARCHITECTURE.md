@@ -74,8 +74,9 @@ void idle_until(std::uint32_t deadline_us) noexcept;
 
 void present(const std::uint8_t (&framebuffer)[1024]) noexcept;
 
-void set_tone(std::uint16_t frequency_hz) noexcept;
-void stop_tone() noexcept;
+void set_tone(std::uint16_t frequency_hz,
+              std::uint8_t channel = 0) noexcept;
+void stop_tone(std::uint8_t channel = 0) noexcept;
 
 bool storage_read(std::uint16_t offset, void* dst,
                   std::uint16_t size) noexcept;
@@ -139,7 +140,7 @@ cmake --build build
 
 ## 8. C++ 游戏层与 C 平台 ABI
 
-Arduboy2 音频兼容入口属于 `src/arduboy2` 公共兼容实现。平台音频尚未落地时，这些入口必须保留统一的无声、非阻塞语义；游戏专用适配只能转发上游自定义派生类的重复声明，不得在 `games/` 中另行实现通用音频行为。这样后续游戏依赖同一接口时会直接复用核心能力。
+Arduboy2Beep 属于 `src/arduboy2`，ArduboyPlaytune 属于 `src/compat` 中的独立官方生态库兼容实现。乐谱解析、等待、重复和声道状态不得进入平台后端；平台只接收最多两个方波声道的频率。游戏专用适配只能处理上游私有优先级等扩展并转发到公共播放器，不得复制乐谱解释器。
 
 Arduboy2 游戏依赖类、方法、重载和 Arduino `Print`，所以游戏与兼容层必须使用 C++ 编译。把整个项目改写为纯 C 会迫使我们修改上游游戏源码，不符合项目目标。
 

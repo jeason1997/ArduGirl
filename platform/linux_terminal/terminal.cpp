@@ -223,9 +223,9 @@ void sleep_ms(std::uint32_t duration) noexcept {
     std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 }
 
-void set_tone(std::uint16_t) noexcept {}
+void set_tone(std::uint16_t, std::uint8_t) noexcept {}
 
-void stop_tone() noexcept {}
+void stop_tone(std::uint8_t) noexcept {}
 
 void present(const Framebuffer::Storage& pixels) noexcept {
     std::string output;
