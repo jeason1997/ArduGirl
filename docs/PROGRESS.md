@@ -21,14 +21,16 @@
 | Linux terminal backend | partial | Braille 显示、raw input、固定帧模式已运行；按当前决策暂停效果优化 |
 | MicroTD | partial | 子模块源码未修改；固定输入回放已验证进入地图、建塔和启动波次；待持久化和完整游玩验证 |
 | ArduboyWorks 游戏集 | partial | 整仓固定到 `d4b1f041`；18 个游戏均已成功构建并分别通过 180 帧 SDL2 无头冒烟；待逐游戏固定输入回放、实际画面截图和完整玩法验证 |
-| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调毫秒/微秒计时、headless、事件注入、framebuffer golden test、EEPROM 文件后端、双声道方波和波表播放；gamepad 与长时间音频仍待验证 |
-| Arduboy2 兼容实现 | partial | 已覆盖当前 20 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM、静态音频控制和定时 tone；尚非完整上游 API |
-| 游戏源码 | partial | 已固定并接入 MicroTD、ArduboyWorks 18 个游戏与 Ardynia；后续游戏按 `GAME_PORTS.md` 继续导入 |
-| 音频 | partial | SDL2 已实现双声道方波、8 位波表混合和定时停止；Arduboy2Beep、ArduboyPlaytune 与 ArduboyWorks 音频扩展已接入，Ardynia 已提供真实双声道音效样本。当前游戏不依赖 ArduboyTones/ATMlib，待真实样本驱动后续移植 |
+| Linux SDL2 backend | partial | 已实现窗口、最近邻整数缩放、键盘输入、单调毫秒/微秒计时、headless、事件注入、framebuffer golden test、EEPROM 文件后端、双声道方波、波表和四声道 ATM 合成；gamepad 与长时间音频仍待验证 |
+| Arduboy2 兼容实现 | partial | 已覆盖当前 21 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM、静态音频控制和定时 tone；尚非完整上游 API |
+| 游戏源码 | partial | 已固定并接入 MicroTD、ArduboyWorks 18 个游戏、Ardynia 与 Arduventure；后续游戏按 `GAME_PORTS.md` 继续导入 |
+| 音频 | partial | SDL2 已实现双声道方波、8 位波表和四声道 ATM 合成；Arduboy2Beep、ArduboyPlaytune、ArduboyWorks 音频扩展与 ATMlib 已接入，Arduventure 标题音乐回放通过。ArduboyTones 与长时间音乐仍待真实样本验证 |
 | PY32 | planned | 需先指定芯片/板卡/屏幕 |
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+- 明确本仓库发布约束：用户要求“提交”时只使用 Git 检查、提交并推送当前分支，不依赖 GitHub CLI，也不默认创建 Pull Request。
+- 固定并接入 Arduventure `938fae77` 与 ATMlib `952d079f`：上游子模块保持 clean，公共兼容层解释四声道乐谱，SDL2 合成脉冲、三角和噪声波形；从空 `build/` 完成全仓构建，ATM 单元测试、180 帧无头启动和“标题→新游戏→剧情入口”固定回放通过，并保存 ArduGirl framebuffer 实际截图。当前仍标为 `partial`，待战斗、存档、完整剧情和长时间音乐验证。
 - 固定并接入 Ardynia `860312d2`：上游子模块保持 clean，通过外部入口和独立 `port.mk` 构建；补齐公共 `Arduboy2Base::sBuffer`、静态 `Arduboy2Audio` 与 EEPROM `get/put` 契约。修复玩家贴近屏幕顶部时依赖 AVR 16 位 `int` 回绕的 framebuffer 越界，以及蛇敌人离屏后先读瓦片造成的数组越界；“进入游戏后持续向上移动”固定回放已在 ASan+UBSan 与普通优化构建下通过。
 - Linux SDL2 与终端运行时新增致命信号调用栈输出，可执行文件使用 `-rdynamic` 导出符号；崩溃后仍恢复默认信号行为，以保留非零退出状态和 core dump 能力。
 
@@ -76,7 +78,7 @@
 3. 添加 PCM、复杂压缩图片、时间回绕、GCC/Clang 和 sanitizers 测试。
 4. 增加 SDL2 gamepad 输入和键位配置。
 5. 按 `GAME_PORTS.md` 优先级引入 Twotris，并完成源码固定、构建、冒烟和截图闭环。
-6. 根据新游戏的真实依赖选择 ArduboyTones、ATMlib 或其他扩展库；随后再评估 MCU 后端。
+6. 以新游戏样本继续验证 ArduboyTones 或其他扩展库，并为 ATMlib 增加长时间音乐与更多效果指令回归；随后再评估 MCU 后端。
 
 ## 未决策项
 

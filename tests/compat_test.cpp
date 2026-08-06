@@ -36,6 +36,7 @@ void play_wave(std::uint16_t rate, const std::uint8_t*, std::uint16_t count) noe
     wave_count = count;
 }
 void stop_wave() noexcept { wave_count = 0; }
+void set_synth(const SynthVoice*, std::uint8_t) noexcept {}
 bool storage_read(std::uint16_t offset, void* destination, std::uint16_t size) noexcept {
     std::memcpy(destination, storage + offset, size);
     return true;

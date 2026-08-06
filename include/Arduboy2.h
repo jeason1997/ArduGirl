@@ -96,9 +96,14 @@ public:
     void blank() noexcept { clear(); }
     void flashlight() noexcept {}
     void systemButtons() noexcept {}
+    void exitToBootloader() noexcept {}
     void setFrameRate(std::uint8_t rate) noexcept;
     bool nextFrame() noexcept;
+    bool everyXFrames(std::uint8_t frames) const noexcept {
+        return frames != 0 && frameCount % frames == 0;
+    }
     void clear() noexcept;
+    void fillScreen(std::uint8_t color = WHITE) noexcept;
     void display(bool clear_buffer = false) noexcept;
     void setCursor(std::int16_t x, std::int16_t y) noexcept;
     std::size_t print(const char* text) noexcept;

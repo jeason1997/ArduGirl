@@ -1,0 +1,21 @@
+id = "arduventure"
+name = "Arduventure"
+source = "https://github.com/Team-ARG-Museum/ID-46-Arduventure"
+revision = "938fae770f04369ae4e4dd29c1039f7b43e7d96c"
+entry = "third_party/Arduventure/ARDU_AB/ARDU_AB.ino"
+
+[compat]
+level = "C"
+status = "partial"
+libraries = ["Arduboy2", "ATMlib", "EEPROM"]
+
+[port]
+patches = [
+    "patches/0001-host-use-native-function-pointers.patch",
+    "patches/0002-worlddata-use-cxx17-initializers.patch",
+]
+notes = [
+    "上游源码与资产保持未修改；代码采用 MIT 许可证，但剧情、角色、美术和其他资产由 TEAM a.r.g. 保留版权。",
+    "ATMlib 固定为 Team-ARG-Museum/ATMlib 的 952d079f573c0a9361d9f1a101134b7df884ab12，并由公共兼容层解释乐谱。",
+    "补丁移除上游自带的 AVR main 入口，把函数指针读取改为宿主宽度安全的 pgm_read_ptr，并将指定初始化改写为等价 C++17 构造。",
+]

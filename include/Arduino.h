@@ -87,6 +87,23 @@ long random(long maximum) noexcept;
 long random(long minimum, long maximum) noexcept;
 long map(long value, long from_low, long from_high,
          long to_low, long to_high) noexcept;
+inline char* itoa(int value, char* buffer, int radix) noexcept {
+    if (buffer == nullptr || radix < 2 || radix > 36) return buffer;
+    char temporary[35]{};
+    unsigned int magnitude = value < 0 ? 0u - static_cast<unsigned int>(value) :
+                                        static_cast<unsigned int>(value);
+    std::size_t count = 0;
+    do {
+        const auto digit = magnitude % static_cast<unsigned int>(radix);
+        temporary[count++] = static_cast<char>(digit < 10 ? '0' + digit : 'a' + digit - 10);
+        magnitude /= static_cast<unsigned int>(radix);
+    } while (magnitude != 0);
+    std::size_t output = 0;
+    if (value < 0 && radix == 10) buffer[output++] = '-';
+    while (count != 0) buffer[output++] = temporary[--count];
+    buffer[output] = '\0';
+    return buffer;
+}
 
 // 使用函数而不是 Arduino 常见的宏，避免宏展开破坏 C++ 标准库中的 std::min/max。
 template<typename Left, typename Right>

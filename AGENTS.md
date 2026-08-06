@@ -91,6 +91,7 @@ game -> compat/arduboy2 -> core/platform API -> platform backend
 - 远程仓库固定为 `origin = https://github.com/jeason1997/ArduGirl.git`，默认开发分支为 `main`。
 - 未经用户明确说“提交”，不得创建 commit，也不得推送。
 - 当用户说“提交”时，默认同时执行：检查变更范围、运行适当验证、创建有意义的提交、推送当前分支到 `origin`。
+- 本仓库的提交与推送只使用 Git 命令，不依赖 GitHub CLI、GitHub App 或其他发布工作流，也不因缺少 `gh` 阻塞；除非用户另行明确要求，否则不创建 Pull Request。
 - 如果推送因为认证、网络、分支保护或远程冲突失败，保留本地 commit，并明确报告原因和下一步。
 - 不得使用强制推送，除非用户明确指定并确认其影响。
 

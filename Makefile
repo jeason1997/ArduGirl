@@ -7,6 +7,7 @@ SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
 STORAGE_TEST_TARGET := $(BUILD_DIR)/storage-test
 COMPAT_TEST_TARGET := $(BUILD_DIR)/compat-test
 PLAYTUNE_TEST_TARGET := $(BUILD_DIR)/playtune-test
+ATM_TEST_TARGET := $(BUILD_DIR)/atm-test
 SDL_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
 SDL_LIBS := $(shell pkg-config --libs sdl2 2>/dev/null)
 
@@ -18,6 +19,7 @@ LINUX_RUNTIME_LDFLAGS := $(LDFLAGS) -rdynamic
 
 RUNTIME_SOURCES := \
 	src/core/framebuffer.cpp \
+	src/compat/ATMlib.cpp \
 	src/compat/ArduboyPlaytune.cpp \
 	src/runtime/main.cpp
 
@@ -60,6 +62,9 @@ COMPAT_TEST_OBJECTS := \
 PLAYTUNE_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/playtune_test.o \
 	$(BUILD_DIR)/src/compat/ArduboyPlaytune.o
+ATM_TEST_OBJECTS := \
+	$(BUILD_DIR)/tests/atm_test.o \
+	$(BUILD_DIR)/src/compat/ATMlib.o
 
 .PHONY: all test test-terminal smoke clean check-upstream check-sdl
 
@@ -111,14 +116,19 @@ $(PLAYTUNE_TEST_TARGET): $(PLAYTUNE_TEST_OBJECTS)
 	@mkdir -p $(@D)
 	$(CXX) $(PLAYTUNE_TEST_OBJECTS) $(LDFLAGS) -o $@
 
+$(ATM_TEST_TARGET): $(ATM_TEST_OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(ATM_TEST_OBJECTS) $(LDFLAGS) -o $@
+
 $(BUILD_DIR)/src/arduboy2/Arduboy2.o: $(BUILD_DIR)/generated/font5x7.inc
 
-test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(COMPAT_TEST_TARGET) $(PLAYTUNE_TEST_TARGET) $(PORT_TEST_TARGETS)
+test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(COMPAT_TEST_TARGET) $(PLAYTUNE_TEST_TARGET) $(ATM_TEST_TARGET) $(PORT_TEST_TARGETS)
 	$(TEST_TARGET)
 	$(SDL_TEST_TARGET)
 	$(STORAGE_TEST_TARGET)
 	$(COMPAT_TEST_TARGET)
 	$(PLAYTUNE_TEST_TARGET)
+	$(ATM_TEST_TARGET)
 
 test-terminal: $(PORT_TERMINAL_TEST_TARGETS)
 

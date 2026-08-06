@@ -1,6 +1,7 @@
 #include "ArduboyPlaytune.h"
 #include "ardugirl/framebuffer.hpp"
 #include "ardugirl/runtime.hpp"
+#include "ardugirl/platform.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -30,6 +31,7 @@ void set_tone(std::uint16_t, std::uint8_t) noexcept {}
 void stop_tone(std::uint8_t) noexcept {}
 void play_wave(std::uint16_t, const std::uint8_t*, std::uint16_t) noexcept {}
 void stop_wave() noexcept {}
+void set_synth(const SynthVoice*, std::uint8_t) noexcept {}
 bool storage_read(std::uint16_t offset, void* destination, std::uint16_t size) noexcept {
     if (static_cast<std::size_t>(offset) + size > sizeof(replay_storage)) return false;
     std::memcpy(destination, replay_storage + offset, size);

@@ -48,7 +48,7 @@ SDL2 是当前默认 Linux 后端，以覆盖更多现有 Linux 发行版、开�
 
 ### M4：音频
 
-SDL2 audio callback 以 48 kHz、16 位单声道混合最多两个方波声道和一条 8 位无符号波表流。波表使用定点相位按调用方给出的采样率重采样，播放到样本末尾后自动停止。游戏线程只通过加锁后的状态启动或停止声音，音频回调不得访问或修改游戏对象。无音频设备时初始化继续成功并静音降级。当前覆盖定时 tone、Arduboy2Beep、ArduboyPlaytune 和 ArduboyWorks `playWave`；ArduboyTones 与 ATMlib 待出现实际依赖后单独移植。
+SDL2 audio callback 以 48 kHz、16 位单声道混合最多两个方波声道、一条 8 位无符号波表流和四个 ATM 合成声部。波表使用定点相位按调用方给出的采样率重采样，播放到样本末尾后自动停止；ATM 声部按振荡器类型生成脉冲、三角和噪声波形。游戏线程只通过加锁后的状态更新声音，音频回调不得访问或修改游戏对象。无音频设备时初始化继续成功并静音降级。当前覆盖定时 tone、Arduboy2Beep、ArduboyPlaytune、ArduboyWorks `playWave` 和 ATMlib；ArduboyTones 待出现实际依赖后单独移植。
 
 ## 命令行接口
 

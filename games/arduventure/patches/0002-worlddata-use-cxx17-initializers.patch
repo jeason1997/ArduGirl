@@ -1,0 +1,42 @@
+--- worlddata.h
++++ worlddata.h
+@@ -21,9 +21,10 @@ byte getRegion(byte chunk_pos_x, byte chunk_pos_y)
+   for (byte i = 0; i < TOTAL_REGIONS; i++)
+   {
+-    Point chunk_pos = { .x = chunk_pos_x, .y = chunk_pos_y};
+-    Rect reg = {.x = pgm_read_byte(regions + i * 4), .y = pgm_read_byte(regions + 1 + i * 4),
+-                .width = pgm_read_byte(regions + 2 + i * 4), .height = pgm_read_byte(regions + 3 + i * 4)
+-               };
++    Point chunk_pos(chunk_pos_x, chunk_pos_y);
++    Rect reg(pgm_read_byte(regions + i * 4),
++             pgm_read_byte(regions + 1 + i * 4),
++             pgm_read_byte(regions + 2 + i * 4),
++             pgm_read_byte(regions + 3 + i * 4));
+     if (arduboy.collide(chunk_pos, reg)) return i;
+   }
+   return REGION_FOREST;
+@@ -345,21 +345,12 @@ void checkDoors()
+ {
+   if (!(playerDirection & 0B00000001)) //WALKING NORTH OR SOUTH
+   {
+-    Point p =
+-    {
+-      .x = player.x,
+-      .y = player.y,
+-    };
++    Point p(player.x, player.y);
+ 
+     for (byte i = 0; i < TOTAL_DOORS; i++)
+     {
+-      Rect door =
+-      {
+-        .x = (16 * pgm_read_byte(&doors[i * 2])) - 3,
+-        .y = 16 * pgm_read_byte(&doors[(i * 2) + 1 ]),
+-        .width = 10,
+-        .height = 10
+-      };
++      Rect door((16 * pgm_read_byte(&doors[i * 2])) - 3,
++                16 * pgm_read_byte(&doors[(i * 2) + 1 ]), 10, 10);
+ 
+       if (arduboy.collide(p, door))
+       {

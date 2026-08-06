@@ -60,7 +60,7 @@
 | 39 | Space Battle: Trench Run | 射击 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/TrenchRun-Arduboy-1.0) | B/C | 未导入、未构建；射击物、场景滚动和声音使工作量较高 |
 | 40 | Rayne the Rogue | 动作冒险 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/RAYNE_THE_ROGUE-1.0) | B/C | 未导入、未构建；当前入口为已有平台移植副本 |
 | 41 | CastleBoy | 平台冒险 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/CastleBoy-master) | C | 未导入、未构建；官方精选，当前入口为已有平台移植副本，程序规模和资源较大 |
-| 42 | Arduventure | 动作 RPG | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/ID-46-Arduventure-master) | C/D | 未导入、未构建；官方代表作，但当前入口为已有平台移植副本，地图、音频、存档和底层优化复杂 |
+| 42 | Arduventure | 动作 RPG | [上游源码](https://github.com/Team-ARG-Museum/ID-46-Arduventure) | C | **部分回放验证**：源码固定为 `938fae77`，四声道 ATMlib 标题音乐、SDL2 冷构建、180 帧无头启动及“标题→新游戏→剧情入口”回放通过，并已保存实际截图；待完整剧情推进、战斗、存档和长时间音乐验收 |
 | 43 | Circuit Dude | 线路谜题 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/CircuitDude) | C | 未导入、未构建；当前入口为已有平台移植副本，需评估平台相关改动 |
 | 44 | Omega Horizon | 平台射击 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/OMEGA_HORIZON_AB) | C | 未导入、未构建；官方精选，当前入口为已有平台移植副本，资源与音频复杂 |
 | 45 | Squario | 平台动作 | [可访问源码](https://github.com/tonym128/ESP32_Arduboy/tree/master/GAMES/Squario) | C | 未导入、未构建；当前入口为已有平台移植副本，需审计移植层耦合 |

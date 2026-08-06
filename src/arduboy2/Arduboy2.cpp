@@ -109,6 +109,10 @@ void Arduboy2::clear() noexcept {
     cursor_y = 0;
 }
 
+void Arduboy2::fillScreen(std::uint8_t color) noexcept {
+    ardugirl::framebuffer().data().fill(color == BLACK ? 0x00 : 0xFF);
+}
+
 void Arduboy2::display(bool clear_buffer) noexcept {
     ardugirl::display();
     if (clear_buffer) clear();

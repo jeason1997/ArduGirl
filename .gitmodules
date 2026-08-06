@@ -10,3 +10,9 @@
 [submodule "third_party/Ardynia"]
 	path = third_party/Ardynia
 	url = https://github.com/city41/ardynia.git
+[submodule "third_party/Arduventure"]
+	path = third_party/Arduventure
+	url = https://github.com/Team-ARG-Museum/ID-46-Arduventure.git
+[submodule "third_party/ATMlib"]
+	path = third_party/ATMlib
+	url = https://github.com/Team-ARG-Museum/ATMlib.git

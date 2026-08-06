@@ -30,6 +30,9 @@ const std::uint8_t* wave_samples = nullptr;
 std::uint16_t wave_sample_count = 0;
 std::uint64_t wave_position = 0;
 std::uint64_t wave_step = 0;
+std::array<SynthVoice, 4> synth_voices{};
+std::array<std::uint32_t, 4> synth_phases{};
+std::uint32_t noise_state = 1;
 
 constexpr std::uint8_t kLeft = 0x01;
 constexpr std::uint8_t kRight = 0x02;
@@ -91,6 +94,24 @@ void audio_callback(void*, Uint8* stream, int length) noexcept {
                 wave_sample_count = 0;
             }
         }
+        for (std::size_t channel = 0; channel < synth_voices.size(); ++channel) {
+            const auto& voice = synth_voices[channel];
+            if (voice.frequency_hz == 0 || voice.volume == 0) continue;
+            synth_phases[channel] += static_cast<std::uint32_t>(
+                (static_cast<std::uint64_t>(voice.frequency_hz) << 32u) / 48000u);
+            std::int32_t signal = 0;
+            if (voice.waveform == 2) {
+                const auto ramp = static_cast<std::int32_t>(synth_phases[channel] >> 23u) & 0x1FF;
+                signal = ramp < 256 ? ramp - 128 : 383 - ramp;
+            } else if (voice.waveform == 3) {
+                noise_state = (noise_state >> 1u) ^
+                    (static_cast<std::uint32_t>(-(noise_state & 1u)) & 0xB400u);
+                signal = (noise_state & 1u) != 0 ? 128 : -128;
+            } else {
+                signal = synth_phases[channel] < 0x80000000u ? 128 : -128;
+            }
+            mixed += signal * static_cast<std::int32_t>(voice.volume) / 2;
+        }
         if (mixed > 32767) mixed = 32767;
         if (mixed < -32768) mixed = -32768;
         samples[index] = static_cast<std::int16_t>(mixed);
@@ -111,6 +132,9 @@ bool init(const Config& config) noexcept {
     wave_sample_count = 0;
     wave_position = 0;
     wave_step = 0;
+    synth_voices = {};
+    synth_phases = {};
+    noise_state = 1;
 
     // 无窗口测试仍初始化 SDL 的计时与事件子系统，但不要求显示服务器。
     const auto subsystems = static_cast<Uint32>(SDL_INIT_TIMER | SDL_INIT_EVENTS |
@@ -253,6 +277,17 @@ void stop_wave() noexcept {
     SDL_LockAudioDevice(audio_device);
     wave_samples = nullptr;
     wave_sample_count = 0;
+    SDL_UnlockAudioDevice(audio_device);
+}
+
+void set_synth(const SynthVoice* voices, std::uint8_t count) noexcept {
+    if (audio_device == 0) return;
+    SDL_LockAudioDevice(audio_device);
+    synth_voices = {};
+    if (voices != nullptr) {
+        const auto copied = count < synth_voices.size() ? count : synth_voices.size();
+        for (std::size_t index = 0; index < copied; ++index) synth_voices[index] = voices[index];
+    }
     SDL_UnlockAudioDevice(audio_device);
 }
 

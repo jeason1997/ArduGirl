@@ -29,6 +29,12 @@ void stop_tone(std::uint8_t channel = 0) noexcept;
 void play_wave(std::uint16_t sample_rate_hz, const std::uint8_t* samples,
                std::uint16_t sample_count) noexcept;
 void stop_wave() noexcept;
+struct SynthVoice {
+    std::uint16_t frequency_hz = 0;
+    std::uint8_t volume = 0;
+    std::uint8_t waveform = 0;
+};
+void set_synth(const SynthVoice* voices, std::uint8_t count) noexcept;
 void present(const Framebuffer::Storage& pixels) noexcept;
 bool storage_read(std::uint16_t offset, void* destination,
                   std::uint16_t size) noexcept;

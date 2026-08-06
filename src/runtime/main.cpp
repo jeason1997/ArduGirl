@@ -1,4 +1,5 @@
 #include "ardugirl/platform.hpp"
+#include "ATMlib.h"
 #include "ardugirl/runtime.hpp"
 #include "ArduboyPlaytune.h"
 
@@ -89,6 +90,7 @@ int main(int argc, char** argv) {
     std::uint32_t rendered_frames = 0;
     while (ardugirl::platform::pump_events()) {
         ardugirl_update_playtunes();
+        ardugirl::atm::service();
         loop();
         ++rendered_frames;
         if (frame_limit != 0 && rendered_frames >= frame_limit) {
