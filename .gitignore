@@ -1,0 +1,39 @@
+# CMake 构建目录与生成文件
+/build/
+/build-*/
+/out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# 编译产物与调试文件
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+*.elf
+*.map
+*.pdb
+
+# 编辑器与操作系统临时文件
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# 测试、覆盖率和运行时存档
+/Testing/
+*.gcda
+*.gcno
+*.profraw
+*.profdata
+eeprom.bin
+*.sav
+
