@@ -16,6 +16,18 @@ bool legacy_score_enabled = true;
 ArduboyPlaytune legacy_score_player(legacy_score_enabled);
 std::uint8_t legacy_score_priority = 0xFF;
 
+// Arduino 只约定随机数范围和播种接口，不保证跨平台复现 libc 的具体序列。
+// 使用固定宽度状态可避免裸机固件因 rand() 拉入 newlib 的可重入与 stdio 状态。
+std::uint32_t random_state = 1;
+
+std::uint32_t next_random() noexcept {
+    // xorshift32 的全零状态无法离开零点；randomSeed(0) 不改变状态，因此这里始终非零。
+    random_state ^= random_state << 13;
+    random_state ^= random_state >> 17;
+    random_state ^= random_state << 5;
+    return random_state;
+}
+
 struct LegacyScoreChannels {
     LegacyScoreChannels() noexcept {
         legacy_score_player.initChannel(PIN_SPEAKER_1);
@@ -53,8 +65,26 @@ std::uint32_t micros() noexcept { return ardugirl::platform::micros(); }
 void delay(unsigned long duration) noexcept {
     ardugirl::platform::sleep_ms(static_cast<std::uint32_t>(duration));
 }
-void randomSeed(unsigned long seed) noexcept { std::srand(static_cast<unsigned int>(seed)); }
-long random(long maximum) noexcept { return maximum > 0 ? std::rand() % maximum : 0; }
+void randomSeed(unsigned long seed) noexcept {
+    const auto narrowed_seed = static_cast<std::uint32_t>(seed);
+    if (narrowed_seed != 0) {
+        random_state = narrowed_seed;
+    }
+}
+
+extern "C" int rand() noexcept {
+    return static_cast<int>(next_random() & 0x7FFFFFFFu);
+}
+
+extern "C" void srand(unsigned int seed) noexcept {
+    random_state = seed != 0 ? static_cast<std::uint32_t>(seed) : 1u;
+}
+
+long random(long maximum) noexcept {
+    return maximum > 0
+        ? static_cast<long>(next_random() % static_cast<unsigned long>(maximum))
+        : 0;
+}
 long random(long minimum, long maximum) noexcept {
     return maximum > minimum ? minimum + random(maximum - minimum) : minimum;
 }

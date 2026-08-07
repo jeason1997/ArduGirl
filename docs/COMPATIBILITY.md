@@ -75,6 +75,8 @@ ArduboyPlaytune 和 ATMlib 已作为独立兼容库实现。ATMlib 由 Arduventu
 
 当前 `micros()` 使用平台单调高精度计数器并按无符号 32 位自然回绕；不再由毫秒值乘 1000 模拟。Linux SDL2 音频支持两个方波声道、一条波表流和四个 ATM 合成声部，不模拟 AVR 定时器寄存器。
 
+`random()`、`randomSeed()` 以及 AVR 游戏可能直接使用的 `rand()`、`srand()` 共享兼容层自有的 32 位确定性状态，不依赖宿主 libc 的随机数实现。这保留 Arduino 所需的半开区间、重播种和零种子不改变状态语义，同时避免 MCU 固件引入 newlib 的可重入与 stdio 全局状态；具体随机序列不承诺与某个 Arduino core 或宿主 libc 相同。
+
 ## 测试策略
 
 - 单元测试：绘图边界、遮罩、碰撞、按钮边沿、时间回绕、PROGMEM 加载。

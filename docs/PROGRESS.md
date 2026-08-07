@@ -25,10 +25,12 @@
 | Arduboy2 兼容实现 | partial | 已覆盖当前 21 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM、静态音频控制和定时 tone；尚非完整上游 API |
 | 游戏源码 | partial | 已固定并接入 MicroTD、ArduboyWorks 18 个游戏、Ardynia 与 Arduventure；后续游戏按 `GAME_PORTS.md` 继续导入 |
 | 音频 | partial | SDL2 已实现双声道方波、8 位波表和四声道 ATM 合成；Arduboy2Beep、ArduboyPlaytune、ArduboyWorks 音频扩展与 ATMlib 已接入，Arduventure 标题音乐回放通过。ArduboyTones 与长时间音乐仍待真实样本验证 |
-| PY32 | partial | PY32F002A + ST7789 已改用额定 24 MHz HSI；2026-08-07 最近一次完整冷构建通过 21/24，失败项为 Bananonsense、Chri-Bocchi Cat、Stairs Sweep；其后 Stairs Sweep 已独立冷构建通过，尚未重跑全量，剩余两款仍待修复；另待实机长时间静置、60 FPS、按钮和蜂鸣器验收，Flash EEPROM 尚未实现 |
+| PY32 | partial | PY32F002A + ST7789 已改用额定 24 MHz HSI；2026-08-07 最近一次完整冷构建通过 21/24，失败项为 Bananonsense、Chri-Bocchi Cat、Stairs Sweep；其后 Stairs Sweep 与 Chri-Bocchi Cat 已分别独立冷构建通过，尚未重跑全量，Bananonsense 仍待修复；另待实机长时间静置、60 FPS、按钮和蜂鸣器验收，Flash EEPROM 尚未实现 |
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+
+- 修复 Chri-Bocchi Cat 的 PY32 RAM 溢出：该游戏除 Arduino `random()` 外还直接调用 AVR libc 风格的 `rand()`，原实现因此把 newlib 随机数、可重入和 stdio 状态带入固件，在 4 KB RAM 中超出 144 字节。兼容层现以 4 字节固定宽度 xorshift 状态统一实现 `random()`、`randomSeed()`、`rand()` 和 `srand()`，保留半开区间、确定性重播种及 Arduino 零种子语义，并增加边界与重播种回归测试。PY32 独立冷构建通过，固件 text 15100、data 16、bss 3600 字节，map 确认不再分配 newlib 随机数/stdio 全局状态；Linux 公共兼容测试及该游戏构建、180 帧冒烟通过。完整 Linux 并行测试另因既有 Ardynia 生成快照竞态失败，串行测试又在 Helmets & Hordes 的既有补丁上下文不匹配处失败，均未记为全量通过。
 
 - 移除集合 profile 中与正式补丁重复的 `replacements` 源码改写机制；原有 ArduboyWorks 兼容修改已迁移为每个游戏显式引用、带上下文校验的编号补丁。公共准备器拒绝构建配置重新声明源码替换，源码适配只保留 `patches` 一条路径。
 - 修复 Stairs Sweep 的 PY32 裸机链接失败：ArduboyWorks 集合 profile 原先只会把 `MyArduboy.cpp` 中动态创建的 `ArduboyPlaytune` 替换为公共固定容量播放器工厂，遗漏了该游戏采用的 `MyArduboyV.cpp`，导致固件引用未提供的 `operator new`。现由同一平台无关 profile 覆盖该文件名，继续保持上游目录不变且不向 PY32 构建加入游戏特判。生成快照已确认改用 `ardugirl_create_playtune()`；PY32 独立冷构建通过，固件 text 17272、data 340、bss 3204 字节；Linux 单游戏构建、180 帧冒烟及公共 Playtune 回归测试通过。最近一次完整 PY32 冷构建尚未重跑，因此不把独立结果误报为新的全量通过数。

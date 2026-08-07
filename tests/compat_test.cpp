@@ -4,6 +4,7 @@
 #include "ardugirl/runtime.hpp"
 
 #include <cassert>
+#include <cstdlib>
 #include <cstring>
 #include <cstdint>
 
@@ -74,6 +75,27 @@ int main() {
     delay(2);
     assert(micros() == 1236567u);
     assert(map(5, 0, 10, 0, 100) == 50);
+    randomSeed(12345);
+    const long first_random = random(1000);
+    const long second_random = random(-20, 20);
+    assert(first_random >= 0 && first_random < 1000);
+    assert(second_random >= -20 && second_random < 20);
+    randomSeed(12345);
+    assert(random(1000) == first_random);
+    assert(random(-20, 20) == second_random);
+    randomSeed(0);
+    const long after_zero_seed = random(1000);
+    randomSeed(12345);
+    random(1000);
+    random(-20, 20);
+    assert(random(1000) == after_zero_seed);
+    assert(random(0) == 0);
+    assert(random(10, 10) == 10);
+    std::srand(6789);
+    const int first_libc_random = std::rand();
+    assert(first_libc_random >= 0);
+    std::srand(6789);
+    assert(std::rand() == first_libc_random);
     constexpr std::uint8_t program_byte = 0xA5;
     assert(pgm_read_byte_near(&program_byte) == program_byte);
     char long_text[32]{};
