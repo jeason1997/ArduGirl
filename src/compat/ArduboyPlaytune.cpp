@@ -3,10 +3,15 @@
 #include "ardugirl/platform.hpp"
 
 #include <cstdint>
+#include <new>
 
 namespace {
 
 ArduboyPlaytune* first_player = nullptr;
+constexpr std::uint8_t kPersistentPlayerCapacity = 8;
+alignas(ArduboyPlaytune) std::uint8_t persistent_player_storage
+    [kPersistentPlayerCapacity][sizeof(ArduboyPlaytune)]{};
+std::uint8_t persistent_player_count = 0;
 
 std::uint16_t midi_frequency(std::uint8_t note) noexcept {
     // MIDI 0 的频率以 Q16 表示，逐半音乘以 2^(1/12)。全程使用整数，
@@ -122,4 +127,11 @@ void ardugirl_update_playtunes() noexcept {
     for (auto* player = first_player; player != nullptr; player = player->next_) {
         player->update();
     }
+}
+
+ArduboyPlaytune* ardugirl_create_playtune(bool& output_enabled) noexcept {
+    if (persistent_player_count >= kPersistentPlayerCapacity) return nullptr;
+    auto* storage = persistent_player_storage[persistent_player_count++];
+    // placement new 只在固定静态存储上建立对象，不申请堆，也不注册退出析构。
+    return new (storage) ArduboyPlaytune(output_enabled);
 }

@@ -20,7 +20,7 @@ optional = true
 [[replacements]]
 file = "MyArduboy.cpp"
 old = "pTunes = new ArduboyPlaytune(myAudio.enabled);"
-new = "static ArduboyPlaytune tunes(myAudio.enabled); pTunes = &tunes;"
+new = "pTunes = ardugirl_create_playtune(myAudio.enabled);"
 optional = true
 
 [[replacements]]

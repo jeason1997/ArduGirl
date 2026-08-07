@@ -30,6 +30,7 @@
 
 ## 已完成
 
+- 修复 ArduboyWorks Hollow 的 PY32 裸机链接失败：集合适配原先把上游动态创建的 `ArduboyPlaytune` 改成函数内静态对象，其非平凡析构会注册 `atexit`，继而把 newlib 退出链和缺失的 `_fini` 拉入固件。公共 Playtune 兼容层新增固定容量、无堆分配且不注册退出析构的进程期播放器工厂，集合 profile 统一使用该入口，并增加最小回归测试。Hollow 从空目标目录交叉构建通过，固件 text 22536、data 340、bss 3356 字节；CMSIS-DAP/OpenOCD 写入、校验和复位成功，Linux 全量测试同时通过。
 - 统一游戏构建描述：Linux 不再加载每个游戏或集合的 `port.mk`，而是一次扫描 `game.toml` 生成轻量目录，并由平台内单一模板展开 SDL、终端、冒烟和回放目标；PY32 与 Linux 现共同消费 `tools/prepare_game.py` 生成的原子源码快照和运行入口。删除 7 份重复 `port.mk` 与 7 份手写 `entry.cpp`。普通游戏只需清单和可选补丁；ArduboyWorks 的真实集合差异由每款清单显式引用集合级 `profile.toml`，不再依赖构建器向父目录猜测 `build.toml`。从空 `build/` 执行 Linux 全部 24 个 SDL 游戏的 `make -j4` 冷构建通过，随后 `make test -j4` 的公共测试、24 款冒烟和 3 款固定回放全部通过，`make test-terminal` 通过；PY32 MicroTD 交叉构建通过，固件 text 19280、data 364、bss 3484 字节。
 - 修复 Linux 平台 `GAME=<game-id>` 选择发生得过晚的问题：平台 Makefile 原先先加载全部游戏 `port.mk` 和依赖，再从最终目标中过滤指定游戏，导致 `/mnt/e` 上的单游戏构建仍承担全仓解析开销。现根据直属游戏目录或集合内 `game.toml` 自动定位并只加载所属 `port.mk`；ArduboyWorks 集合同时只展开指定游戏，根 Makefile不包含任何游戏名称或路径特判。
 - 修复统一入口的 Linux 单游戏选择回归：根 Makefile 转发默认 `all` 后，Linux 平台曾忽略 `GAME` 并依赖全部 `PORT_BUILD_TARGETS`，导致 `make PLATFORM=linux GAME=microtd` 编译所有游戏。Linux 平台现从各移植模块登记的构建产物中精确选择与 `GAME` 对应的唯一目标；未指定 `GAME` 时才保持全量构建，未知或重复匹配立即报错。MicroTD 和 ArduboyWorks 的依赖文件裁剪同时识别 `GAME` 参数，避免单游戏调用重新读取无关游戏依赖。默认单游戏调用保持原有的“编译后运行”行为；`build` 目标只生成 SDL 程序，`run` 可显式启动。

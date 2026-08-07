@@ -36,3 +36,7 @@ private:
 
 // 运行时调用这一入口推进所有播放器；游戏无需手动轮询乐谱状态。
 void ardugirl_update_playtunes() noexcept;
+
+// 为不能使用动态分配的适配代码提供进程期播放器。返回对象不会析构，
+// 因而不会在裸机固件中注册退出处理；容量耗尽时返回空指针。
+ArduboyPlaytune* ardugirl_create_playtune(bool& output_enabled) noexcept;

@@ -74,5 +74,13 @@ int main() {
     stereo_player.playScore(shifted_score, 12);
     assert(frequencies[0] >= 879 && frequencies[0] <= 881);
     stereo_player.stopScore();
+
+    bool persistent_enabled = true;
+    auto* persistent_player = ardugirl_create_playtune(persistent_enabled);
+    assert(persistent_player != nullptr);
+    persistent_player->initChannel(0);
+    persistent_player->playScore(shifted_score);
+    assert(persistent_player->playing());
+    persistent_player->stopScore();
     return 0;
 }
