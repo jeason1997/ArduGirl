@@ -30,8 +30,13 @@ bool next_frame(std::uint8_t frames_per_second) noexcept {
     const auto duration = static_cast<std::uint32_t>(1000u / frames_per_second);
     const auto now = platform::millis();
     if (deadline == 0) deadline = now;
-    if (static_cast<std::int32_t>(now - deadline) < 0) platform::sleep_ms(deadline - now);
-    deadline += duration;
+    if (static_cast<std::int32_t>(now - deadline) < 0) {
+        platform::sleep_ms(deadline - now);
+        deadline += duration;
+    } else {
+        // 显示或游戏逻辑偶发超期时从当前时刻重新排期，避免期限永久落后并最终跨过有符号比较半周期。
+        deadline = now + duration;
+    }
     return true;
 }
 

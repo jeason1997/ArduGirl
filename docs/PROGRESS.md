@@ -25,7 +25,7 @@
 | Arduboy2 兼容实现 | partial | 已覆盖当前 21 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM、静态音频控制和定时 tone；尚非完整上游 API |
 | 游戏源码 | partial | 已固定并接入 MicroTD、ArduboyWorks 18 个游戏、Ardynia 与 Arduventure；后续游戏按 `GAME_PORTS.md` 继续导入 |
 | 音频 | partial | SDL2 已实现双声道方波、8 位波表和四声道 ATM 合成；Arduboy2Beep、ArduboyPlaytune、ArduboyWorks 音频扩展与 ATMlib 已接入，Arduventure 标题音乐回放通过。ArduboyTones 与长时间音乐仍待真实样本验证 |
-| PY32 | partial | PY32F002A + ST7789 首版已构建、烧录并进入 Arduventure 绘制循环；按钮、蜂鸣器待实机交互验收，Flash EEPROM 尚未实现 |
+| PY32 | partial | PY32F002A + ST7789 已改用额定 24 MHz HSI；2026-08-07 全量冷构建通过 11/24，仍有 13 款失败，因此批量兼容修复尚未完成；另待实机长时间静置、60 FPS、按钮和蜂鸣器验收，Flash EEPROM 尚未实现 |
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
@@ -34,6 +34,7 @@
 - 修复统一入口的 Linux 单游戏选择回归：根 Makefile 转发默认 `all` 后，Linux 平台曾忽略 `GAME` 并依赖全部 `PORT_BUILD_TARGETS`，导致 `make PLATFORM=linux GAME=microtd` 编译所有游戏。Linux 平台现从各移植模块登记的构建产物中精确选择与 `GAME` 对应的唯一目标；未指定 `GAME` 时才保持全量构建，未知或重复匹配立即报错。MicroTD 和 ArduboyWorks 的依赖文件裁剪同时识别 `GAME` 参数，避免单游戏调用重新读取无关游戏依赖。默认单游戏调用保持原有的“编译后运行”行为；`build` 目标只生成 SDL 程序，`run` 可显式启动。
 - 整理平台所有权与统一构建入口：根 Makefile 不再声明 `py32`、`flash-py32` 或 `PY32_GAME`，只按 `PLATFORM` 选择平台 Makefile，并原样转发目标和 `GAME` 等变量；PY32 统一使用 `make PLATFORM=py32 GAME=<game-id>` 构建、追加 `flash` 烧录。Linux 与 PY32 自有文件均按职责分类：实现进入 `src/`，私有头文件进入 `include/`，平台测试或工具分别进入 `tests/`、`tools/`，厂商依赖保留在 `vendor/`；平台实现和专用测试不再平铺在平台根目录或散放到公共测试目录。WSL 冷构建并执行迁移后的 SDL 后端测试和存储测试均通过；终端 smoke 的全部新路径对象可编译，但既有目标最终链接仍缺少 `Arduboy2Audio::enabled()` 与 `millis()`，未把该历史问题误记为本次整理通过。
 - 新增 PY32 全游戏编译测试：`make PLATFORM=py32 test` 由 `platform/py32/tools/test_games.py` 自动遍历全部 `game.toml`，对每款游戏定向清理 `build/py32/<game-id>/` 并独立冷构建，失败后继续检查剩余游戏，最终以汇总状态决定测试退出码。2026-08-06 首轮覆盖 24 款游戏，通过 5 款：Arduventure、Fantasy Rampage、Helmets & Hordes、MicroTD、Sunfire；18 款 ArduboyWorks 游戏因集合入口所需编译定义尚未接入通用 PY32 构建而失败，Ardynia 因现有补丁上下文不匹配而在源码准备阶段失败。测试实现与构建规则均位于 `platform/py32/`，未向游戏目录或公共兼容层加入平台逻辑。
+- 2026-08-07 修正全量测试把 `clean all` 作为并列目标导致旧依赖图误判的问题，并让公共准备器支持递归源码、集合构建描述和原子快照。最新完整冷构建退出码仍为 2，通过 11/24；失败项为 Bananonsense、Chie Magari、Chri Bocchi、Hollow、Hopper、Knight Move、Lasers、Pi 24k、Psicolo、Quarto、Reversi、SameGame、Stairs Sweep。当前提交是阶段性修复，不代表全部游戏已经通过。
 - 重构 Make 分层并消除 WSL 下已完成单游戏目标的长时间等待：根 Makefile 现只选择平台构建文件并转发目标，Linux 的编译器、SDL、公共测试和移植挂载规则全部迁入 `platform/linux/Makefile`，游戏细节继续由各自 `port.mk` 管理。MicroTD 与 ArduboyWorks 集合在单独构建某个游戏时只加载该游戏自身依赖，避免在 `/mnt/e` 的 DrvFS 上读取全部移植的 124 个 `.d` 文件；完整构建、聚合测试和多目标调用仍加载全部依赖。ArduboyWorks 的源码能力探测也由逐游戏 54 次子进程合并为 3 次批量扫描。包含 PowerShell 启动 WSL 的外部计时中，`make -n microtd` 由约 7.6 秒降至约 0.85 秒。
 - 修复 MicroTD 的通用 MCU 构建入口：该游戏仍引用早期 Linux 专用生成物 `build/generated/microtd_patched.ino`，导致 PY32 通用准备器虽然成功应用补丁，却无法满足入口包含路径。MicroTD 自有入口与 `port.mk` 现统一消费 `build/generated/microtd/microtd.ino`，旧的 sed/patch 特殊生成规则已删除；PY32 的统一 Arduino 源码编译环境同时补齐 `ARDUINO=10819`，避免上游启用桌面专用 `main()`。公共兼容层新增无动态分配的整数 `sprintf` 子集，避免一次 `%d` 格式化拉入完整 newlib，固件最终为 text 21360、data 372、bss 3504 字节，并已通过 OpenOCD 写入和校验。上游子模块保持不变，PY32 Makefile 未增加游戏特判。
 - 完成首次 PY32 移植错误复盘，记录平台代码污染游戏目录、厂商库误放根 `third_party/`、直接修改上游游戏、建立“平台 × 游戏”组合构建文件、遗留无关构建目录、GPIO 多引脚误用导致黑屏、全仓清理导致 WSL 构建缓慢，以及遗漏 AVR/ARM `char` 符号差异八类问题；对应纠正方式和后续 MCU 平台检查表已保存至 `docs/PY32_PORTING_RETROSPECTIVE.md`。

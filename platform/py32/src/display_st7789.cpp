@@ -86,7 +86,7 @@ void configure_bus() noexcept {
     LL_GPIO_SetPinPull(kPort, kResetPin, LL_GPIO_PULL_NO);
     LL_GPIO_SetPinPull(kPort, kCommandPin, LL_GPIO_PULL_NO);
     LL_GPIO_SetOutputPin(kPort, kResetPin | kCommandPin);
-    // 参考屏使用 SPI 模式 3；系统约 58 MHz，二分频后的串行时钟约 29 MHz。
+    // 参考屏使用 SPI 模式 3；24 MHz 系统时钟二分频后为 12 MHz，可满足 128×64 单色画面的 60 FPS 带宽。
     SPI1->CR1 = SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI | SPI_CR1_CPOL |
                 SPI_CR1_CPHA | SPI_CR1_BIDIMODE | SPI_CR1_BIDIOE;
     SPI1->CR2 = 0;
@@ -98,12 +98,6 @@ void configure_bus() noexcept {
 namespace ardugirl::py32::display {
 
 bool init() noexcept {
-    static constexpr std::uint8_t gamma_positive[] = {
-        0xD0, 0x04, 0x0D, 0x11, 0x13, 0x2B, 0x3F,
-        0x54, 0x4C, 0x18, 0x0D, 0x0B, 0x1F, 0x23};
-    static constexpr std::uint8_t gamma_negative[] = {
-        0xD0, 0x04, 0x0C, 0x11, 0x12, 0x2C, 0x3F,
-        0x44, 0x51, 0x2F, 0x1F, 0x1F, 0x20, 0x23};
     configure_bus();
     LL_GPIO_ResetOutputPin(kPort, kResetPin);
     delay_ms(10);
@@ -113,19 +107,7 @@ bool init() noexcept {
     command(0x36); data(0x00);
     command(0x3A); data(0x55);
     command(0x21);
-    command(0xB2); data(0x0C); data(0x0C); data(0x00); data(0x33); data(0x33);
-    command(0xB7); data(0x35);
-    command(0xBB); data(0x19);
-    command(0xC0); data(0x2C);
-    command(0xC2); data(0x01);
-    command(0xC3); data(0x12);
-    command(0xC4); data(0x20);
-    command(0xC6); data(0x0F);
-    command(0xD0); data(0xA4); data(0xA1);
-    command(0xE0);
-    for (const auto value : gamma_positive) data(value);
-    command(0xE1);
-    for (const auto value : gamma_negative) data(value);
+    // 单色前端只依赖像素格式和反色命令，沿用面板上电默认的电源、帧率与 Gamma 参数可节省固件空间。
     command(0x29); delay_ms(20);
     window(0, 0, kPanelWidth - 1, kPanelHeight - 1);
     write_color(0x0000, static_cast<std::uint32_t>(kPanelWidth) * kPanelHeight);

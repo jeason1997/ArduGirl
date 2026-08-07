@@ -10,30 +10,21 @@
 
 namespace {
 
-constexpr std::uint32_t kSystemClockHz = 58000000u;
+constexpr std::uint32_t kSystemClockHz = 24000000u;
 constexpr std::uint32_t kAudioTickHz = 20000u;
-constexpr std::uint32_t kFlashRatedClockHz = 48000000u;
-constexpr std::uint32_t kHsiTrimMask = 0x1FFFu;
-constexpr std::uint32_t kHsiOverclockOffset = 0x0440u;
 volatile std::uint32_t audio_ticks = 0;
 volatile std::uint32_t tone_phase = 0;
 volatile std::uint32_t tone_step = 0;
 
 void configure_clock() noexcept {
-    constexpr auto pll_register = RCC_BASE + 0x0Cu;
     LL_RCC_HSI_SetCalibFreq(LL_RCC_HSICALIBRATION_24MHz);
-    MODIFY_REG(RCC->ICSCR, kHsiTrimMask,
-               ((RCC->ICSCR & kHsiTrimMask) + kHsiOverclockOffset) & kHsiTrimMask);
     LL_RCC_HSI_Enable();
     while (LL_RCC_HSI_IsReady() != 1) {}
-    if (LL_SetFlashLatency(kFlashRatedClockHz) != SUCCESS) while (true) {}
+    if (LL_SetFlashLatency(kSystemClockHz) != SUCCESS) while (true) {}
     LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
-    *reinterpret_cast<volatile std::uint32_t*>(pll_register) = 0;
-    SET_BIT(RCC->CR, 1u << 24);
-    while ((RCC->CR & (1u << 25)) == 0) {}
-    MODIFY_REG(RCC->CFGR, RCC_CFGR_SW_Msk, 2u << RCC_CFGR_SW_Pos);
-    while ((RCC->CFGR & RCC_CFGR_SWS_Msk) != (2u << RCC_CFGR_SWS_Pos)) {}
+    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSISYS);
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSISYS) {}
     LL_SetSystemCoreClock(kSystemClockHz);
     SysTick_Config(kSystemClockHz / kAudioTickHz);
 }
@@ -127,20 +118,3 @@ bool storage_read(std::uint16_t, void* destination, std::uint16_t size) noexcept
 bool storage_write(std::uint16_t, const void*, std::uint16_t) noexcept { return false; }
 
 } // 命名空间 ardugirl::platform
-
-extern "C" void* memset(void* destination, int value, std::size_t size) {
-    auto* bytes = static_cast<unsigned char*>(destination);
-    while (size-- != 0) *bytes++ = static_cast<unsigned char>(value);
-    return destination;
-}
-extern "C" void* memcpy(void* destination, const void* source, std::size_t size) {
-    auto* out = static_cast<unsigned char*>(destination);
-    const auto* in = static_cast<const unsigned char*>(source);
-    while (size-- != 0) *out++ = *in++;
-    return destination;
-}
-extern "C" std::size_t strlen(const char* text) {
-    std::size_t size = 0;
-    while (text[size] != '\0') ++size;
-    return size;
-}

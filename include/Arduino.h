@@ -48,7 +48,13 @@ inline Type pgm_read_ptr(const Type* address) noexcept {
 
 #define strcpy_P std::strcpy
 #define memcpy_P std::memcpy
-#define strnlen_P strnlen
+inline std::size_t ardugirl_strnlen(const char* text, std::size_t maximum) noexcept {
+    std::size_t length = 0;
+    while (length < maximum && text[length] != '\0') ++length;
+    return length;
+}
+#define strnlen_P ardugirl_strnlen
+#define strnlen ardugirl_strnlen
 #ifndef DEG_TO_RAD
 #define DEG_TO_RAD 0.017453292519943295769236907684886
 #endif

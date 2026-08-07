@@ -168,8 +168,11 @@ bool next_frame(std::uint8_t frames_per_second) noexcept {
     // Arduino 常用的 32 位计时器回绕语义。
     if (static_cast<std::int32_t>(now - deadline) < 0) {
         platform::sleep_ms(deadline - now);
+        deadline += frame_duration;
+    } else {
+        // 后端或游戏偶发超期后重新以当前时刻排期，防止累计欠帧破坏长期回绕语义。
+        deadline = now + frame_duration;
     }
-    deadline += frame_duration;
     return true;
 }
 

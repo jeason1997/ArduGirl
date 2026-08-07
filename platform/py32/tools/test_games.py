@@ -33,9 +33,21 @@ def discover_games() -> list[str]:
 
 def build_game(game_id: str) -> bool:
     """只清理当前游戏的产物，并用独立 make 进程执行完整构建。"""
-    command = ["make", "-f", PY32_MAKEFILE, f"GAME={game_id}", "clean", "all"]
     print(f"\n===== PY32 冷构建：{game_id} =====", flush=True)
-    result = subprocess.run(command, cwd=ROOT, check=False)
+    # clean 与 all 作为同一次 make 的并列目标时，会基于清理前的旧产物计算依赖图，
+    # 可能跳过随后已被删除的对象；拆成两个进程才能保证每款游戏都是真正冷构建。
+    clean = subprocess.run(
+        ["make", "-f", PY32_MAKEFILE, f"GAME={game_id}", "clean"],
+        cwd=ROOT,
+        check=False,
+    )
+    if clean.returncode != 0:
+        return False
+    result = subprocess.run(
+        ["make", "-f", PY32_MAKEFILE, f"GAME={game_id}", "all"],
+        cwd=ROOT,
+        check=False,
+    )
     return result.returncode == 0
 
 

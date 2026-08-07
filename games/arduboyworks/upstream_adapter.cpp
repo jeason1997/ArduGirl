@@ -1,3 +1,5 @@
+#if __has_include("MyArduboy2.h")
+
 #include "MyArduboy2.h"
 #include "ArduboyPlaytune.h"
 
@@ -47,4 +49,6 @@ void MyArduboy2::playWave(std::uint16_t frequency, const byte* wave,
                           std::uint16_t samples, std::uint8_t priority) {
     Arduboy2::playWave(frequency, wave, samples, priority);
 }
+#endif
+
 #endif
