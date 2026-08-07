@@ -107,11 +107,13 @@ ArduboyPlaytune, ATMlib, ArduboyFX
 
 ## 上游更新
 
-游戏使用主仓库 gitlink 记录的完整 commit SHA，不自动追踪默认分支。日常初始化只能使用：
+游戏使用主仓库 gitlink 记录的完整 commit SHA，不自动追踪默认分支。日常手工初始化全部依赖只能使用：
 
 ```bash
 git submodule update --init --recursive
 ```
+
+指定 `GAME=<game-id>` 的构建会在依赖缺失时按清单自动执行带精确路径的 `git submodule update --init --recursive -- <path>`，只初始化公共 Arduboy2 与当前游戏上游。聚合构建才处理全部游戏子模块。
 
 禁止日常使用 `git submodule update --remote` 或在子模块中执行 `git pull`。只有用户明确要求获取最新版本或指定版本时才能更新：
 

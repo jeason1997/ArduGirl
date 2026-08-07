@@ -15,11 +15,13 @@ make PLATFORM=linux
 make PLATFORM=linux GAME=microtd
 ```
 
-已有工作副本需要初始化上游子模块：
+已有工作副本可以手工初始化全部上游子模块：
 
 ```bash
 git submodule update --init --recursive
 ```
+
+指定 `GAME=<game-id>` 构建时，构建系统也会在缺失依赖时自动初始化该游戏及公共 Arduboy2 子模块，不会拉取其他游戏。未指定游戏的聚合构建仍会初始化全部游戏依赖。
 
 构建全部游戏并运行完整 SDL 测试：
 

@@ -29,14 +29,23 @@ LINUX_CRASH_SOURCE := platform/linux/src/crash.cpp
 SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/src/sdl.cpp platform/linux/src/render.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
 
 GAME_PREPARER := tools/prepare_game.py
+GAME_SUBMODULE_PREPARER := tools/ensure_game_submodules.py
 GAME_CATALOG_GENERATOR := platform/linux/tools/generate_games_make.py
 GAME_CATALOG_KEY := $(if $(strip $(GAME)),$(GAME),all)
 GAME_CATALOG := $(BUILD_DIR)/linux/catalog-$(GAME_CATALOG_KEY).mk
+ifneq ($(MAKECMDGOALS),clean)
+GAME_SUBMODULE_STATUS := $(shell python $(GAME_SUBMODULE_PREPARER) $(if $(strip $(GAME)),--game $(GAME)); printf '%s' $$?)
+ifneq ($(GAME_SUBMODULE_STATUS),0)
+$(error 无法准备游戏子模块)
+endif
 GAME_CATALOG_STATUS := $(shell python $(GAME_CATALOG_GENERATOR) --output $(GAME_CATALOG) $(if $(strip $(GAME)),--game $(GAME)); printf '%s' $$?)
 ifneq ($(GAME_CATALOG_STATUS),0)
 $(error 无法生成 Linux 游戏目录)
 endif
 include $(GAME_CATALOG)
+else
+GAME_IDS :=
+endif
 
 PORT_BUILD_TARGETS :=
 PORT_TEST_TARGETS :=

@@ -2,12 +2,19 @@ BUILD_DIR ?= build
 .DEFAULT_GOAL := all
 VENDOR_DIR := platform/py32/vendor
 GAME_PREPARER := tools/prepare_game.py
+GAME_SUBMODULE_PREPARER := tools/ensure_game_submodules.py
 
 ifeq ($(strip $(GAME)),)
 ifneq ($(filter test,$(MAKECMDGOALS)),test)
 $(error 必须通过 GAME=<game-id> 选择游戏)
 endif
 else
+ifneq ($(MAKECMDGOALS),clean)
+GAME_SUBMODULE_STATUS := $(shell python $(GAME_SUBMODULE_PREPARER) --game $(GAME); printf '%s' $$?)
+ifneq ($(GAME_SUBMODULE_STATUS),0)
+$(error 无法准备游戏子模块)
+endif
+endif
 ARDUGIRL_GAME_ENTRY := $(shell python $(GAME_PREPARER) $(GAME) --field entry_cpp)
 ARDUGIRL_GAME_INCLUDE := $(shell python $(GAME_PREPARER) $(GAME) --field include_dir)
 ARDUGIRL_GAME_GENERATED := $(shell python $(GAME_PREPARER) $(GAME) --field generated_entry)
