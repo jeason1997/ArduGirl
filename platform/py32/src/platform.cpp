@@ -10,8 +10,14 @@
 
 namespace {
 
-constexpr std::uint32_t kSystemClockHz = 24000000u;
+constexpr std::uint32_t kSystemClockHz = 48000000u;
+constexpr std::uint32_t kFlashRatedClockHz = 48000000u;
 constexpr std::uint32_t kAudioTickHz = 20000u;
+auto& pll_config = *reinterpret_cast<volatile std::uint32_t*>(RCC_BASE + 0x0Cu);
+constexpr std::uint32_t kPllEnable = 1u << 24;
+constexpr std::uint32_t kPllReady = 1u << 25;
+constexpr std::uint32_t kPllClockSource = 2u << RCC_CFGR_SW_Pos;
+constexpr std::uint32_t kPllClockStatus = 2u << RCC_CFGR_SWS_Pos;
 volatile std::uint32_t audio_ticks = 0;
 volatile std::uint32_t tone_phase = 0;
 volatile std::uint32_t tone_step = 0;
@@ -20,11 +26,14 @@ void configure_clock() noexcept {
     LL_RCC_HSI_SetCalibFreq(LL_RCC_HSICALIBRATION_24MHz);
     LL_RCC_HSI_Enable();
     while (LL_RCC_HSI_IsReady() != 1) {}
-    if (LL_SetFlashLatency(kSystemClockHz) != SUCCESS) while (true) {}
+    if (LL_SetFlashLatency(kFlashRatedClockHz) != SUCCESS) while (true) {}
     LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSISYS);
-    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSISYS) {}
+    pll_config = 0;
+    RCC->CR |= kPllEnable;
+    while ((RCC->CR & kPllReady) == 0) {}
+    MODIFY_REG(RCC->CFGR, RCC_CFGR_SW_Msk, kPllClockSource);
+    while ((RCC->CFGR & RCC_CFGR_SWS_Msk) != kPllClockStatus) {}
     LL_SetSystemCoreClock(kSystemClockHz);
     SysTick_Config(kSystemClockHz / kAudioTickHz);
 }
@@ -68,6 +77,10 @@ void shutdown() noexcept { stop_tone(); }
 bool pump_events() noexcept { return true; }
 
 std::uint8_t buttons() noexcept {
+#if ARDUGIRL_BUTTONS_CONNECTED == 0
+    // 未接按键时不能采信悬空输入；固定返回 Arduboy 六键全部松开。
+    return 0;
+#else
     const auto pins = ARDUGIRL_BUTTON_PORT->IDR;
     std::uint8_t value = 0;
     if ((pins & ARDUGIRL_BUTTON_LEFT) == 0) value |= 0x01u;
@@ -77,6 +90,7 @@ std::uint8_t buttons() noexcept {
     if ((pins & ARDUGIRL_BUTTON_A) == 0) value |= 0x10u;
     if ((pins & ARDUGIRL_BUTTON_B) == 0) value |= 0x20u;
     return value;
+#endif
 }
 
 std::uint32_t micros() noexcept { return audio_ticks * (1000000u / kAudioTickHz); }

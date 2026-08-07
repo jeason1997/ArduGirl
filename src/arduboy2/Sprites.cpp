@@ -24,6 +24,23 @@ void Sprites::drawOverwrite(std::int16_t x, std::int16_t y,
     const auto frame_size = static_cast<std::size_t>(width) * ((height + 7u) / 8u);
     const auto* data = bitmap + 2u + frame_size * frame;
     auto& screen = ardugirl::framebuffer();
+    if ((y & 7) == 0 && (height & 7u) == 0) {
+        auto& destination = screen.data();
+        const auto first_page = y / 8;
+        const auto pages = height / 8u;
+        for (std::uint8_t page = 0; page < pages; ++page) {
+            const auto destination_page = first_page + page;
+            if (destination_page < 0 || destination_page >= 8) continue;
+            for (std::uint8_t column = 0; column < width; ++column) {
+                const auto destination_x = x + column;
+                if (destination_x < 0 || destination_x >= 128) continue;
+                destination[static_cast<std::size_t>(destination_x) +
+                            static_cast<std::size_t>(destination_page) * 128u] =
+                    data[static_cast<std::size_t>(page) * width + column];
+            }
+        }
+        return;
+    }
     for (std::uint8_t row = 0; row < height; ++row) {
         for (std::uint8_t column = 0; column < width; ++column) {
             screen.set_pixel(x + column, y + row,
@@ -82,6 +99,23 @@ void Sprites::drawSelfMasked(std::int16_t x, std::int16_t y,
     const auto size = static_cast<std::size_t>(width) * ((height + 7u) / 8u);
     const auto* data = bitmap + 2u + size * frame;
     auto& screen = ardugirl::framebuffer();
+    if ((y & 7) == 0 && (height & 7u) == 0) {
+        auto& destination = screen.data();
+        const auto first_page = y / 8;
+        const auto pages = height / 8u;
+        for (std::uint8_t page = 0; page < pages; ++page) {
+            const auto destination_page = first_page + page;
+            if (destination_page < 0 || destination_page >= 8) continue;
+            for (std::uint8_t column = 0; column < width; ++column) {
+                const auto destination_x = x + column;
+                if (destination_x < 0 || destination_x >= 128) continue;
+                destination[static_cast<std::size_t>(destination_x) +
+                            static_cast<std::size_t>(destination_page) * 128u] |=
+                    data[static_cast<std::size_t>(page) * width + column];
+            }
+        }
+        return;
+    }
     for (std::uint8_t row = 0; row < height; ++row)
         for (std::uint8_t column = 0; column < width; ++column)
             if (sprite_bit(data, width, column, row)) screen.set_pixel(x + column, y + row, true);
@@ -95,6 +129,24 @@ void Sprites::drawErase(std::int16_t x, std::int16_t y,
     const auto size = static_cast<std::size_t>(width) * ((height + 7u) / 8u);
     const auto* data = bitmap + 2u + size * frame;
     auto& screen = ardugirl::framebuffer();
+    if ((y & 7) == 0 && (height & 7u) == 0) {
+        auto& destination = screen.data();
+        const auto first_page = y / 8;
+        const auto pages = height / 8u;
+        for (std::uint8_t page = 0; page < pages; ++page) {
+            const auto destination_page = first_page + page;
+            if (destination_page < 0 || destination_page >= 8) continue;
+            for (std::uint8_t column = 0; column < width; ++column) {
+                const auto destination_x = x + column;
+                if (destination_x < 0 || destination_x >= 128) continue;
+                const auto source = data[static_cast<std::size_t>(page) * width + column];
+                destination[static_cast<std::size_t>(destination_x) +
+                            static_cast<std::size_t>(destination_page) * 128u] &=
+                    static_cast<std::uint8_t>(~source);
+            }
+        }
+        return;
+    }
     for (std::uint8_t row = 0; row < height; ++row)
         for (std::uint8_t column = 0; column < width; ++column)
             if (sprite_bit(data, width, column, row)) screen.set_pixel(x + column, y + row, false);
