@@ -102,10 +102,10 @@
 +    BADFLAME_COLLISION_WIDTH,
 +    BADFLAME_COLLISION_HEIGHT
    };
-
+ 
    if (((badWalkingFlame.characteristics & 0B00110000) == 0B00010000) && arduboy.collide(helenaRect, enemyRect))
 @@ -146,10 +146,10 @@
-
+ 
    enemyRect =
    {
 -    .x = badFlame.x + 2,
@@ -135,7 +135,7 @@
    if (((statue.characteristics & 0B00110000) == 0B00010000) && arduboy.collide(helenaRect, enemyRect))
    {
 @@ -186,10 +186,10 @@
-
+ 
    enemyRect =
    {
 -    .x = arrow.x,
@@ -162,7 +162,7 @@
 +    BADWEED_COLLISION_WIDTH,
 +    BADWEED_COLLISION_HEIGHT
    };
-
+ 
    if (stab[currentStab].isActive)
 @@ -242,10 +242,10 @@
    {

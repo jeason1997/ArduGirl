@@ -20,8 +20,9 @@
 
 - 2026-08-07：PY32 未连接实体按键时固定报告六键全部松开，避免悬空 GPIO 在 Twotris、Arduventure 等游戏启动首帧产生虚假 A/B 边沿；ST7789 后端新增板级 RGB565 黑白调色板，使用 256 字节扫描线缓冲区和 16 位 SPI DMA，并跳过未变化 framebuffer 的重复传输。参考同一样机工程启用 48 MHz 隐藏 PLL 配置；Sprites 的页面对齐路径改为直接按 framebuffer 字节复制或合成。Arduventure 烧录校验后复位运行 5 秒，帧计数为 303、`globalCounter` 为 254，确认开场文字按约 60 FPS 完成并进入标题；长时间稳定性仍待验收。
 - 2026-08-07：Twotris SDL2 与 PY32F002A 冷构建通过；PY32 尺寸为 `text=14468`、`data=68`、`bss=2772`。SDL 固定输入从标题进入菜单和双人核心玩法，三张不同状态截图已目视验收并嵌入游戏 README。为其补齐了 Arduboy2 公共 `drawChar` 兼容 API。
+- 2026-08-07：修正 Sunfire 既有补丁的空白上下文标记；3 个补丁通过 `git apply --check --whitespace=error-all`，PY32F002A 并行冷构建通过，尺寸为 `text=15408`、`data=44`、`bss=2780`。
 - 2026-08-07：新增按游戏清单解析的子模块准备步骤；单游戏选择不会展开其他游戏上游，并由独立 Python 回归测试覆盖最小集合与聚合集合。
-- 2026-08-07：删除 terminal 后，MicroTD 的 SDL2 定向构建、固定回放和无头冒烟通过。随后执行聚合 `make test -j4` 时，Helmets & Hordes 在既有补丁 `0001-host-use-native-function-pointers.patch` 的源码准备阶段因上下文不匹配失败，因此本次不能给出新的 24 款全量通过结论。删除前最近一次全量 Linux 证据仍为全部 24 款构建、公共测试、无头冒烟与 3 款固定回放通过。
+- 2026-08-07：删除 terminal 后，MicroTD 的 SDL2 定向构建、固定回放和无头冒烟通过。随后聚合 `make test -j4` 曾因 Helmets & Hordes 的补丁格式错误中止；该游戏的 5 个补丁现已通过 `git apply --check --whitespace=error-all`，PY32F002A 并行冷构建通过，尺寸为 `text=17908`、`data=40`、`bss=3008`。尚未重跑 Linux 聚合测试，因此删除前最近一次全量 Linux 证据仍为全部 24 款构建、公共测试、无头冒烟与 3 款固定回放通过。
 - 2026-08-07：PY32 最近一次完整冷构建退出码非零，通过 21/24；失败为 Bananonsense、Chri-Bocchi、Stairs Sweep。随后 Chri-Bocchi 和 Stairs Sweep 分别独立冷构建通过，但不据此改写全量结果。
 - 2026-08-06：Arduventure 与 Sunfire 已通过 CMSIS-DAP/OpenOCD 写入和校验；寄存器与帧计数证明 CPU、GPIO 和 SPI 在运行。按钮、声音听感、完整画面与长期稳定性仍需分别验收。
 

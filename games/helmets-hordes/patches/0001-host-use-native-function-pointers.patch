@@ -10,11 +10,11 @@
  }
 --- game.h
 +++ game.h
-@@ -34,7 +34,7 @@
+@@ -34,6 +34,6 @@
    updateHelena();
    updateWallParts();
-
+ 
 -  ((FunctionPointer) pgm_read_word (&allWaves[currentWave]))();
 +  ((FunctionPointer) pgm_read_ptr (&allWaves[currentWave]))();
-
+ 
    drawWallParts();
