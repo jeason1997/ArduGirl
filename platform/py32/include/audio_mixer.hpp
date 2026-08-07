@@ -42,6 +42,14 @@ public:
         }
     }
 
+    bool active() const noexcept {
+        for (const auto& tone : tones_)
+            if (tone.step != 0) return true;
+        for (const auto& voice : voices_)
+            if (voice.step != 0 && voice.volume != 0) return true;
+        return false;
+    }
+
     std::int8_t next_sample() noexcept {
         std::int32_t tones = 0;
         std::int32_t synth = 0;

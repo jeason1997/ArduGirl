@@ -59,12 +59,13 @@ void configure_io() noexcept {
         LL_GPIO_SetPinMode(ARDUGIRL_BUTTON_PORT, pin, LL_GPIO_MODE_INPUT);
         LL_GPIO_SetPinPull(ARDUGIRL_BUTTON_PORT, pin, LL_GPIO_PULL_UP);
     }
-    LL_GPIO_SetAFPin_0_7(ARDUGIRL_BUZZER_PORT, ARDUGIRL_BUZZER_PIN_1, LL_GPIO_AF_12);
-    LL_GPIO_SetAFPin_0_7(ARDUGIRL_BUZZER_PORT, ARDUGIRL_BUZZER_PIN_2, LL_GPIO_AF_12);
+    // 数据手册规定 PA0/PA1 的 TIM1_CH3/CH4 位于 AF13；AF12 实际为 I2C。
+    LL_GPIO_SetAFPin_0_7(ARDUGIRL_BUZZER_PORT, ARDUGIRL_BUZZER_PIN_1, LL_GPIO_AF_13);
+    LL_GPIO_SetAFPin_0_7(ARDUGIRL_BUZZER_PORT, ARDUGIRL_BUZZER_PIN_2, LL_GPIO_AF_13);
     LL_GPIO_SetPinMode(ARDUGIRL_BUZZER_PORT, ARDUGIRL_BUZZER_PIN_1, LL_GPIO_MODE_ALTERNATE);
     LL_GPIO_SetPinMode(ARDUGIRL_BUZZER_PORT, ARDUGIRL_BUZZER_PIN_2, LL_GPIO_MODE_ALTERNATE);
 
-    // TIM1 以 48 MHz / 256 = 187.5 kHz 生成同步双路 PWM；相反占空比形成差分音频。
+    // 187.5 kHz 双路 PWM 承载 8 位采样，相反占空比形成差分输出。
     TIM1->PSC = 0;
     TIM1->ARR = 255;
     TIM1->CCR3 = 128;
@@ -87,7 +88,8 @@ extern "C" void ardugirl_py32_hardware_init() noexcept {
 
 extern "C" void SysTick_Handler() {
     ++audio_ticks;
-    const auto sample = static_cast<std::int32_t>(audio_mixer.next_sample());
+    const auto sample = audio_mixer.active()
+        ? static_cast<std::int32_t>(audio_mixer.next_sample()) : 0;
     TIM1->CCR3 = static_cast<std::uint32_t>(128 + sample);
     TIM1->CCR4 = static_cast<std::uint32_t>(128 - sample);
 }

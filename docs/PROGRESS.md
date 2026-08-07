@@ -13,12 +13,12 @@
 | Linux terminal | removed | 2026-08-07 确认废弃；实现、构建目标、测试、清单字段和规格文档均已删除。 |
 | Arduboy2/Arduino 兼容 | partial | 覆盖当前 25 款游戏所需的绘图、Sprites、Print、按钮、帧率、PROGMEM、EEPROM 与多种音频接口；尚不等于完整上游 API。 |
 | 游戏 | partial | 25 款已接入：MicroTD、ArduboyWorks 18 款、Ardynia、Arduventure、Fantasy Rampage、Helmets & Hordes、Sunfire、Twotris。完成度以各游戏 README 和 `game.toml` 为准。 |
-| PY32F002A | partial | 已有 48 MHz、ST7789、按钮、PA0/PA1 差分 PWM 蜂鸣器、六声部软件合成、统一游戏构建和 OpenOCD 烧录路径；Flash EEPROM 未实现，音频听感与硬件交互仍未完整验收。最近一次完整冷构建为 21/24；之后 Chri-Bocchi 与 Stairs Sweep 已单独通过，Bananonsense 仍待修复，尚未重跑全量。 |
+| PY32F002A | partial | 已有 48 MHz、ST7789、按钮、PA0/PA1 差分蜂鸣器、六声部软件合成、统一游戏构建和 OpenOCD 烧录路径；Flash EEPROM 未实现，音频听感与硬件交互仍未完整验收。最近一次完整冷构建为 21/24；之后 Chri-Bocchi 与 Stairs Sweep 已单独通过，Bananonsense 仍待修复，尚未重跑全量。 |
 | STM32 | not-started | 尚无实现；未来复用同一 platform API。 |
 
 ## 最近验证
 
-- 2026-08-07：PY32 蜂鸣器改为跨接 PA0/PA1 的 TIM1_CH3/CH4 差分输出，以 187.5 kHz 硬件 PWM 承载 50 kHz 混合采样；Playtune 两个方波声道与 ATMlib 四个声部均独立合成，ATMlib 使用上游对应的 25% 脉冲、方波、三角波和 LFSR 噪声，并为四声部保留一位余量以避免削波。混音器主机回归测试通过；Arduventure PY32 构建尺寸为 `text=27428`、`data=120`、`bss=2832`，仍需烧录后验证听感和 50 kHz 中断下的长期帧率。
+- 2026-08-07：PY32 蜂鸣器跨接 PA0/PA1，使用 AF13 的 TIM1_CH3/CH4 输出 187.5 kHz 差分硬件 PWM，承载 50 kHz 混合采样；此前 AF12 配置错误导致定时器内部运行但引脚无声，普通 GPIO PDM 路径则经实机确认有明显刺耳噪声。Playtune 两个方波声道与 ATMlib 四个声部均独立合成，ATMlib 使用上游对应的 25% 脉冲、方波、三角波和 LFSR 噪声，并为四声部保留一位余量以避免削波。仍需烧录后验证听感和长期帧率。
 - 2026-08-07：PY32 未连接实体按键时固定报告六键全部松开，避免悬空 GPIO 在 Twotris、Arduventure 等游戏启动首帧产生虚假 A/B 边沿；ST7789 后端新增板级 RGB565 黑白调色板，使用 256 字节扫描线缓冲区和 16 位 SPI DMA，并跳过未变化 framebuffer 的重复传输。参考同一样机工程启用 48 MHz 隐藏 PLL 配置；Sprites 的页面对齐路径改为直接按 framebuffer 字节复制或合成。Arduventure 烧录校验后复位运行 5 秒，帧计数为 303、`globalCounter` 为 254，确认开场文字按约 60 FPS 完成并进入标题；长时间稳定性仍待验收。
 - 2026-08-07：Twotris SDL2 与 PY32F002A 冷构建通过；PY32 尺寸为 `text=14468`、`data=68`、`bss=2772`。SDL 固定输入从标题进入菜单和双人核心玩法，三张不同状态截图已目视验收并嵌入游戏 README。为其补齐了 Arduboy2 公共 `drawChar` 兼容 API。
 - 2026-08-07：修正 Sunfire 既有补丁的空白上下文标记；3 个补丁通过 `git apply --check --whitespace=error-all`，PY32F002A 并行冷构建通过，尺寸为 `text=15408`、`data=44`、`bss=2780`。
