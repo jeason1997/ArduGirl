@@ -1,6 +1,6 @@
 # 当前进度
 
-最后更新：2026-08-06
+最后更新：2026-08-07
 
 ## 总览
 
@@ -25,10 +25,12 @@
 | Arduboy2 兼容实现 | partial | 已覆盖当前 21 个游戏，并补齐高频图元、bitmap、Sprites 模式、文本缩放/换行、按钮、帧率、PROGMEM、EEPROM、静态音频控制和定时 tone；尚非完整上游 API |
 | 游戏源码 | partial | 已固定并接入 MicroTD、ArduboyWorks 18 个游戏、Ardynia 与 Arduventure；后续游戏按 `GAME_PORTS.md` 继续导入 |
 | 音频 | partial | SDL2 已实现双声道方波、8 位波表和四声道 ATM 合成；Arduboy2Beep、ArduboyPlaytune、ArduboyWorks 音频扩展与 ATMlib 已接入，Arduventure 标题音乐回放通过。ArduboyTones 与长时间音乐仍待真实样本验证 |
-| PY32 | partial | PY32F002A + ST7789 已改用额定 24 MHz HSI；2026-08-07 全量冷构建通过 11/24，仍有 13 款失败，因此批量兼容修复尚未完成；另待实机长时间静置、60 FPS、按钮和蜂鸣器验收，Flash EEPROM 尚未实现 |
+| PY32 | partial | PY32F002A + ST7789 已改用额定 24 MHz HSI；2026-08-07 最近一次完整冷构建通过 21/24，失败项为 Bananonsense、Chri-Bocchi Cat、Stairs Sweep；其后 Stairs Sweep 已独立冷构建通过，尚未重跑全量，剩余两款仍待修复；另待实机长时间静置、60 FPS、按钮和蜂鸣器验收，Flash EEPROM 尚未实现 |
 | STM32 | planned | Linux/PY32 之后 |
 
 ## 已完成
+
+- 修复 Stairs Sweep 的 PY32 裸机链接失败：ArduboyWorks 集合 profile 原先只会把 `MyArduboy.cpp` 中动态创建的 `ArduboyPlaytune` 替换为公共固定容量播放器工厂，遗漏了该游戏采用的 `MyArduboyV.cpp`，导致固件引用未提供的 `operator new`。现由同一平台无关 profile 覆盖该文件名，继续保持上游目录不变且不向 PY32 构建加入游戏特判。生成快照已确认改用 `ardugirl_create_playtune()`；PY32 独立冷构建通过，固件 text 17272、data 340、bss 3204 字节；Linux 单游戏构建、180 帧冒烟及公共 Playtune 回归测试通过。最近一次完整 PY32 冷构建尚未重跑，因此不把独立结果误报为新的全量通过数。
 
 - 修复 PY32 并行冷构建的生成源码竞态：平台 Makefile 现在把准备器同批产生的全部 C/C++ 快照显式连接到主生成目标，避免 `make -j` 在准备器完成前报告“没有规则可生成”；PY32 游戏测试会删除对应生成快照并使用 `-j4` 构建，持续覆盖该依赖契约。
 - 修复 ArduboyWorks Hollow 的 PY32 裸机链接失败：集合适配原先把上游动态创建的 `ArduboyPlaytune` 改成函数内静态对象，其非平凡析构会注册 `atexit`，继而把 newlib 退出链和缺失的 `_fini` 拉入固件。公共 Playtune 兼容层新增固定容量、无堆分配且不注册退出析构的进程期播放器工厂，集合 profile 统一使用该入口，并增加最小回归测试。Hollow 从空目标目录交叉构建通过，固件 text 22536、data 340、bss 3356 字节；CMSIS-DAP/OpenOCD 写入、校验和复位成功，Linux 全量测试同时通过。

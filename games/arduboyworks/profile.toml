@@ -24,6 +24,12 @@ new = "pTunes = ardugirl_create_playtune(myAudio.enabled);"
 optional = true
 
 [[replacements]]
+file = "MyArduboyV.cpp"
+old = "pTunes = new ArduboyPlaytune(myAudio.enabled);"
+new = "pTunes = ardugirl_create_playtune(myAudio.enabled);"
+optional = true
+
+[[replacements]]
 file = "common.h"
 old = '''^    "\.incbin.*$'''
 new = '''    ".incbin \"build/generated/{game_id}/" file "\"\n"                \'''
