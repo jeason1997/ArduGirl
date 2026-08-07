@@ -96,6 +96,10 @@ $(ARDUGIRL_GAME_GENERATED): $(ARDUGIRL_GAME_MANIFEST) $(ARDUGIRL_GAME_BUILD_CONF
 # 准备器一次原子生成源码快照和统一入口；显式声明副产物，保证空 build/ 下也能解析规则。
 $(ARDUGIRL_GAME_ENTRY): $(ARDUGIRL_GAME_GENERATED)
 
+# 准备器会原子替换整份源码快照；所有同批生成的源文件都必须先等待主生成目标完成，
+# 否则并行冷构建可能在准备器落盘前把它们判定为“没有生成规则”。
+$(filter-out $(ARDUGIRL_GAME_GENERATED),$(ARDUGIRL_GAME_CPP_SOURCES) $(ARDUGIRL_GAME_C_SOURCES)): $(ARDUGIRL_GAME_GENERATED)
+
 $(OBJECT_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(ARDUGIRL_GAME_CPP_FLAGS) -c $< -o $@

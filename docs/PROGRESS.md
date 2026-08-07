@@ -30,6 +30,7 @@
 
 ## 已完成
 
+- 修复 PY32 并行冷构建的生成源码竞态：平台 Makefile 现在把准备器同批产生的全部 C/C++ 快照显式连接到主生成目标，避免 `make -j` 在准备器完成前报告“没有规则可生成”；PY32 游戏测试会删除对应生成快照并使用 `-j4` 构建，持续覆盖该依赖契约。
 - 修复 ArduboyWorks Hollow 的 PY32 裸机链接失败：集合适配原先把上游动态创建的 `ArduboyPlaytune` 改成函数内静态对象，其非平凡析构会注册 `atexit`，继而把 newlib 退出链和缺失的 `_fini` 拉入固件。公共 Playtune 兼容层新增固定容量、无堆分配且不注册退出析构的进程期播放器工厂，集合 profile 统一使用该入口，并增加最小回归测试。Hollow 从空目标目录交叉构建通过，固件 text 22536、data 340、bss 3356 字节；CMSIS-DAP/OpenOCD 写入、校验和复位成功，Linux 全量测试同时通过。
 - 统一游戏构建描述：Linux 不再加载每个游戏或集合的 `port.mk`，而是一次扫描 `game.toml` 生成轻量目录，并由平台内单一模板展开 SDL、终端、冒烟和回放目标；PY32 与 Linux 现共同消费 `tools/prepare_game.py` 生成的原子源码快照和运行入口。删除 7 份重复 `port.mk` 与 7 份手写 `entry.cpp`。普通游戏只需清单和可选补丁；ArduboyWorks 的真实集合差异由每款清单显式引用集合级 `profile.toml`，不再依赖构建器向父目录猜测 `build.toml`。从空 `build/` 执行 Linux 全部 24 个 SDL 游戏的 `make -j4` 冷构建通过，随后 `make test -j4` 的公共测试、24 款冒烟和 3 款固定回放全部通过，`make test-terminal` 通过；PY32 MicroTD 交叉构建通过，固件 text 19280、data 364、bss 3484 字节。
 - 修复 Linux 平台 `GAME=<game-id>` 选择发生得过晚的问题：平台 Makefile 原先先加载全部游戏 `port.mk` 和依赖，再从最终目标中过滤指定游戏，导致 `/mnt/e` 上的单游戏构建仍承担全仓解析开销。现根据直属游戏目录或集合内 `game.toml` 自动定位并只加载所属 `port.mk`；ArduboyWorks 集合同时只展开指定游戏，根 Makefile不包含任何游戏名称或路径特判。

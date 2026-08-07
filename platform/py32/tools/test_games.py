@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import shutil
 import subprocess
 import sys
 import tomllib
@@ -43,8 +44,12 @@ def build_game(game_id: str) -> bool:
     )
     if clean.returncode != 0:
         return False
+    # 仅清理平台输出不足以覆盖准备阶段；删除精确的游戏快照，确保测试能发现生成依赖竞态。
+    generated = ROOT / "build" / "generated" / game_id
+    if generated.exists():
+        shutil.rmtree(generated)
     result = subprocess.run(
-        ["make", "-f", PY32_MAKEFILE, f"GAME={game_id}", "all"],
+        ["make", "-f", PY32_MAKEFILE, f"GAME={game_id}", "-j4", "all"],
         cwd=ROOT,
         check=False,
     )
