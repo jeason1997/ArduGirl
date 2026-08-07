@@ -1,0 +1,27 @@
+--- a/morse.ino
++++ b/morse.ino
+@@ -2,9 +2,9 @@
+ 
+ /*  Defines  */
+ 
+-#define callInitFunc(idx)   ((void (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx].initFunc))()
+-#define callUpdateFunc(idx) ((MODE_T (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx].updateFunc))()
+-#define callDrawFunc(idx)   ((void (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx].drawFunc))()
++#define callInitFunc(idx) (moduleTable[idx].initFunc)()
++#define callUpdateFunc(idx) (moduleTable[idx].updateFunc)()
++#define callDrawFunc(idx) (moduleTable[idx].drawFunc)()
+ 
+ /*  Typedefs  */
+ 
+--- a/common.h
++++ b/common.h
+@@ -120,7 +120,7 @@
+ #define IMPORT_BIN_FILE(file, sym) asm (    \
+     ".global " #sym "\n"                    \
+     #sym ":\n"                              \
+-    ".incbin \"" file "\"\n"                \
++    ".incbin \"build/generated/morse/" file "\"\n"                \
+     ".set _sizeof_" #sym ", . - " #sym "\n")
+ 
+ #define circulate(n, v, m)  (((n) + (v) + (m)) % (m))
+

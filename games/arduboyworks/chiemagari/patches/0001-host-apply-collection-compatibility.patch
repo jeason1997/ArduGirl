@@ -1,0 +1,27 @@
+--- a/chiemagari.ino
++++ b/chiemagari.ino
+@@ -6,9 +6,9 @@
+ 
+ /*  Defines  */
+ 
+-#define callInitFunc(idx)   ((void (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx]))()
+-#define callUpdateFunc(idx) ((MODE_T (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx] + 2))()
+-#define callDrawFunc(idx)   ((void (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx] + 4))()
++#define callInitFunc(idx) (moduleTable[idx].initFunc)()
++#define callUpdateFunc(idx) (moduleTable[idx].updateFunc)()
++#define callDrawFunc(idx) (moduleTable[idx].drawFunc)()
+ 
+ /*  Typedefs  */
+ 
+--- a/MyArduboy.cpp
++++ b/MyArduboy.cpp
+@@ -17,7 +17,7 @@
+ 
+ MyArduboy::MyArduboy(void)
+ {
+-    pTunes = new ArduboyPlaytune(myAudio.enabled);
++    pTunes = ardugirl_create_playtune(myAudio.enabled);
+     pTunes->initChannel(PIN_SPEAKER_1);
+ }
+ 
+

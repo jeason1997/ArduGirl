@@ -2,40 +2,6 @@ exclude_sources = ["MyArduboyPlaytune.cpp"]
 extra_cpp_sources = ["games/arduboyworks/upstream_adapter.cpp"]
 cpp_flags = ["-DUSE_ARDUBOY2_LIB", "-fpermissive", "-Wno-narrowing"]
 
-[[replacements]]
-file = "{game_id}.ino"
-old = '''^#define callInitFunc\(idx\).*$\n#define callUpdateFunc\(idx\).*$\n#define callDrawFunc\(idx\).*$'''
-new = '''#define callInitFunc(idx) (moduleTable[idx].initFunc)()
-#define callUpdateFunc(idx) (moduleTable[idx].updateFunc)()
-#define callDrawFunc(idx) (moduleTable[idx].drawFunc)()'''
-regex = true
-optional = true
-
-[[replacements]]
-file = "title.cpp"
-old = "static void drawText(const char *p, int lines);"
-new = "static void drawText(const char *p, int16_t y);"
-optional = true
-
-[[replacements]]
-file = "MyArduboy.cpp"
-old = "pTunes = new ArduboyPlaytune(myAudio.enabled);"
-new = "pTunes = ardugirl_create_playtune(myAudio.enabled);"
-optional = true
-
-[[replacements]]
-file = "MyArduboyV.cpp"
-old = "pTunes = new ArduboyPlaytune(myAudio.enabled);"
-new = "pTunes = ardugirl_create_playtune(myAudio.enabled);"
-optional = true
-
-[[replacements]]
-file = "common.h"
-old = '''^    "\.incbin.*$'''
-new = '''    ".incbin \"build/generated/{game_id}/" file "\"\n"                \'''
-regex = true
-optional = true
-
 [[defines_if_contains]]
 file = "MyArduboy2.h"
 text = "stopTone"

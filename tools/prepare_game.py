@@ -20,6 +20,8 @@ def load_build_config(manifest: Path) -> tuple[Path, dict]:
     with manifest.open("rb") as stream:
         data = tomllib.load(stream)
     inline = data.get("build", {})
+    if "replacements" in inline:
+        raise SystemExit(f"构建配置不得直接改写源码，请使用游戏 patches：{manifest}")
     profile_name = inline.get("profile")
     if not profile_name:
         return manifest, inline
@@ -28,6 +30,8 @@ def load_build_config(manifest: Path) -> tuple[Path, dict]:
         raise SystemExit(f"构建配置不存在：{profile}")
     with profile.open("rb") as stream:
         merged = tomllib.load(stream)
+    if "replacements" in merged:
+        raise SystemExit(f"集合构建配置不得直接改写源码，请使用游戏 patches：{profile}")
     merged.update({key: value for key, value in inline.items() if key != "profile"})
     return profile, merged
 
@@ -123,7 +127,9 @@ def apply_patch(directory: Path, patch_path: Path) -> None:
                 hunk_lines.append(lines[index])
                 index += 1
 
-            normalized_hunk = [" " if line == "" else line for line in hunk_lines]
+            # 统一 diff 的空白上下文必须带前导空格；忽略文件末尾无标记的空行，
+            # 避免把补丁文本自身的结尾换行误认为额外源码上下文。
+            normalized_hunk = [line for line in hunk_lines if line != ""]
             old_lines = [line[1:] for line in normalized_hunk if line[0] in " -"]
             hunk_start = -1
             for candidate in range(source_cursor, len(original) - len(old_lines) + 1):
@@ -176,28 +182,6 @@ def prepare(game_id: str) -> None:
             if source.suffix.lower() in {".h", ".hpp", ".c", ".cpp", ".ino"}:
                 content = content.replace(b"\r\n", b"\n")
             target.write_bytes(content)
-
-    # 集合可用声明式替换描述共同的上游源码差异，避免把规则复制到每个平台。
-    build_config_path, build_config = load_build_config(manifest)
-    if build_config:
-        replacements = build_config.get("replacements", [])
-        for replacement in replacements:
-            target = temporary / replacement["file"].format(game_id=game_id)
-            if not target.is_file() and replacement.get("optional", False):
-                continue
-            content = target.read_text(encoding="utf-8")
-            old = replacement["old"]
-            new = replacement["new"].format(game_id=game_id)
-            if replacement.get("regex", False):
-                updated, count = re.subn(old, lambda _: new, content, count=1, flags=re.MULTILINE)
-            else:
-                count = 1 if old in content else 0
-                updated = content.replace(old, new, 1)
-            if count == 0:
-                if replacement.get("optional", False):
-                    continue
-                raise SystemExit(f"集合源码替换上下文不匹配：{build_config_path}：{target.name}")
-            target.write_text(updated, encoding="utf-8", newline="\n")
 
     for relative_patch in data.get("port", {}).get("patches", []):
         patch = (manifest.parent / relative_patch).resolve()

@@ -13,5 +13,5 @@ status = "smoke"
 libraries = ["Arduboy2"]
 
 [port]
-patches = ["patches/0001-game-fix-floor-draw-return-type.patch"]
-notes = ["共享 ArduboyWorks 构建入口；上游子模块保持未修改。", "修正 drawFloorOrBlank 声明为 bool 却不返回值导致的桌面优化构建未定义行为。"]
+patches = ["patches/0001-game-fix-floor-draw-return-type.patch", "patches/0002-host-apply-collection-compatibility.patch"]
+notes = ["共享 ArduboyWorks 构建入口；补丁显式适配 AVR 函数指针和音频对象生命周期，上游子模块保持未修改。", "修正 drawFloorOrBlank 声明为 bool 却不返回值导致的桌面优化构建未定义行为。"]

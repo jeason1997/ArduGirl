@@ -1,0 +1,27 @@
+--- a/evasion.ino
++++ b/evasion.ino
+@@ -2,9 +2,9 @@
+ 
+ /*  Defines  */
+ 
+-#define callInitFunc(idx)   ((void (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx]))()
+-#define callUpdateFunc(idx) ((MODE_T (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx] + 2))()
+-#define callDrawFunc(idx)   ((void (*)(void)) pgm_read_word((uint16_t) &moduleTable[idx] + 4))()
++#define callInitFunc(idx) (moduleTable[idx].initFunc)()
++#define callUpdateFunc(idx) (moduleTable[idx].updateFunc)()
++#define callDrawFunc(idx) (moduleTable[idx].drawFunc)()
+ 
+ /*  Typedefs  */
+ 
+--- a/title.cpp
++++ b/title.cpp
+@@ -54,7 +54,7 @@
+ static void drawNotice(void);
+ 
+ static void drawGuy(int16_t x);
+-static void drawText(const char *p, int lines);
++static void drawText(const char *p, int16_t y);
+ 
+ /*  Local Functions (macros)  */
+ 
+

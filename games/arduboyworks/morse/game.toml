@@ -13,5 +13,5 @@ status = "smoke"
 libraries = ["Arduboy2"]
 
 [port]
-patches = []
-notes = ["共享 ArduboyWorks 构建入口；上游子模块保持未修改。"]
+patches = ["patches/0001-host-apply-collection-compatibility.patch"]
+notes = ["共享 ArduboyWorks 构建入口；补丁显式记录该游戏所需的宿主源码兼容差异，上游子模块保持未修改。"]

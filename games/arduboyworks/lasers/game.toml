@@ -13,5 +13,5 @@ status = "smoke"
 libraries = ["Arduboy2"]
 
 [port]
-patches = ["patches/0001-common-replace-avr-gray-fill-assembly.patch"]
-notes = ["共享 ArduboyWorks 构建入口；用等价 C++ 循环替换仅适用于 AVR 的灰屏汇编，上游子模块保持未修改；这是宿主平台适配，尚未提交上游 issue。"]
+patches = ["patches/0001-common-replace-avr-gray-fill-assembly.patch", "patches/0002-host-apply-collection-compatibility.patch"]
+notes = ["共享 ArduboyWorks 构建入口；用等价 C++ 循环替换仅适用于 AVR 的灰屏汇编，并显式适配 AVR 函数指针和音频对象生命周期；上游子模块保持未修改；这是宿主平台适配，尚未提交上游 issue。"]

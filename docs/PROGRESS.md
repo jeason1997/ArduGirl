@@ -30,6 +30,7 @@
 
 ## 已完成
 
+- 移除集合 profile 中与正式补丁重复的 `replacements` 源码改写机制；原有 ArduboyWorks 兼容修改已迁移为每个游戏显式引用、带上下文校验的编号补丁。公共准备器拒绝构建配置重新声明源码替换，源码适配只保留 `patches` 一条路径。
 - 修复 Stairs Sweep 的 PY32 裸机链接失败：ArduboyWorks 集合 profile 原先只会把 `MyArduboy.cpp` 中动态创建的 `ArduboyPlaytune` 替换为公共固定容量播放器工厂，遗漏了该游戏采用的 `MyArduboyV.cpp`，导致固件引用未提供的 `operator new`。现由同一平台无关 profile 覆盖该文件名，继续保持上游目录不变且不向 PY32 构建加入游戏特判。生成快照已确认改用 `ardugirl_create_playtune()`；PY32 独立冷构建通过，固件 text 17272、data 340、bss 3204 字节；Linux 单游戏构建、180 帧冒烟及公共 Playtune 回归测试通过。最近一次完整 PY32 冷构建尚未重跑，因此不把独立结果误报为新的全量通过数。
 
 - 修复 PY32 并行冷构建的生成源码竞态：平台 Makefile 现在把准备器同批产生的全部 C/C++ 快照显式连接到主生成目标，避免 `make -j` 在准备器完成前报告“没有规则可生成”；PY32 游戏测试会删除对应生成快照并使用 `-j4` 构建，持续覆盖该依赖契约。

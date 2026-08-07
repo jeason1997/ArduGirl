@@ -1,0 +1,27 @@
+--- a/gosencho.ino
++++ b/gosencho.ino
+@@ -10,9 +10,9 @@
+ 
+ /*  Local Functions (macros)  */
+ 
+-#define callInitFunc(idx)   ((void (*)(void)) pgm_read_word(&moduleTable[idx].initFunc))()
+-#define callUpdateFunc(idx) ((MODE_T (*)(void)) pgm_read_word(&moduleTable[idx].updateFunc))()
+-#define callDrawFunc(idx)   ((void (*)(void)) pgm_read_word(&moduleTable[idx].drawFunc))()
++#define callInitFunc(idx) (moduleTable[idx].initFunc)()
++#define callUpdateFunc(idx) (moduleTable[idx].updateFunc)()
++#define callDrawFunc(idx) (moduleTable[idx].drawFunc)()
+ 
+ /*  Local Constants  */
+ 
+--- a/title.cpp
++++ b/title.cpp
+@@ -23,7 +23,7 @@
+ static void drawTop(void);
+ static void drawCredit(void);
+ static void drawTitleLogo(int16_t x, int16_t y);
+-static void drawText(const char *p, int lines);
++static void drawText(const char *p, int16_t y);
+ 
+ /*  Local Functions (macros)  */
+ 
+
