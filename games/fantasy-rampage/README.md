@@ -2,9 +2,13 @@
 
 元素卡牌策略游戏，复用公共 ATMlib 四声道播放器。
 
-状态：partial。固定输入启动、菜单和对局入口已通过；完整对局与长期音乐仍待验收。
+状态：`partial`。现有截图记录了启动、菜单和对局入口，但截图输入尚未固化为自动回放；完整对局与长期音乐仍待验收。
 
-运行：make fantasy-rampage
+构建并运行：`make PLATFORM=linux GAME=fantasy-rampage`
+
+仅构建：`make PLATFORM=linux GAME=fantasy-rampage build`
+
+定向测试：`make PLATFORM=linux GAME=fantasy-rampage test-fantasy-rampage`
 
 ## ArduGirl SDL2 实际运行截图
 

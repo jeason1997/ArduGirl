@@ -2,7 +2,6 @@ CXX ?= g++
 CC ?= gcc
 .DEFAULT_GOAL := all
 BUILD_DIR := build
-SMOKE_TARGET := $(BUILD_DIR)/terminal-smoke
 TEST_TARGET := $(BUILD_DIR)/framebuffer-test
 SDL_TEST_TARGET := $(BUILD_DIR)/sdl-backend-test
 STORAGE_TEST_TARGET := $(BUILD_DIR)/storage-test
@@ -28,7 +27,6 @@ RUNTIME_SOURCES := \
 LINUX_STORAGE_SOURCE := platform/linux/src/storage.cpp
 LINUX_CRASH_SOURCE := platform/linux/src/crash.cpp
 SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/src/sdl.cpp platform/linux/src/render.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
-TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/src/terminal.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
 
 GAME_PREPARER := tools/prepare_game.py
 GAME_CATALOG_GENERATOR := platform/linux/tools/generate_games_make.py
@@ -42,7 +40,6 @@ include $(GAME_CATALOG)
 
 PORT_BUILD_TARGETS :=
 PORT_TEST_TARGETS :=
-PORT_TERMINAL_TEST_TARGETS :=
 PORT_DEPENDS :=
 
 GAME_COMPAT_SOURCES := \
@@ -57,15 +54,10 @@ GAME_REPLAY_COMMON_SOURCES := \
 
 define GAME_template
 GAME_SDL_TARGET_$(1) := $$(BUILD_DIR)/$(1)-sdl
-GAME_TERMINAL_TARGET_$(1) := $$(BUILD_DIR)/$(1)-terminal
 GAME_SDL_SOURCES_$(1) := $$(SDL_COMMON_SOURCES) $$(GAME_COMPAT_SOURCES) \
-	$$(GAME_ENTRY_CPP_$(1)) $$(GAME_CPP_SOURCES_$(1)) $$(GAME_EXTRA_CPP_SOURCES_$(1))
-GAME_TERMINAL_SOURCES_$(1) := $$(TERMINAL_COMMON_SOURCES) $$(GAME_COMPAT_SOURCES) \
 	$$(GAME_ENTRY_CPP_$(1)) $$(GAME_CPP_SOURCES_$(1)) $$(GAME_EXTRA_CPP_SOURCES_$(1))
 GAME_SDL_OBJECTS_$(1) := $$(GAME_SDL_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/$(1)/%.o) \
 	$$(GAME_C_SOURCES_$(1):%.c=$$(BUILD_DIR)/linux/$(1)/%.o)
-GAME_TERMINAL_OBJECTS_$(1) := $$(GAME_TERMINAL_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/terminal-$(1)/%.o) \
-	$$(GAME_C_SOURCES_$(1):%.c=$$(BUILD_DIR)/linux/terminal-$(1)/%.o)
 GAME_REPLAY_SOURCES_$(1) := $$(GAME_REPLAY_SOURCE_$(1)) $$(GAME_REPLAY_COMMON_SOURCES) \
 	$$(GAME_CPP_SOURCES_$(1)) $$(GAME_EXTRA_CPP_SOURCES_$(1))
 GAME_REPLAY_OBJECTS_$(1) := $$(GAME_REPLAY_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/replay-$(1)/%.o) \
@@ -83,11 +75,6 @@ $$(BUILD_DIR)/linux/$(1)/%.o: %.cpp
 	$$(CXX) $$(CPPFLAGS) $$(SDL_CFLAGS) $$(CXXFLAGS) -I$$(BUILD_DIR)/generated/$(1) \
 		$$(GAME_CPP_FLAGS_$(1)) -DARDUINO=10819 -MMD -MP -c $$< -o $$@
 
-$$(BUILD_DIR)/linux/terminal-$(1)/%.o: %.cpp
-	@mkdir -p $$(@D)
-	$$(CXX) $$(CPPFLAGS) $$(CXXFLAGS) -I$$(BUILD_DIR)/generated/$(1) \
-		$$(GAME_CPP_FLAGS_$(1)) -DARDUINO=10819 -MMD -MP -c $$< -o $$@
-
 $$(BUILD_DIR)/linux/replay-$(1)/%.o: %.cpp
 	@mkdir -p $$(@D)
 	$$(CXX) $$(CPPFLAGS) $$(CXXFLAGS) -I$$(BUILD_DIR)/generated/$(1) \
@@ -98,13 +85,10 @@ $$(BUILD_DIR)/linux/$(1)/%.o: %.c
 	$$(CC) $$(CPPFLAGS) $$(SDL_CFLAGS) -O2 -Wall -Wextra -I$$(BUILD_DIR)/generated/$(1) -MMD -MP -c $$< -o $$@
 
 $$(filter $$(BUILD_DIR)/linux/$(1)/build/generated/$(1)/%,$$(GAME_SDL_OBJECTS_$(1))): $$(GAME_GENERATED_ENTRY_$(1))
-$$(filter $$(BUILD_DIR)/linux/terminal-$(1)/build/generated/$(1)/%,$$(GAME_TERMINAL_OBJECTS_$(1))): $$(GAME_GENERATED_ENTRY_$(1))
 $$(filter $$(BUILD_DIR)/linux/replay-$(1)/build/generated/$(1)/%,$$(GAME_REPLAY_OBJECTS_$(1))): $$(GAME_GENERATED_ENTRY_$(1))
 $$(GAME_EXTRA_CPP_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/$(1)/%.o): $$(GAME_GENERATED_ENTRY_$(1))
-$$(GAME_EXTRA_CPP_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/terminal-$(1)/%.o): $$(GAME_GENERATED_ENTRY_$(1))
 $$(GAME_EXTRA_CPP_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/replay-$(1)/%.o): $$(GAME_GENERATED_ENTRY_$(1))
 $$(BUILD_DIR)/linux/$(1)/src/arduboy2/Arduboy2.o: $$(BUILD_DIR)/generated/font5x7.inc
-$$(BUILD_DIR)/linux/terminal-$(1)/src/arduboy2/Arduboy2.o: $$(BUILD_DIR)/generated/font5x7.inc
 $$(BUILD_DIR)/linux/replay-$(1)/src/arduboy2/Arduboy2.o: $$(BUILD_DIR)/generated/font5x7.inc
 
 $$(GAME_SDL_TARGET_$(1)): $$(GAME_SDL_OBJECTS_$(1))
@@ -126,22 +110,9 @@ $$(BUILD_DIR)/$(1)-replay-test: $$(GAME_REPLAY_OBJECTS_$(1))
 	$$(CXX) $$^ $$(LDFLAGS) -o $$@
 endif
 
-ifneq ($$(strip $$(GAME_TERMINAL_$(1))),)
-.PHONY: $(1)-terminal test-$(1)-terminal
-$$(GAME_TERMINAL_TARGET_$(1)): $$(GAME_TERMINAL_OBJECTS_$(1))
-	@mkdir -p $$(@D)
-	$$(CXX) $$^ $$(LINUX_RUNTIME_LDFLAGS) -o $$@
-$(1)-terminal: check-upstream $$(GAME_TERMINAL_TARGET_$(1))
-	$$(GAME_TERMINAL_TARGET_$(1))
-test-$(1)-terminal: check-upstream $$(GAME_TERMINAL_TARGET_$(1))
-	@save_dir="$$$$(mktemp -d)"; trap 'rm -rf "$$$$save_dir"' EXIT; \
-		$$(GAME_TERMINAL_TARGET_$(1)) --frames 1 --plain --save-dir "$$$$save_dir" >/dev/null
-PORT_TERMINAL_TEST_TARGETS += test-$(1)-terminal
-endif
-
 PORT_BUILD_TARGETS += $$(GAME_SDL_TARGET_$(1))
 PORT_TEST_TARGETS += test-$(1)
-PORT_DEPENDS += $$(GAME_SDL_OBJECTS_$(1):.o=.d) $$(GAME_TERMINAL_OBJECTS_$(1):.o=.d) \
+PORT_DEPENDS += $$(GAME_SDL_OBJECTS_$(1):.o=.d) \
 	$$(if $$(GAME_REPLAY_SOURCE_$(1)),$$(GAME_REPLAY_OBJECTS_$(1):.o=.d))
 endef
 
@@ -157,11 +128,6 @@ $(error build 和 run 目标必须通过 GAME=<game-id> 选择游戏)
 endif
 endif
 
-SMOKE_SOURCES := \
-	$(TERMINAL_COMMON_SOURCES) \
-	platform/linux/tests/terminal_game.cpp
-
-SMOKE_OBJECTS := $(SMOKE_SOURCES:%.cpp=$(BUILD_DIR)/smoke/%.o)
 TEST_OBJECTS := \
 	$(BUILD_DIR)/src/core/framebuffer.o \
 	$(BUILD_DIR)/tests/framebuffer_test.o
@@ -192,7 +158,7 @@ STDIO_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/stdio_test.o \
 	$(BUILD_DIR)/src/compat/stdio.o
 
-.PHONY: all build run test test-terminal smoke clean check-upstream check-sdl
+.PHONY: all build run test clean check-upstream check-sdl
 
 all: check-upstream check-sdl $(if $(strip $(GAME)),$(SELECTED_GAME_TARGETS),$(PORT_BUILD_TARGETS))
 	$(if $(strip $(GAME)),$(SELECTED_GAME_TARGETS),@:)
@@ -211,17 +177,9 @@ check-sdl:
 	@pkg-config --exists sdl2 || \
 		(printf '%s\n' '缺少 SDL2 开发包或 pkg-config，无法构建默认 SDL 后端' && false)
 
-$(SMOKE_TARGET): $(SMOKE_OBJECTS)
-	@mkdir -p $(@D)
-	$(CXX) $(SMOKE_OBJECTS) $(LINUX_RUNTIME_LDFLAGS) -o $@
-
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CPPFLAGS) $(SDL_CFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
-
-$(BUILD_DIR)/smoke/%.o: %.cpp
-	@mkdir -p $(@D)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
 $(BUILD_DIR)/generated/font5x7.inc: third_party/Arduboy2/src/Arduboy2Data.cpp
 	@mkdir -p $(@D)
@@ -270,14 +228,8 @@ test: check-sdl $(TEST_TARGET) $(SDL_TEST_TARGET) $(STORAGE_TEST_TARGET) $(COMPA
 	$(ATM_TEST_TARGET)
 	$(STDIO_TEST_TARGET)
 
-test-terminal: $(PORT_TERMINAL_TEST_TARGETS)
-
-smoke: $(SMOKE_TARGET)
-	$(SMOKE_TARGET)
-
 clean:
 	rm -rf $(BUILD_DIR)
 
--include $(SMOKE_OBJECTS:.o=.d) \
-	$(BUILD_DIR)/tests/framebuffer_test.d \
+-include $(BUILD_DIR)/tests/framebuffer_test.d \
 	$(if $(PORT_DEPENDS_OVERRIDE),$(PORT_DEPENDS_OVERRIDE),$(PORT_DEPENDS))

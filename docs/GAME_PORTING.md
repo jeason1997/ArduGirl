@@ -52,7 +52,6 @@ libraries = ["Arduboy2"]
 smoke_frames = 180
 # 有独立确定性回归测试时再声明以下字段。
 # replay_source = "tests/example_game_replay_test.cpp"
-# terminal = true
 
 [port]
 patches = []

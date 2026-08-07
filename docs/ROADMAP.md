@@ -1,67 +1,38 @@
 # 实施路线图
 
-## Phase 0：规格与治理
+本文件只保留未完成方向。当前完成度与最近证据见 `PROGRESS.md`，已完成工作的演进历史见 Git。
 
-- [x] 明确源码级原生编译，不采用模拟器。
-- [x] 定义目录、分层、平台边界和游戏导入规则。
-- [x] 定义整数、内存和性能规则。
-- [x] 固定上游版本与零修改导入流程。
+## 1. Linux SDL2 质量基线
 
-## Phase 1：Linux 运行基线
+- [ ] 增加 gamepad 输入与可配置键位。
+- [ ] 增加确定性 PCM golden test、声音抢占和长时间播放验证。
+- [ ] 建立 GCC/Clang、Debug/Release 与 ASan/UBSan 构建矩阵。
+- [ ] 增加时间回绕、帧调度和复杂压缩图片测试。
 
-- [x] GNU Make 聚合构建和游戏扩展点。
-- [x] Arduino `setup/loop` runtime 和 platform API。
-- [x] Linux terminal Braille 显示、raw input 和 headless 固定帧运行。
-- [x] SDL2 窗口、键盘事件、最近邻整数缩放和 headless 模式。
-- [x] Linux EEPROM 文件后端与游戏隔离。
-- [ ] SDL2 gamepad 输入和键位配置。
+Linux terminal 已废弃，不再属于路线图。
 
-## Phase 2：Arduboy2 与 Arduino 兼容
+## 2. 兼容层完整性
 
-- [x] 固定 Arduboy2 上游基线。
-- [x] 128×64、1-bit、1024 字节 framebuffer。
-- [x] 高频图元、bitmap、compressed bitmap 和 Sprites 模式。
-- [x] 帧率、按钮电平与边沿、字体和基础 Print。
-- [x] PROGMEM、安全读取、时间、随机数和 EEPROM。
-- [x] framebuffer、兼容 API、SDL 和存储回归测试。
-- [ ] 对照固定上游版本完成 API 差异清单。
-- [ ] 补齐仍有价值的 Arduboy2/Print 辅助接口和官方示例编译测试。
+- [ ] 对照固定 Arduboy2 revision 建立 API 差异清单。
+- [ ] 补齐真实游戏需要的 Arduboy2、Print 和 Arduino 辅助接口。
+- [ ] 清理仍依赖 `-fpermissive` 的上游适配。
+- [ ] 仅在新游戏出现真实依赖时评估 ArduboyTones、ArdBitmap 或 ArduboyFX。
 
-## Phase 3：声音与扩展库
+## 3. 游戏验收
 
-- [x] Arduboy2Beep 和定时 tone。
-- [x] ArduboyPlaytune 音符、等待、重复、移调和双声道调度。
-- [x] SDL2 双方波混合与 8 位波表播放。
-- [ ] 增加确定性 PCM golden test、抢占和长时间播放验证。
-- [ ] 新游戏实际依赖时再移植 ArduboyTones、ATMlib、ArdBitmap 或 ArduboyFX。
+- [ ] 为 24 款已接入游戏逐一固化回放、玩法、音频与存档证据。
+- [ ] 继续按 `GAME_PORTS.md` 导入不同依赖类型的游戏。
+- [ ] 保持每款游戏独立的清单、冷构建、冒烟、回放和多阶段截图验收。
 
-## Phase 4：真实游戏基线
+## 4. PY32F002A
 
-- [x] 接入 MicroTD 和 ArduboyWorks 18 个游戏。
-- [x] 全部 19 个游戏完成冷构建和启动冒烟。
-- [x] MicroTD 固定输入回放覆盖选图、建塔和启动波次。
-- [ ] 为 ArduboyWorks 游戏逐个增加固定输入回放、截图和玩法验证。
-- [ ] 为代表游戏增加存档往返与长时间运行验证。
-- [ ] 按 `GAME_PORTS.md` 继续导入不同依赖类型的游戏。
+- [ ] 修复剩余游戏构建并完成全量 24 款冷构建。
+- [ ] 完成实机显示、按钮、蜂鸣器、帧率和长时间稳定性验收。
+- [ ] 实现掉电持久化的 Flash EEPROM 后端。
+- [ ] 固化 Flash、RAM、栈和帧时间预算。
 
-## Phase 5：质量基线
+## 5. 后续平台
 
-- [ ] 增加 GCC/Clang、Debug/Release 和 ASan/UBSan 构建矩阵。
-- [ ] 增加兼容性静态审计脚本。
-- [ ] 增加时间回绕、帧调度、音频混合和复杂压缩图片测试。
-- [ ] 清理仍依赖 `-fpermissive` 的上游适配问题。
-
-## Phase 6：PY32
-
-- [ ] 选定具体芯片、开发板、屏幕、引脚、工具链和存储方案。
-- [ ] 实现 GPIO、SysTick/timer、显示、PWM 和 Flash storage backend。
-- [ ] 使用 Linux golden tests 作为像素参考。
-- [ ] 输出 Flash/RAM/栈预算和帧时间。
-
-具体硬件未确定前不写厂商 HAL 代码，避免错误绑定外设和容量假设。
-
-## Phase 7：STM32 和其他平台
-
-- [ ] 以相同 platform API 添加 STM32 backend。
-- [ ] 区分 SSD1306 直传和 RGB565 scanline 转换。
-- [ ] 建立每个平台的板级配置，不复制核心兼容实现。
+- [ ] Linux 与 PY32 基线稳定后，以相同 platform API 添加 STM32 backend。
+- [ ] 为每个平台建立板级配置，并保持 SSD1306 直传与 RGB565 后端转换的边界。
+- [ ] 不复制核心兼容实现，不让平台类型泄漏到公共接口。

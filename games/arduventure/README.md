@@ -13,7 +13,14 @@ Arduventure 是 TEAM a.r.g. 制作的 Arduboy 动作 RPG。玩家探索多个区
 当前状态为 `partial`：SDL2 冷构建、180 帧无头启动、四声道标题音乐和上述固定输入回放已经通过；截图证明已进入可移动的房间探索玩法，但战斗、存档、完整剧情和长时间音乐仍未验收。
 
 ```bash
-make arduventure
+make PLATFORM=linux GAME=arduventure
+```
+
+仅构建或执行定向测试：
+
+```bash
+make PLATFORM=linux GAME=arduventure build
+make PLATFORM=linux GAME=arduventure test-arduventure
 ```
 
 代码采用 MIT 许可证；上游明确声明故事、角色、精灵、图块、设计和美术不属于 MIT 授权范围，相关权利归 TEAM a.r.g. 所有。

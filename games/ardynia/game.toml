@@ -6,7 +6,7 @@ entry = "third_party/Ardynia/ardynia.ino"
 
 [compat]
 level = "C"
-status = "smoke-tested"
+status = "replay-tested"
 libraries = ["Arduboy2", "ArduboyPlaytune", "EEPROM"]
 
 [test]
@@ -25,5 +25,5 @@ notes = [
     "最小补丁把负值左移改为显式无符号打包，消除宿主 C++17 常量表达式中的未定义行为",
     "绘图补丁使用有符号 framebuffer 偏移，消除依赖 AVR 16 位 int 回绕的屏幕顶部越界访问",
     "蛇敌人补丁在读取房间瓦片前检查坐标，避免离屏坐标索引 rooms 数组",
-    "当前先完成冷构建和启动冒烟，固定输入回放、实际截图和完整玩法验证仍待补充"
+    "固定输入回放与三张实际截图已完成，完整战斗、地牢、道具、存档和音频流程仍待验收"
 ]

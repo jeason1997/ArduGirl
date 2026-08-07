@@ -71,7 +71,6 @@ def emit_game(path: Path, data: dict) -> list[str]:
     patches = [path.parent / item for item in data.get("port", {}).get("patches", [])]
     test = data.get("test", {})
     replay_source = test.get("replay_source", "")
-    terminal = test.get("terminal", False)
     cpp_sources = [
         (generated_dir / source).as_posix()
         for source in source_paths(entry, ".cpp", excluded)
@@ -102,7 +101,6 @@ def emit_game(path: Path, data: dict) -> list[str]:
         "PATCHES": " ".join(make_path(item) for item in patches),
         "SMOKE_FRAMES": test.get("smoke_frames", 180),
         "REPLAY_SOURCE": replay_source,
-        "TERMINAL": "1" if terminal else "",
     }
     lines = [f"# {game_id} 的字段来自 {make_path(path)}。"]
     lines.extend(f"GAME_{name}_{game_id} := {make_value(value)}" for name, value in values.items())

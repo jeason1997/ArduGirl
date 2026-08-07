@@ -19,7 +19,7 @@
 
 | 接入顺序 | 状态 | 游戏 | 类型 | 源码 | 当前验证程度 |
 |---:|---|---|---|---|---|
-| 1 | ✅ 已移植 | MicroTD | 塔防 | [上游源码](https://gitlab.com/drummyfish/Arduboy_TD) | SDL2/终端构建、地图、建塔、波次、EEPROM 回放和 4 张截图通过 |
+| 1 | ✅ 已移植 | MicroTD | 塔防 | [上游源码](https://gitlab.com/drummyfish/Arduboy_TD) | SDL2 构建、地图、建塔、波次、EEPROM 回放和 4 张截图通过 |
 | 2 | ✅ 已移植 | ARDUBULLETs | 弹幕射击 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/ardubullets) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
 | 3 | ✅ 已移植 | Bananonsense | 文字搜索 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/bananonsense) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |
 | 4 | ✅ 已移植 | Chie Magari Ita | 棋盘解谜 | [上游源码](https://github.com/obono/ArduboyWorks/tree/master/chiemagari) | ArduboyWorks 批量接入；构建、冒烟、菜单与核心玩法截图通过 |

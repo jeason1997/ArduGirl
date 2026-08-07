@@ -2,7 +2,7 @@
 
 ArduGirl 让 Arduboy 游戏源码直接编译到 Linux、PY32、STM32 等平台。它不模拟 AVR，也不运行 `.hex` 文件；游戏继续包含官方 `Arduboy2.h`，平台差异由兼容层处理。
 
-项目当前默认使用 Linux SDL2 前端。游戏位于 `games/` 的直接子目录中，上游文件通过 Git 子模块引入并保持不修改。终端后端继续保留为可选目标，MCU 后端将在 Linux 基线稳定后实现。
+项目当前使用 Linux SDL2 前端，并已有 PY32F002A 实验后端。游戏位于 `games/` 或集合子目录中，上游文件通过 Git 子模块引入并保持不修改。终端后端已经废弃并删除。
 
 ## 快速开始
 
@@ -11,8 +11,8 @@ ArduGirl 让 Arduboy 游戏源码直接编译到 Linux、PY32、STM32 等平台�
 ```bash
 git clone --recursive https://github.com/jeason1997/ArduGirl.git
 cd ArduGirl
-make
-make microtd
+make PLATFORM=linux
+make PLATFORM=linux GAME=microtd
 ```
 
 已有工作副本需要初始化上游子模块：
@@ -41,10 +41,8 @@ EEPROM 默认保存在 XDG data 目录的 `ardugirl/<game-id>/eeprom.bin`。测�
 运行首个社区游戏 MicroTD：
 
 ```bash
-make microtd
+make PLATFORM=linux GAME=microtd
 ```
-
-终端后端暂不继续优化，可通过 `make microtd-terminal` 和 `make test-terminal` 显式构建或测试。
 
 ## 上游源码原则
 
@@ -61,7 +59,7 @@ make microtd
 - [SDL2 前端](docs/LINUX_SDL.md)
 - [PY32F002A 平台](docs/PY32F002A.md)
 - [PY32 移植错误复盘](docs/PY32_PORTING_RETROSPECTIVE.md)
-- [终端前端](docs/LINUX_TERMINAL.md)
+- [文档索引与维护规则](docs/README.md)
 - [路线图](docs/ROADMAP.md)
 - [当前进度](docs/PROGRESS.md)
 - [参考资料](docs/REFERENCES.md)

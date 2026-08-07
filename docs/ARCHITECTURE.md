@@ -7,7 +7,7 @@ ArduGirl 使用四层结构：
 1. **Game**：原始游戏逻辑、资源、`setup()` 和 `loop()`。
 2. **Compatibility**：Arduboy2、Sprites、Arduino 和有限 AVR 兼容 API。
 3. **Core**：统一 runtime、1024 字节 framebuffer 和平台无关服务。
-4. **Backend**：默认使用 Linux SDL2，保留 Linux terminal 作为可选后端；PY32F002A 已有首版实验后端，STM32 尚未实现。
+4. **Backend**：Linux 使用 SDL2；PY32F002A 已有首版实验后端，STM32 尚未实现。早期 terminal 后端已经废弃并删除。
 
 只有下层可以被上层依赖。后端通过注册或链接时选择实现平台契约。
 
@@ -108,22 +108,20 @@ Runtime 顺序：初始化平台 → `setup()` 一次 → 事件泵 → `loop()`
 当前最小实现使用 GNU Make，生成：
 
 - `build/microtd-sdl`
-- `build/microtd-terminal`
 - `build/framebuffer-test`
 
 根目录 Makefile 只负责选择平台 Makefile 和转发用户目标，不声明编译器参数、平台源码、公共测试对象或游戏构建细节。Linux 构建实现位于 `platform/linux/Makefile`，PY32 构建实现位于 `platform/py32/Makefile`。每款游戏以 `game.toml` 作为唯一必需的构建描述；通用准备器递归生成已规范换行并应用补丁的源码快照和统一入口，各平台只消费这份共同结果。新增普通游戏不得再创建 `port.mk` 或手写入口文件。
 
-Linux 平台先用一次清单扫描生成轻量 Make 元数据，再由单一模板展开编译、链接、冒烟、回放和可选终端目标。指定 `GAME=<game-id>` 时只扫描和展开选中的游戏，并只加载它的 `.d` 文件；不得先展开全部游戏再过滤，因为 GNU Make 在判断目标是否最新之前就会解析依赖文件，在 WSL 挂载的 Windows 文件系统上会形成显著启动延迟。未指定 `GAME` 的 `all`、`test` 等聚合目标才展开全部清单。
+Linux 平台先用一次清单扫描生成轻量 Make 元数据，再由单一模板展开编译、链接、冒烟和回放目标。指定 `GAME=<game-id>` 时只扫描和展开选中的游戏，并只加载它的 `.d` 文件；不得先展开全部游戏再过滤，因为 GNU Make 在判断目标是否最新之前就会解析依赖文件，在 WSL 挂载的 Windows 文件系统上会形成显著启动延迟。未指定 `GAME` 的 `all`、`test` 等聚合目标才展开全部清单。
 
 同仓库多游戏可以在各自 `game.toml` 的 `[build] profile` 中显式引用集合级 `profile.toml`。profile 只描述该上游集合共有的源码排除、附加适配翻译单元、编译兼容选项和可校验源码转换；不得包含 Linux、SDL、MCU、工具链或最终目标规则，也不得由构建器按父目录隐式猜测。普通游戏不需要 profile。
 
-`make`、具体游戏目标和 `make test` 默认使用 SDL2。终端后端通过带 `-terminal` 后缀的目标显式选择。当平台数量和工具链配置增长后，再评估是否加入下列 CMake targets：
+`make`、具体游戏目标和 `make test` 使用 SDL2。当平台数量和工具链配置增长后，再评估是否加入下列 CMake targets：
 
 - `ardugirl_core`
 - `ardugirl_arduboy2`
 - `ardugirl_compat`
 - `ardugirl_platform_linux_sdl2`
-- `ardugirl_platform_linux_terminal`
 - `game_<id>`
 - `ardugirl_<id>` 最终可执行文件
 
@@ -150,7 +148,7 @@ cmake --build build
 
 Arduboy2Beep 属于 `src/arduboy2`，ArduboyPlaytune 属于 `src/compat` 中的独立官方生态库兼容实现。乐谱解析、等待、重复、移调和声道状态不得进入平台后端；平台只接收最多两个方波声道的频率，或一段带固定采样率和生命周期契约的 8 位无符号波表。游戏专用适配只能处理上游私有优先级等扩展并转发到公共播放器，不得复制乐谱解释器。
 
-ATMlib 同样位于 `src/compat`：兼容层解释四声道 tracker 乐谱并按单调时间推进节拍，平台只接收固定宽度的频率、音量和波形编号快照。SDL 回调负责生成采样但不读取乐谱或游戏对象；终端后端保持静音。这样既保留上游音乐语义，也不把 AVR Timer4、ISR 或寄存器引入公共接口。
+ATMlib 同样位于 `src/compat`：兼容层解释四声道 tracker 乐谱并按单调时间推进节拍，平台只接收固定宽度的频率、音量和波形编号快照。SDL 回调负责生成采样但不读取乐谱或游戏对象。这样既保留上游音乐语义，也不把 AVR Timer4、ISR 或寄存器引入公共接口。
 
 Arduboy2 游戏依赖类、方法、重载和 Arduino `Print`，所以游戏与兼容层必须使用 C++ 编译。把整个项目改写为纯 C 会迫使我们修改上游游戏源码，不符合项目目标。
 

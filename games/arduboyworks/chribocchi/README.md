@@ -10,10 +10,17 @@
 
 ## 状态与运行
 
-当前状态为 `partial`：Linux SDL2 冷构建、180 帧冒烟和上述固定输入路径已验证；截图证明游戏已进入核心玩法，但完整流程、所有关卡、音效和长期存档仍未逐项验收。
+清单状态为 `smoke`：Linux SDL2 构建和 180 帧无头冒烟已通过，现有截图记录了标题、菜单与玩法画面。截图生成时使用的输入尚未固化为自动回放测试，因此不能据此标记为 `replay-tested` 或完成移植；其余待验收项应按本游戏实际功能逐项确认。
 
-运行：
+构建并运行 Linux SDL2 版本：
 
 ```bash
-make chribocchi
+make PLATFORM=linux GAME=chribocchi
+```
+
+仅构建或执行定向测试：
+
+```bash
+make PLATFORM=linux GAME=chribocchi build
+make PLATFORM=linux GAME=chribocchi test-chribocchi
 ```

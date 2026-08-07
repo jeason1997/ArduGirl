@@ -45,12 +45,6 @@
 
 SDL2 类型只能存在于 `platform/linux/` 的 SDL 实现文件内部。未来可增加 SDL3 backend，但不改变平台公共接口。
 
-### POSIX terminal
-
-- termios: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/termios.h.html
-- ANSI terminal control: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-- 用途：TTY raw input、光标定位、差分刷新和退出恢复。
-
 ## 游戏发现渠道
 
 - Arduboy Community: https://community.arduboy.com/

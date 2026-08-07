@@ -21,7 +21,7 @@
 - frame rate、frameCount、everyXFrames
 - pollButtons 和全部按钮查询
 - 支持缩放、换行、光标查询、字符串和整数的基本文本输出
-- audio enabled 状态、`initAudio`、定时 `playTone` 和停止接口；SDL2 后端输出方波，终端后端保持静音。ArduboyPlaytune 已实现音符、停止、毫秒等待、标记、重复和移调，并支持两个方波声道；`playWave` 支持一次性播放 8 位无符号波表
+- audio enabled 状态、`initAudio`、定时 `playTone` 和停止接口；SDL2 后端输出方波。ArduboyPlaytune 已实现音符、停止、毫秒等待、标记、重复和移调，并支持两个方波声道；`playWave` 支持一次性播放 8 位无符号波表
 - ATMlib 已实现四声道乐谱、延时、轨道调用与重复、音量/频率滑动、移调、琶音、音符截断、颤音/震音和滑音解释；主循环按单调时间推进节拍，SDL2 后端合成脉冲、三角和噪声波形
 
 ### Arduino
