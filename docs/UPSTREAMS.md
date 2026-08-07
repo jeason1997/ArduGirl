@@ -13,6 +13,25 @@ ArduGirl 的主仓库通过 Git 子模块 gitlink 固定每个上游的完整 co
 | Helmets & Hordes | `third_party/Helmets-Hordes` | `87d1b7e1cc7419be84e078404cbceba58f76a64e` | ATMlib 横向地牢动作游戏 | 仅按用户明确要求更新 |
 | Fantasy Rampage | `third_party/Fantasy-Rampage` | `29d30d3574e31074aa8bb5d070c073f652b85f1a` | ATMlib 元素卡牌游戏 | 仅按用户明确要求更新 |
 | Sunfire | `third_party/Sunfire` | `e99fff73e2d7ba974b8fbef90f7adf90c764397b` | ATMlib 太空飞行射击游戏 | 仅按用户明确要求更新 |
+| Twotris | `third_party/Twotris` | `73391606ba4b8e4e18e9838eb130aff410310599` | 双人下落方块与组合输入样本 | 仅按用户明确要求更新 |
+| Rooftop Rescue | `third_party/Rooftop` | `cb8e9203f62f5ce49423742aa3fb7bc6e1ca3847` | 待移植的直升机救援游戏 | 仅按用户明确要求更新 |
+| Ravine Despoiler | `third_party/Ravine-Despoiler` | `c48915c69c92c1f2e070775558866d84cd70b91b` | 待移植的街机投弹游戏 | 仅按用户明确要求更新 |
+| Evade 2 | `third_party/Evade2` | `bc6fa60203afc35266b5d4c5c5140ce6a714334d` | 待移植的街机躲避游戏 | 仅按用户明确要求更新 |
+| Blackjack | `third_party/Blackjack` | `72a6b1b7c583971568d92eca39c81b8cb99def29` | 待移植的卡牌游戏 | 仅按用户明确要求更新 |
+| Waternet | `third_party/Waternet` | `2f5e8ce47f9bb292a8c30fdf04f91988f0c2a300` | 待移植的管线谜题 | 仅按用户明确要求更新 |
+| LayingPipe | `third_party/LayingPipe` | `d3c0279079ef0a5c7161cbf39d2375e4d5a7aa25` | 待移植的连线谜题 | 仅按用户明确要求更新 |
+| LATE | `third_party/LATE` | `643440bf49257cf070cd54ab6e24e5e8122c7442` | 待移植的三合一休闲谜题 | 仅按用户明确要求更新 |
+| Glove | `third_party/Glove` | `81e9988fea3fc68edc984260b17d6f52beb5d497` | 待移植的迷宫动作冒险 | 仅按用户明确要求更新 |
+| Kong | `third_party/Kong` | `ec95141029a2a401edcf97b4b8d0f121139a2d15` | 待移植的 Game & Watch 式街机游戏 | 仅按用户明确要求更新 |
+| Kong II | `third_party/Kong-II` | `8ba0b35b998d2c52161964ee06f126704bea1b13` | 待移植的 Game & Watch 式街机游戏 | 仅按用户明确要求更新 |
+| Oh Mummy | `third_party/OhMummy` | `a8f155afd5682236da394bfca07f0f65153b3146` | 待移植的迷宫街机游戏 | 仅按用户明确要求更新 |
+| Arduboy Game Collection | `third_party/Arduboy-Game-Collection` | `b1ffab7e4f2591c93b18380d4ff6eb3011a71bac` | Pipe Boy 等候选游戏的合集上游 | 仅按用户明确要求更新 |
+| Games'n Goblins | `third_party/Games-n-Goblins` | `56560944bf0b2fc17973d78e436e5a22efc3847f` | 待移植的限时拼图游戏 | 仅按用户明确要求更新 |
+| Omega Chase | `third_party/OmegaChase` | `64bc7d38d21fe6684a147554b4b46b043fe6be4f` | 待移植的双摇杆式射击游戏 | 仅按用户明确要求更新 |
+| Quadrastic | `third_party/Quadrastic` | `9d36cc53865f33c89467501c18cea2257e9db29e` | 待移植的区域争夺动作游戏 | 仅按用户明确要求更新 |
+| Pyoro! | `third_party/Pyoro` | `edc9d63244e92946596c67f7af476eb10145055d` | 待移植的接物动作游戏 | 仅按用户明确要求更新 |
+| The Bounce | `third_party/TheBounce` | `2fcc65fffc3c3a213d8882aaa8ee7811fd738cdd` | 待移植的物理平台游戏 | 仅按用户明确要求更新 |
+| TiMiNoo | `third_party/TiMiNoo` | `73ccd7fee1e675ca36f016cde2b317dc0bdb2a84` | 待移植的虚拟宠物游戏 | 仅按用户明确要求更新 |
 
 MicroTD 当前带有一份可独立重放的最小补丁：为 `buildSelectedTower()` 的成功路径补充缺失的 `true` 返回值，并显式标记预期的状态分支贯穿。该补丁只消除上游未定义行为和编译歧义，构建时应用到生成目录，子模块工作树保持 clean。
 

@@ -8,16 +8,17 @@
 
 | 范围 | 状态 | 当前事实与证据 |
 |---|---|---|
-| 架构与构建 | partial | 根 Makefile 只转发平台目标；Linux 与 PY32 各自拥有构建规则；24 款游戏由 `game.toml` 自动发现，单游戏构建只按需初始化其上游与公共 Arduboy2 子模块。公共契约稳定，仍需完善兼容 API 差异审计。 |
+| 架构与构建 | partial | 根 Makefile 只转发平台目标；Linux 与 PY32 各自拥有构建规则；25 款游戏由 `game.toml` 自动发现，单游戏构建只按需初始化其上游与公共 Arduboy2 子模块。公共契约稳定，仍需完善兼容 API 差异审计。 |
 | Linux SDL2 | partial | 唯一 Linux 前端；窗口、键盘、单调时间、headless、输入回放、截图、文件 EEPROM、崩溃诊断和音频已实现。待 gamepad、键位配置和长时间音频验证。 |
 | Linux terminal | removed | 2026-08-07 确认废弃；实现、构建目标、测试、清单字段和规格文档均已删除。 |
-| Arduboy2/Arduino 兼容 | partial | 覆盖当前 24 款游戏所需的绘图、Sprites、Print、按钮、帧率、PROGMEM、EEPROM 与多种音频接口；尚不等于完整上游 API。 |
-| 游戏 | partial | 24 款已接入：MicroTD、ArduboyWorks 18 款、Ardynia、Arduventure、Fantasy Rampage、Helmets & Hordes、Sunfire。完成度以各游戏 README 和 `game.toml` 为准。 |
+| Arduboy2/Arduino 兼容 | partial | 覆盖当前 25 款游戏所需的绘图、Sprites、Print、按钮、帧率、PROGMEM、EEPROM 与多种音频接口；尚不等于完整上游 API。 |
+| 游戏 | partial | 25 款已接入：MicroTD、ArduboyWorks 18 款、Ardynia、Arduventure、Fantasy Rampage、Helmets & Hordes、Sunfire、Twotris。完成度以各游戏 README 和 `game.toml` 为准。 |
 | PY32F002A | partial | 已有 24 MHz、ST7789、按钮、蜂鸣器、统一游戏构建和 OpenOCD 烧录路径；Flash EEPROM 未实现，硬件交互仍未完整验收。最近一次完整冷构建为 21/24；之后 Chri-Bocchi 与 Stairs Sweep 已单独通过，Bananonsense 仍待修复，尚未重跑全量。 |
 | STM32 | not-started | 尚无实现；未来复用同一 platform API。 |
 
 ## 最近验证
 
+- 2026-08-07：Twotris SDL2 与 PY32F002A 冷构建通过；PY32 尺寸为 `text=14468`、`data=68`、`bss=2772`。SDL 固定输入从标题进入菜单和双人核心玩法，三张不同状态截图已目视验收并嵌入游戏 README。为其补齐了 Arduboy2 公共 `drawChar` 兼容 API。
 - 2026-08-07：新增按游戏清单解析的子模块准备步骤；单游戏选择不会展开其他游戏上游，并由独立 Python 回归测试覆盖最小集合与聚合集合。
 - 2026-08-07：删除 terminal 后，MicroTD 的 SDL2 定向构建、固定回放和无头冒烟通过。随后执行聚合 `make test -j4` 时，Helmets & Hordes 在既有补丁 `0001-host-use-native-function-pointers.patch` 的源码准备阶段因上下文不匹配失败，因此本次不能给出新的 24 款全量通过结论。删除前最近一次全量 Linux 证据仍为全部 24 款构建、公共测试、无头冒烟与 3 款固定回放通过。
 - 2026-08-07：PY32 最近一次完整冷构建退出码非零，通过 21/24；失败为 Bananonsense、Chri-Bocchi、Stairs Sweep。随后 Chri-Bocchi 和 Stairs Sweep 分别独立冷构建通过，但不据此改写全量结果。

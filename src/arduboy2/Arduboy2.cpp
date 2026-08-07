@@ -493,6 +493,26 @@ void Arduboy2::setTextBackground(std::uint8_t color) noexcept {
     text_background_ = color;
 }
 
+void Arduboy2::drawChar(std::int16_t x, std::int16_t y,
+                        std::uint8_t character, std::uint8_t color,
+                        std::uint8_t background, std::uint8_t size) noexcept {
+    if (size == 0) return;
+    const auto glyph = glyph_for(static_cast<char>(character));
+    auto& screen = ardugirl::framebuffer();
+    for (std::int16_t column = 0; column < 6; ++column) {
+        const auto bits = column < 5 ? glyph[static_cast<std::size_t>(column)] : 0;
+        for (std::int16_t row = 0; row < 8; ++row) {
+            const bool foreground = (bits & static_cast<std::uint8_t>(1u << row)) != 0;
+            if (!foreground && color == background) continue;
+            const bool pixel = (foreground ? color : background) == WHITE;
+            for (std::uint8_t sy = 0; sy < size; ++sy)
+                for (std::uint8_t sx = 0; sx < size; ++sx)
+                    screen.set_pixel(static_cast<std::int16_t>(x + column * size + sx),
+                                     static_cast<std::int16_t>(y + row * size + sy), pixel);
+        }
+    }
+}
+
 std::size_t Arduboy2::write(std::uint8_t character) noexcept {
     drawCharacter(static_cast<char>(character));
     return 1;

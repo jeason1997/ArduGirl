@@ -1,0 +1,25 @@
+id = "twotris"
+name = "Twotris"
+source = "https://github.com/skaterced/Twotris"
+revision = "73391606ba4b8e4e18e9838eb130aff410310599"
+entry = "third_party/Twotris/Twotris.ino"
+
+[build]
+cpp_flags = ["-fpermissive"]
+
+[compat]
+level = "A"
+status = "replay-tested"
+libraries = ["Arduboy2"]
+
+[test]
+smoke_frames = 180
+
+[port]
+patches = []
+notes = [
+    "上游源码通过通用生成入口参与构建，固定 revision 的子模块保持未修改",
+    "静态扫描未发现 AVR 寄存器、ISR、内联汇编或额外库依赖",
+    "上游 square.h 在类内声明成员时重复使用 Square:: 限定名，使用 GCC 的 -fpermissive 保持源码不变",
+    "SDL 固定输入回放已从标题进入菜单和双人核心玩法，并生成三张不同状态截图"
+]

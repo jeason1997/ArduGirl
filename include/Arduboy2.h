@@ -221,6 +221,9 @@ public:
                         std::uint8_t color = WHITE) noexcept;
     void setTextColor(std::uint8_t color) noexcept;
     void setTextBackground(std::uint8_t color) noexcept;
+    static void drawChar(std::int16_t x, std::int16_t y,
+                         std::uint8_t character, std::uint8_t color,
+                         std::uint8_t background, std::uint8_t size) noexcept;
 
 protected:
     std::int16_t cursor_x = 0;

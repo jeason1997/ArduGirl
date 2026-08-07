@@ -111,6 +111,10 @@ int main() {
     arduboy.drawRoundRect(32, 1, 12, 10, 3);
     arduboy.fillRoundRect(48, 1, 12, 10, 3);
     assert(ardugirl::framebuffer().pixel(53, 5));
+    arduboy.drawChar(80, 1, 'A', BLACK, WHITE, 2);
+    // 第六列是字符间隔，验证背景色和缩放都按上游契约绘制。
+    assert(ardugirl::framebuffer().pixel(90, 1));
+    assert(ardugirl::framebuffer().pixel(91, 2));
 
     constexpr std::uint8_t xy_bitmap[] = {0x80};
     arduboy.drawSlowXYBitmap(64, 1, xy_bitmap, 1, 1);

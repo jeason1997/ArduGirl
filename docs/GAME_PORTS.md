@@ -43,6 +43,7 @@
 | 22 | ✅ 已移植 | Helmets & Hordes | 横向动作 | [上游源码](https://github.com/Team-ARG-Museum/ID-47-Helmets-Hordes) | ATMlib、固定输入冒烟和三阶段截图通过，完整流程仍为 partial |
 | 23 | ✅ 已移植 | Fantasy Rampage | 卡牌策略 | [上游源码](https://github.com/Team-ARG-Museum/ID-48-Fantasy-Rampage) | ATMlib、固定输入冒烟和三阶段截图通过，完整对局仍为 partial |
 | 24 | ✅ 已移植 | Sunfire | 太空射击 | [上游源码](https://github.com/Team-ARG-Museum/ID-50-Sunfire) | ATMlib、固定输入冒烟和三阶段截图通过，完整波次仍为 partial |
+| 25 | ✅ 已移植 | Twotris | 双人下落方块 | [上游源码](https://github.com/skaterced/Twotris) | SDL2 与 PY32 冷构建通过；固定输入进入双人玩法，标题、菜单和玩法三张截图通过 |
 
 以上游戏均已进入源码级移植流程并能在 ArduGirl 运行；`✅ 已移植` 不代表完整流程、全部音频和长期存档已经验收，具体完成度以各游戏 README 为准。
 
@@ -50,7 +51,6 @@
 
 | 原优先级 | 游戏 | 类型 | 源码 | 预估等级 | 排序理由 |
 |---:|---|---|---|---|---|
-| 2 | Twotris | 双人下落方块 | [上游源码](https://github.com/skaterced/Twotris) | A/B | 未导入、未构建；玩法明确、代码预计较小，并能覆盖双人组合输入，作为下一款移植的首选 |
 | 3 | Rooftop Rescue | 直升机救援 | [上游源码](https://github.com/BertVeer/Rooftop) | A/B | 未导入、未构建；轻量动作游戏，适合验证基础绘图、碰撞和按键 |
 | 4 | Ravine Despoiler | 街机投弹 | [上游源码](https://github.com/unwiredben/arduboy-ravine-despoiler) | A/B | 未导入、未构建；源码入口独立，适合作为低风险 Arduboy2 样本 |
 | 5 | Evade 2 | 街机躲避 | [上游源码](https://github.com/ArduboyCollection/evade2) | A/B | 未导入、未构建；官方精选作品，循环简单，适合验证帧率和碰撞 |

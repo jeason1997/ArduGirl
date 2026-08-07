@@ -25,3 +25,60 @@
 [submodule "third_party/Sunfire"]
 	path = third_party/Sunfire
 	url = https://github.com/Team-ARG-Museum/ID-50-Sunfire.git
+[submodule "third_party/Twotris"]
+	path = third_party/Twotris
+	url = https://github.com/skaterced/Twotris.git
+[submodule "third_party/Rooftop"]
+	path = third_party/Rooftop
+	url = https://github.com/BertVeer/Rooftop.git
+[submodule "third_party/Ravine-Despoiler"]
+	path = third_party/Ravine-Despoiler
+	url = https://github.com/unwiredben/arduboy-ravine-despoiler.git
+[submodule "third_party/Evade2"]
+	path = third_party/Evade2
+	url = https://github.com/ArduboyCollection/evade2.git
+[submodule "third_party/Blackjack"]
+	path = third_party/Blackjack
+	url = https://github.com/Press-Play-On-Tape/Blackjack.git
+[submodule "third_party/Waternet"]
+	path = third_party/Waternet
+	url = https://github.com/joyrider3774/waternet_arduboy.git
+[submodule "third_party/LayingPipe"]
+	path = third_party/LayingPipe
+	url = https://github.com/ArduboyCollection/LayingPipe.git
+[submodule "third_party/LATE"]
+	path = third_party/LATE
+	url = https://github.com/core1024/LATE.git
+[submodule "third_party/Glove"]
+	path = third_party/Glove
+	url = https://github.com/ArduboyCollection/glove.git
+[submodule "third_party/Kong"]
+	path = third_party/Kong
+	url = https://github.com/Press-Play-On-Tape/Kong.git
+[submodule "third_party/Kong-II"]
+	path = third_party/Kong-II
+	url = https://github.com/Press-Play-On-Tape/Kong-II.git
+[submodule "third_party/OhMummy"]
+	path = third_party/OhMummy
+	url = https://github.com/Mattvic79/OhMummy.git
+[submodule "third_party/Arduboy-Game-Collection"]
+	path = third_party/Arduboy-Game-Collection
+	url = https://github.com/Glitsch3n/arduboy-game-collection.git
+[submodule "third_party/Games-n-Goblins"]
+	path = third_party/Games-n-Goblins
+	url = https://github.com/ImMrShrike/gng-arduboy-game.git
+[submodule "third_party/OmegaChase"]
+	path = third_party/OmegaChase
+	url = https://github.com/Karl-Williams/OmegaChase.git
+[submodule "third_party/Quadrastic"]
+	path = third_party/Quadrastic
+	url = https://github.com/ArduboyCollection/Quadrastic.git
+[submodule "third_party/Pyoro"]
+	path = third_party/Pyoro
+	url = https://github.com/Thesola10/Pyoro.git
+[submodule "third_party/TheBounce"]
+	path = third_party/TheBounce
+	url = https://github.com/ArduboyCollection/TheBounceArduboy.git
+[submodule "third_party/TiMiNoo"]
+	path = third_party/TiMiNoo
+	url = https://github.com/TME520/TiMiNoo-Arduboy.git
