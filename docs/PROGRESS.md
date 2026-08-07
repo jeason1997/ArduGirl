@@ -30,6 +30,7 @@
 
 ## 已完成
 
+- 统一游戏构建描述：Linux 不再加载每个游戏或集合的 `port.mk`，而是一次扫描 `game.toml` 生成轻量目录，并由平台内单一模板展开 SDL、终端、冒烟和回放目标；PY32 与 Linux 现共同消费 `tools/prepare_game.py` 生成的原子源码快照和运行入口。删除 7 份重复 `port.mk` 与 7 份手写 `entry.cpp`。普通游戏只需清单和可选补丁；ArduboyWorks 的真实集合差异由每款清单显式引用集合级 `profile.toml`，不再依赖构建器向父目录猜测 `build.toml`。从空 `build/` 执行 Linux 全部 24 个 SDL 游戏的 `make -j4` 冷构建通过，随后 `make test -j4` 的公共测试、24 款冒烟和 3 款固定回放全部通过，`make test-terminal` 通过；PY32 MicroTD 交叉构建通过，固件 text 19280、data 364、bss 3484 字节。
 - 修复 Linux 平台 `GAME=<game-id>` 选择发生得过晚的问题：平台 Makefile 原先先加载全部游戏 `port.mk` 和依赖，再从最终目标中过滤指定游戏，导致 `/mnt/e` 上的单游戏构建仍承担全仓解析开销。现根据直属游戏目录或集合内 `game.toml` 自动定位并只加载所属 `port.mk`；ArduboyWorks 集合同时只展开指定游戏，根 Makefile不包含任何游戏名称或路径特判。
 - 修复统一入口的 Linux 单游戏选择回归：根 Makefile 转发默认 `all` 后，Linux 平台曾忽略 `GAME` 并依赖全部 `PORT_BUILD_TARGETS`，导致 `make PLATFORM=linux GAME=microtd` 编译所有游戏。Linux 平台现从各移植模块登记的构建产物中精确选择与 `GAME` 对应的唯一目标；未指定 `GAME` 时才保持全量构建，未知或重复匹配立即报错。MicroTD 和 ArduboyWorks 的依赖文件裁剪同时识别 `GAME` 参数，避免单游戏调用重新读取无关游戏依赖。默认单游戏调用保持原有的“编译后运行”行为；`build` 目标只生成 SDL 程序，`run` 可显式启动。
 - 整理平台所有权与统一构建入口：根 Makefile 不再声明 `py32`、`flash-py32` 或 `PY32_GAME`，只按 `PLATFORM` 选择平台 Makefile，并原样转发目标和 `GAME` 等变量；PY32 统一使用 `make PLATFORM=py32 GAME=<game-id>` 构建、追加 `flash` 烧录。Linux 与 PY32 自有文件均按职责分类：实现进入 `src/`，私有头文件进入 `include/`，平台测试或工具分别进入 `tests/`、`tools/`，厂商依赖保留在 `vendor/`；平台实现和专用测试不再平铺在平台根目录或散放到公共测试目录。WSL 冷构建并执行迁移后的 SDL 后端测试和存储测试均通过；终端 smoke 的全部新路径对象可编译，但既有目标最终链接仍缺少 `Arduboy2Audio::enabled()` 与 `millis()`，未把该历史问题误记为本次整理通过。

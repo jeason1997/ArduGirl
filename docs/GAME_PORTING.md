@@ -16,10 +16,10 @@ games/<game-id>/
 ├── game.toml        来源、固定版本、依赖、补丁和兼容状态
 ├── README.md        游戏简介、全部验收截图、移植状态和运行方法
 ├── assets/          当前 ArduGirl 前端生成的截图等移植侧素材
-├── upstream/        固定版本的上游源码，尽量不改
-├── port/            ArduGirl wrapper/config
 └── patches/         必须修改上游时的可审查补丁
 ```
+
+`game.toml` 是每款游戏唯一必需的构建描述。通用准备器根据 `entry` 递归复制 sketch 目录、应用补丁并生成运行时入口；普通游戏不创建 `port.mk`、`entry.cpp` 或平台专用构建文件。确有共同源码布局差异的同仓库游戏，可由各自 `[build] profile` 显式引用集合根目录的 `profile.toml`，但该文件不能包含平台或工具链规则。
 
 同一上游仓库包含多个游戏时，集合构建应从各游戏的 `game.toml` 自动发现目标，不得在主构建文件中维护游戏名白名单。游戏特有补丁放在对应游戏的 `patches/` 目录，使用 `0001-<作用域>-<说明>.patch` 形式的编号统一 diff，并在 `game.toml` 中记录；不得用依赖行范围匹配的临时文本转换脚本代替可审查补丁。
 
@@ -48,6 +48,12 @@ level = "A"
 status = "builds"
 libraries = ["Arduboy2"]
 
+[test]
+smoke_frames = 180
+# 有独立确定性回归测试时再声明以下字段。
+# replay_source = "tests/example_game_replay_test.cpp"
+# terminal = true
+
 [port]
 patches = []
 notes = []
@@ -72,7 +78,7 @@ notes = []
 优先级从高到低：
 
 1. 在 ArduGirl 的 Arduino/Arduboy2 兼容层补齐通用 API。
-2. 使用外部 `entry.cpp`、include path 和构建选项接入原始 `.ino/.cpp`。
+2. 使用清单、统一生成入口、include path 和构建选项接入原始 `.ino/.cpp`。
 3. 为额外库提供独立兼容实现。
 4. 确实依赖 AVR 寄存器或未定义行为时，维护独立、最小、可重放补丁。
 

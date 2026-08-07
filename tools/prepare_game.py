@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import re
 import shutil
+import time
 import tomllib
 from pathlib import Path
 
@@ -15,12 +16,20 @@ HUNK_HEADER = re.compile(r"^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@")
 
 
 def load_build_config(manifest: Path) -> tuple[Path, dict]:
-    """读取集合共有构建描述；普通独立游戏返回空描述。"""
-    path = manifest.parent.parent / "build.toml"
-    if not path.is_file():
-        return manifest, {}
-    with path.open("rb") as stream:
-        return path, tomllib.load(stream)
+    """读取清单内构建描述，并按显式引用合并集合级配置。"""
+    with manifest.open("rb") as stream:
+        data = tomllib.load(stream)
+    inline = data.get("build", {})
+    profile_name = inline.get("profile")
+    if not profile_name:
+        return manifest, inline
+    profile = (manifest.parent / profile_name).resolve()
+    if not profile.is_file():
+        raise SystemExit(f"构建配置不存在：{profile}")
+    with profile.open("rb") as stream:
+        merged = tomllib.load(stream)
+    merged.update({key: value for key, value in inline.items() if key != "profile"})
+    return profile, merged
 
 
 def find_manifest(game_id: str) -> tuple[Path, dict]:
@@ -214,7 +223,16 @@ def prepare(game_id: str) -> None:
     if destination.exists():
         shutil.rmtree(destination)
     # Windows 不允许 os.replace 用目录替换目录；上面已显式移除目标，因此普通重命名即可。
-    temporary.rename(destination)
+    # DrvFS 上的目录句柄可能在并行构建中短暂滞留；只重试原子重命名，
+    # 不回退为逐文件覆盖，以免其他编译任务观察到半成品快照。
+    for attempt in range(20):
+        try:
+            temporary.rename(destination)
+            break
+        except PermissionError:
+            if attempt == 19:
+                raise
+            time.sleep(0.05)
 
 
 def main() -> None:

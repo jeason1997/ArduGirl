@@ -1,6 +1,6 @@
 exclude_sources = ["MyArduboyPlaytune.cpp"]
 extra_cpp_sources = ["games/arduboyworks/upstream_adapter.cpp"]
-cpp_flags = ["-DUSE_ARDUBOY2_LIB"]
+cpp_flags = ["-DUSE_ARDUBOY2_LIB", "-fpermissive", "-Wno-narrowing"]
 
 [[replacements]]
 file = "{game_id}.ino"

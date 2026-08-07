@@ -1,4 +1,5 @@
 CXX ?= g++
+CC ?= gcc
 .DEFAULT_GOAL := all
 BUILD_DIR := build
 SMOKE_TARGET := $(BUILD_DIR)/terminal-smoke
@@ -29,31 +30,125 @@ LINUX_CRASH_SOURCE := platform/linux/src/crash.cpp
 SDL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/src/sdl.cpp platform/linux/src/render.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
 TERMINAL_COMMON_SOURCES := $(RUNTIME_SOURCES) platform/linux/src/terminal.cpp $(LINUX_STORAGE_SOURCE) $(LINUX_CRASH_SOURCE)
 
+GAME_PREPARER := tools/prepare_game.py
+GAME_CATALOG_GENERATOR := platform/linux/tools/generate_games_make.py
+GAME_CATALOG_KEY := $(if $(strip $(GAME)),$(GAME),all)
+GAME_CATALOG := $(BUILD_DIR)/linux/catalog-$(GAME_CATALOG_KEY).mk
+GAME_CATALOG_STATUS := $(shell python $(GAME_CATALOG_GENERATOR) --output $(GAME_CATALOG) $(if $(strip $(GAME)),--game $(GAME)); printf '%s' $$?)
+ifneq ($(GAME_CATALOG_STATUS),0)
+$(error 无法生成 Linux 游戏目录)
+endif
+include $(GAME_CATALOG)
+
 PORT_BUILD_TARGETS :=
 PORT_TEST_TARGETS :=
 PORT_TERMINAL_TEST_TARGETS :=
 PORT_DEPENDS :=
-ifneq ($(strip $(GAME)),)
-DIRECT_GAME_MAKEFILE := $(wildcard games/$(GAME)/port.mk)
-COLLECTION_GAME_MANIFESTS := $(wildcard games/*/$(GAME)/game.toml)
-COLLECTION_GAME_MAKEFILES := $(foreach manifest,$(COLLECTION_GAME_MANIFESTS),$(dir $(patsubst %/,%,$(dir $(manifest))))port.mk)
-GAME_MAKEFILES := $(sort $(DIRECT_GAME_MAKEFILE) $(COLLECTION_GAME_MAKEFILES))
-ifeq ($(strip $(GAME_MAKEFILES)),)
-$(error 未找到 Linux 游戏：$(GAME))
+
+GAME_COMPAT_SOURCES := \
+	src/arduboy2/Arduboy2.cpp \
+	src/arduboy2/Sprites.cpp \
+	src/compat/EEPROM.cpp
+GAME_REPLAY_COMMON_SOURCES := \
+	src/core/framebuffer.cpp \
+	src/compat/ATMlib.cpp \
+	src/compat/ArduboyPlaytune.cpp \
+	$(GAME_COMPAT_SOURCES)
+
+define GAME_template
+GAME_SDL_TARGET_$(1) := $$(BUILD_DIR)/$(1)-sdl
+GAME_TERMINAL_TARGET_$(1) := $$(BUILD_DIR)/$(1)-terminal
+GAME_SDL_SOURCES_$(1) := $$(SDL_COMMON_SOURCES) $$(GAME_COMPAT_SOURCES) \
+	$$(GAME_ENTRY_CPP_$(1)) $$(GAME_CPP_SOURCES_$(1)) $$(GAME_EXTRA_CPP_SOURCES_$(1))
+GAME_TERMINAL_SOURCES_$(1) := $$(TERMINAL_COMMON_SOURCES) $$(GAME_COMPAT_SOURCES) \
+	$$(GAME_ENTRY_CPP_$(1)) $$(GAME_CPP_SOURCES_$(1)) $$(GAME_EXTRA_CPP_SOURCES_$(1))
+GAME_SDL_OBJECTS_$(1) := $$(GAME_SDL_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/$(1)/%.o) \
+	$$(GAME_C_SOURCES_$(1):%.c=$$(BUILD_DIR)/linux/$(1)/%.o)
+GAME_TERMINAL_OBJECTS_$(1) := $$(GAME_TERMINAL_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/terminal-$(1)/%.o) \
+	$$(GAME_C_SOURCES_$(1):%.c=$$(BUILD_DIR)/linux/terminal-$(1)/%.o)
+GAME_REPLAY_SOURCES_$(1) := $$(GAME_REPLAY_SOURCE_$(1)) $$(GAME_REPLAY_COMMON_SOURCES) \
+	$$(GAME_CPP_SOURCES_$(1)) $$(GAME_EXTRA_CPP_SOURCES_$(1))
+GAME_REPLAY_OBJECTS_$(1) := $$(GAME_REPLAY_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/replay-$(1)/%.o) \
+	$$(GAME_C_SOURCES_$(1):%.c=$$(BUILD_DIR)/linux/replay-$(1)/%.o)
+
+$$(GAME_GENERATED_ENTRY_$(1)): $$(GAME_SNAPSHOT_SOURCES_$(1)) $$(GAME_MANIFEST_$(1)) \
+		$$(GAME_BUILD_CONFIG_$(1)) $$(GAME_PATCHES_$(1)) $$(GAME_PREPARER)
+	python $$(GAME_PREPARER) $(1) --prepare
+
+$$(GAME_ENTRY_CPP_$(1)): $$(GAME_GENERATED_ENTRY_$(1))
+$$(GAME_CPP_SOURCES_$(1)) $$(GAME_C_SOURCES_$(1)): $$(GAME_GENERATED_ENTRY_$(1))
+
+$$(BUILD_DIR)/linux/$(1)/%.o: %.cpp
+	@mkdir -p $$(@D)
+	$$(CXX) $$(CPPFLAGS) $$(SDL_CFLAGS) $$(CXXFLAGS) -I$$(BUILD_DIR)/generated/$(1) \
+		$$(GAME_CPP_FLAGS_$(1)) -DARDUINO=10819 -MMD -MP -c $$< -o $$@
+
+$$(BUILD_DIR)/linux/terminal-$(1)/%.o: %.cpp
+	@mkdir -p $$(@D)
+	$$(CXX) $$(CPPFLAGS) $$(CXXFLAGS) -I$$(BUILD_DIR)/generated/$(1) \
+		$$(GAME_CPP_FLAGS_$(1)) -DARDUINO=10819 -MMD -MP -c $$< -o $$@
+
+$$(BUILD_DIR)/linux/replay-$(1)/%.o: %.cpp
+	@mkdir -p $$(@D)
+	$$(CXX) $$(CPPFLAGS) $$(CXXFLAGS) -I$$(BUILD_DIR)/generated/$(1) \
+		$$(GAME_CPP_FLAGS_$(1)) -DARDUINO=10819 -MMD -MP -c $$< -o $$@
+
+$$(BUILD_DIR)/linux/$(1)/%.o: %.c
+	@mkdir -p $$(@D)
+	$$(CC) $$(CPPFLAGS) $$(SDL_CFLAGS) -O2 -Wall -Wextra -I$$(BUILD_DIR)/generated/$(1) -MMD -MP -c $$< -o $$@
+
+$$(filter $$(BUILD_DIR)/linux/$(1)/build/generated/$(1)/%,$$(GAME_SDL_OBJECTS_$(1))): $$(GAME_GENERATED_ENTRY_$(1))
+$$(filter $$(BUILD_DIR)/linux/terminal-$(1)/build/generated/$(1)/%,$$(GAME_TERMINAL_OBJECTS_$(1))): $$(GAME_GENERATED_ENTRY_$(1))
+$$(filter $$(BUILD_DIR)/linux/replay-$(1)/build/generated/$(1)/%,$$(GAME_REPLAY_OBJECTS_$(1))): $$(GAME_GENERATED_ENTRY_$(1))
+$$(GAME_EXTRA_CPP_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/$(1)/%.o): $$(GAME_GENERATED_ENTRY_$(1))
+$$(GAME_EXTRA_CPP_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/terminal-$(1)/%.o): $$(GAME_GENERATED_ENTRY_$(1))
+$$(GAME_EXTRA_CPP_SOURCES_$(1):%.cpp=$$(BUILD_DIR)/linux/replay-$(1)/%.o): $$(GAME_GENERATED_ENTRY_$(1))
+$$(BUILD_DIR)/linux/$(1)/src/arduboy2/Arduboy2.o: $$(BUILD_DIR)/generated/font5x7.inc
+$$(BUILD_DIR)/linux/terminal-$(1)/src/arduboy2/Arduboy2.o: $$(BUILD_DIR)/generated/font5x7.inc
+$$(BUILD_DIR)/linux/replay-$(1)/src/arduboy2/Arduboy2.o: $$(BUILD_DIR)/generated/font5x7.inc
+
+$$(GAME_SDL_TARGET_$(1)): $$(GAME_SDL_OBJECTS_$(1))
+	@mkdir -p $$(@D)
+	$$(CXX) $$^ $$(LINUX_RUNTIME_LDFLAGS) $$(SDL_LIBS) -o $$@
+
+.PHONY: $(1) test-$(1)
+$(1): check-upstream check-sdl $$(GAME_SDL_TARGET_$(1))
+	$$(GAME_SDL_TARGET_$(1))
+
+test-$(1): check-upstream check-sdl $$(GAME_SDL_TARGET_$(1)) $$(if $$(GAME_REPLAY_SOURCE_$(1)),$$(BUILD_DIR)/$(1)-replay-test)
+	$$(if $$(GAME_REPLAY_SOURCE_$(1)),$$(BUILD_DIR)/$(1)-replay-test)
+	@save_dir="$$$$(mktemp -d)"; trap 'rm -rf "$$$$save_dir"' EXIT; \
+		$$(GAME_SDL_TARGET_$(1)) --headless --frames $$(GAME_SMOKE_FRAMES_$(1)) --save-dir "$$$$save_dir"
+
+ifneq ($$(strip $$(GAME_REPLAY_SOURCE_$(1))),)
+$$(BUILD_DIR)/$(1)-replay-test: $$(GAME_REPLAY_OBJECTS_$(1))
+	@mkdir -p $$(@D)
+	$$(CXX) $$^ $$(LDFLAGS) -o $$@
 endif
-else
-GAME_MAKEFILES := $(wildcard games/*/port.mk)
+
+ifneq ($$(strip $$(GAME_TERMINAL_$(1))),)
+.PHONY: $(1)-terminal test-$(1)-terminal
+$$(GAME_TERMINAL_TARGET_$(1)): $$(GAME_TERMINAL_OBJECTS_$(1))
+	@mkdir -p $$(@D)
+	$$(CXX) $$^ $$(LINUX_RUNTIME_LDFLAGS) -o $$@
+$(1)-terminal: check-upstream $$(GAME_TERMINAL_TARGET_$(1))
+	$$(GAME_TERMINAL_TARGET_$(1))
+test-$(1)-terminal: check-upstream $$(GAME_TERMINAL_TARGET_$(1))
+	@save_dir="$$$$(mktemp -d)"; trap 'rm -rf "$$$$save_dir"' EXIT; \
+		$$(GAME_TERMINAL_TARGET_$(1)) --frames 1 --plain --save-dir "$$$$save_dir" >/dev/null
+PORT_TERMINAL_TEST_TARGETS += test-$(1)-terminal
 endif
-include $(GAME_MAKEFILES)
+
+PORT_BUILD_TARGETS += $$(GAME_SDL_TARGET_$(1))
+PORT_TEST_TARGETS += test-$(1)
+PORT_DEPENDS += $$(GAME_SDL_OBJECTS_$(1):.o=.d) $$(GAME_TERMINAL_OBJECTS_$(1):.o=.d) \
+	$$(if $$(GAME_REPLAY_SOURCE_$(1)),$$(GAME_REPLAY_OBJECTS_$(1):.o=.d))
+endef
+
+$(foreach game,$(GAME_IDS),$(eval $(call GAME_template,$(game))))
 
 ifneq ($(strip $(GAME)),)
-SELECTED_GAME_TARGETS := $(filter $(BUILD_DIR)/%-$(GAME)-sdl $(BUILD_DIR)/$(GAME)-sdl,$(PORT_BUILD_TARGETS))
-ifeq ($(strip $(SELECTED_GAME_TARGETS)),)
-$(error 未找到 Linux 游戏：$(GAME))
-endif
-ifneq ($(words $(SELECTED_GAME_TARGETS)),1)
-$(error Linux 游戏 $(GAME) 匹配到多个构建目标：$(SELECTED_GAME_TARGETS))
-endif
+SELECTED_GAME_TARGETS := $(GAME_SDL_TARGET_$(GAME))
 endif
 
 ifneq ($(filter build run,$(MAKECMDGOALS)),)
@@ -100,7 +195,7 @@ STDIO_TEST_OBJECTS := \
 .PHONY: all build run test test-terminal smoke clean check-upstream check-sdl
 
 all: check-upstream check-sdl $(if $(strip $(GAME)),$(SELECTED_GAME_TARGETS),$(PORT_BUILD_TARGETS))
-	@if [ -n "$(strip $(GAME))" ]; then $(SELECTED_GAME_TARGETS); fi
+	$(if $(strip $(GAME)),$(SELECTED_GAME_TARGETS),@:)
 
 build: check-upstream check-sdl $(SELECTED_GAME_TARGETS)
 	@printf '%s\n' 'SDL 程序已生成：$(SELECTED_GAME_TARGETS)'

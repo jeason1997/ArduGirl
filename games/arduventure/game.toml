@@ -9,6 +9,10 @@ level = "C"
 status = "partial"
 libraries = ["Arduboy2", "ATMlib", "EEPROM"]
 
+[test]
+smoke_frames = 180
+replay_source = "tests/arduventure_replay_test.cpp"
+
 [port]
 patches = [
     "patches/0001-host-use-native-function-pointers.patch",

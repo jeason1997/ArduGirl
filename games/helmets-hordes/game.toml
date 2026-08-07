@@ -9,6 +9,9 @@ level = "C"
 status = "partial"
 libraries = ["Arduboy2", "ATMlib", "EEPROM"]
 
+[test]
+smoke_frames = 240
+
 [port]
 patches = ["patches/0001-host-use-native-function-pointers.patch", "patches/0002-collision-use-cxx17-initializers.patch", "patches/0003-functions-declare-return-types.patch", "patches/0004-host-remove-undefined-behavior.patch", "patches/0005-elements-remove-undefined-behavior.patch"]
 notes = [

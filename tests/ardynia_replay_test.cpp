@@ -45,7 +45,7 @@ bool storage_write(std::uint16_t offset, const void* source, std::uint16_t size)
 
 } // 命名空间 ardugirl::platform
 
-#include "../games/ardynia/entry.cpp"
+#include "../build/generated/ardynia/ardugirl_entry.cpp"
 
 namespace {
 

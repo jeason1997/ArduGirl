@@ -9,6 +9,9 @@ level = "C"
 status = "partial"
 libraries = ["Arduboy2", "ATMlib"]
 
+[test]
+smoke_frames = 240
+
 [port]
 patches = ["patches/0001-host-use-native-function-pointers.patch", "patches/0002-song-use-explicit-byte-values.patch"]
 notes = [

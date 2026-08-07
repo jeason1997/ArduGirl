@@ -4,6 +4,9 @@ source = "https://github.com/obono/ArduboyWorks"
 revision = "d4b1f041789dcd1d71907654e4025d613b4ab420"
 entry = "third_party/ArduboyWorks/gosencho/gosencho.ino"
 
+[build]
+profile = "../profile.toml"
+
 [compat]
 level = "B"
 status = "smoke"

@@ -9,6 +9,10 @@ level = "C"
 status = "smoke-tested"
 libraries = ["Arduboy2", "ArduboyPlaytune", "EEPROM"]
 
+[test]
+smoke_frames = 180
+replay_source = "tests/ardynia_replay_test.cpp"
+
 [port]
 patches = [
     "patches/0001-entity-template-avoid-negative-shift.patch",
@@ -16,7 +20,7 @@ patches = [
     "patches/0003-snake-check-bounds-before-tile-read.patch"
 ]
 notes = [
-    "上游源码通过外部 entry.cpp 和原始 src 翻译单元参与构建，子模块保持未修改",
+    "上游源码通过通用生成入口和快照内 src 翻译单元参与构建，子模块保持未修改",
     "声音效果会初始化两个 ArduboyPlaytune 逻辑声道，剑击、成功提示和首领吼声包含双声道重叠",
     "最小补丁把负值左移改为显式无符号打包，消除宿主 C++17 常量表达式中的未定义行为",
     "绘图补丁使用有符号 framebuffer 偏移，消除依赖 AVR 16 位 int 回绕的屏幕顶部越界访问",
