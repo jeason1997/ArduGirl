@@ -1,4 +1,5 @@
 #include "Arduboy2.h"
+#include "ArduboyTones.h"
 #include "ArduboyPlaytune.h"
 
 #include "ardugirl/framebuffer.hpp"
@@ -122,6 +123,7 @@ void Arduboy2::setFrameRate(std::uint8_t rate) noexcept {
 }
 
 bool Arduboy2::nextFrame() noexcept {
+    ardugirl_update_tones();
     if (tone_end_ms_ != 0 &&
         static_cast<std::int32_t>(millis() - tone_end_ms_) >= 0) {
         stopTone();

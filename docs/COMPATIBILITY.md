@@ -21,7 +21,7 @@
 - frame rate、frameCount、everyXFrames
 - pollButtons 和全部按钮查询
 - 支持缩放、换行、光标查询、字符串和整数的基本文本输出
-- audio enabled 状态、`initAudio`、定时 `playTone` 和停止接口；SDL2 后端输出方波。ArduboyPlaytune 已实现音符、停止、毫秒等待、标记、重复和移调，并支持两个方波声道；`playWave` 支持一次性播放 8 位无符号波表
+- audio enabled 状态、`initAudio`、定时 `playTone` 和停止接口；SDL2 后端输出方波。ArduboyTones 已实现单音、最多三音内联序列、PROGMEM/RAM 频率时长序列、休止、结束、重复、播放状态和音量模式 API；ArduboyPlaytune 已实现音符、停止、毫秒等待、标记、重复和移调，并支持两个方波声道；`playWave` 支持一次性播放 8 位无符号波表
 - ATMlib 已实现四声道乐谱、延时、轨道调用与重复、音量/频率滑动、移调、琶音、音符截断、颤音/震音和滑音解释；主循环按单调时间推进节拍，SDL2 后端合成脉冲、三角和噪声波形
 
 ### Arduino
@@ -66,12 +66,12 @@ EEPROM.put(addr, someNativeStruct);   // padding 和字段宽度变化
 建议兼容顺序：
 
 1. Arduboy2 + Sprites
-2. ArduboyTones / Arduboy2Beep
+2. Arduboy2Beep 的剩余差异
 3. ArdBitmap
 4. ArduboyFX 数据读取抽象
 5. 由游戏样本驱动的其他库
 
-ArduboyPlaytune 和 ATMlib 已作为独立兼容库实现。ATMlib 由 Arduventure 的固定上游样本驱动，保留乐谱语义但不复制 AVR Timer4/ISR；ArduboyTones 和其他直接依赖 AVR timer/ISR 的库仍待真实游戏驱动后移植。
+ArduboyTones、ArduboyPlaytune 和 ATMlib 已作为独立兼容库实现。ArduboyTones 由 Rooftop Rescue 的固定上游样本驱动，以平台单调时间推进序列，不复制 AVR Timer3/ISR；ATMlib 保留乐谱语义但不复制 AVR Timer4/ISR。其他直接依赖 AVR timer/ISR 的库仍待真实游戏驱动后移植。
 
 当前 `micros()` 使用平台单调高精度计数器并按无符号 32 位自然回绕；不再由毫秒值乘 1000 模拟。Linux SDL2 音频支持两个方波声道、一条波表流和四个 ATM 合成声部，不模拟 AVR 定时器寄存器。
 

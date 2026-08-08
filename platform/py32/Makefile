@@ -73,7 +73,7 @@ TARGET := $(OUTPUT_DIR)/ardugirl-$(GAME)-py32f002a
 LDSCRIPT := $(VENDOR_DIR)/Core/Startup/py32f002a_32k_4k.ld
 OPENOCD_TARGET := $(VENDOR_DIR)/Core/OpenOCD/py32f002a_32k.cfg
 
-CPP_SOURCES := src/core/framebuffer.cpp src/compat/ATMlib.cpp \
+CPP_SOURCES := src/core/framebuffer.cpp src/compat/ATMlib.cpp src/compat/ArduboyTones.cpp \
 	src/compat/ArduboyPlaytune.cpp src/compat/stdio.cpp src/compat/math.cpp \
 	src/arduboy2/Arduboy2.cpp src/arduboy2/Sprites.cpp \
 	src/compat/EEPROM.cpp platform/py32/src/runtime.cpp platform/py32/src/platform.cpp \

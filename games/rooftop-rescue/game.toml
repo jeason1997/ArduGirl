@@ -1,0 +1,23 @@
+id = "rooftop-rescue"
+name = "Rooftop Rescue"
+source = "https://github.com/BertVeer/Rooftop"
+revision = "cb8e9203f62f5ce49423742aa3fb7bc6e1ca3847"
+entry = "third_party/Rooftop/rooftop/rooftop.ino"
+
+[compat]
+level = "B"
+status = "replay-tested"
+libraries = ["Arduboy2", "ArduboyTones", "EEPROM"]
+
+[test]
+smoke_frames = 240
+replay_source = "tests/rooftop_rescue_replay_test.cpp"
+
+[port]
+patches = []
+notes = [
+    "上游源码通过通用生成入口参与构建，固定 revision 的子模块保持未修改",
+    "静态扫描未发现 AVR 寄存器、ISR、内联汇编或动态分配",
+    "使用公共 ArduboyTones 兼容层播放单音和 PROGMEM 音符序列",
+    "固定输入回放验证标题、进入玩法、直升机换楼和放绳，并生成三张不同状态截图"
+]

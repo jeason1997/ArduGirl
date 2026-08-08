@@ -1,4 +1,5 @@
 #include "Arduboy2.h"
+#include "ArduboyTones.h"
 
 #include "ardugirl/framebuffer.hpp"
 #include "ardugirl/runtime.hpp"
@@ -13,6 +14,7 @@ namespace {
 std::uint32_t clock_us = 1234567;
 std::uint16_t wave_rate = 0;
 std::uint16_t wave_count = 0;
+std::uint16_t current_tone = 0;
 std::uint8_t storage[1024]{};
 
 } // 匿名命名空间
@@ -30,8 +32,8 @@ namespace ardugirl::platform {
 std::uint32_t millis() noexcept { return clock_us / 1000u; }
 std::uint32_t micros() noexcept { return clock_us; }
 void sleep_ms(std::uint32_t duration) noexcept { clock_us += duration * 1000u; }
-void set_tone(std::uint16_t, std::uint8_t) noexcept {}
-void stop_tone(std::uint8_t) noexcept {}
+void set_tone(std::uint16_t frequency, std::uint8_t) noexcept { current_tone = frequency; }
+void stop_tone(std::uint8_t) noexcept { current_tone = 0; }
 void play_wave(std::uint16_t rate, const std::uint8_t*, std::uint16_t count) noexcept {
     wave_rate = rate;
     wave_count = count;
@@ -67,6 +69,27 @@ int main() {
     assert(!arduboy.audio.enabled());
     arduboy.audio.toggle();
     assert(Arduboy2Audio::enabled());
+    ArduboyTones tones(arduboy.audio.enabled);
+    constexpr std::uint16_t tone_sequence[] PROGMEM = {
+        440, 10, NOTE_REST, 5, 220, 10, TONES_END
+    };
+    tones.tones(tone_sequence);
+    assert(tones.playing() && current_tone == 440);
+    clock_us += 10000;
+    arduboy.nextFrame();
+    assert(tones.playing() && current_tone == 0);
+    clock_us += 5000;
+    arduboy.nextFrame();
+    assert(tones.playing() && current_tone == 220);
+    clock_us += 10000;
+    arduboy.nextFrame();
+    assert(!tones.playing() && current_tone == 0);
+    Arduboy2Audio::off();
+    tones.tone(330);
+    assert(tones.playing() && current_tone == 0);
+    tones.noTone();
+    Arduboy2Audio::on();
+    clock_us = 1234567;
     arduboy.initAudio(1);
     constexpr byte wave[] = {0, 128, 255};
     arduboy.playWave(8000, wave, 3);

@@ -21,6 +21,7 @@ LINUX_RUNTIME_LDFLAGS := $(LDFLAGS) -rdynamic
 RUNTIME_SOURCES := \
 	src/core/framebuffer.cpp \
 	src/compat/ATMlib.cpp \
+	src/compat/ArduboyTones.cpp \
 	src/compat/ArduboyPlaytune.cpp \
 	src/runtime/main.cpp
 
@@ -58,6 +59,7 @@ GAME_COMPAT_SOURCES := \
 GAME_REPLAY_COMMON_SOURCES := \
 	src/core/framebuffer.cpp \
 	src/compat/ATMlib.cpp \
+	src/compat/ArduboyTones.cpp \
 	src/compat/ArduboyPlaytune.cpp \
 	$(GAME_COMPAT_SOURCES)
 
@@ -154,6 +156,7 @@ COMPAT_TEST_OBJECTS := \
 	$(BUILD_DIR)/tests/compat_test.o \
 	$(BUILD_DIR)/src/core/framebuffer.o \
 	$(BUILD_DIR)/src/arduboy2/Arduboy2.o \
+	$(BUILD_DIR)/src/compat/ArduboyTones.o \
 	$(BUILD_DIR)/src/compat/ArduboyPlaytune.o \
 	$(BUILD_DIR)/src/arduboy2/Sprites.o \
 	$(BUILD_DIR)/src/compat/EEPROM.o
