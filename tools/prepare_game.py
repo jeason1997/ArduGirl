@@ -82,6 +82,7 @@ def describe(game_id: str, field: str) -> None:
         "c_sources": " ".join(
             (ROOT / "build" / "generated" / game_id / path.relative_to(upstream_entry.parent)).relative_to(ROOT).as_posix()
             for path in sorted(upstream_entry.parent.rglob("*.c"))
+            if path.name not in excluded_sources
         ),
         "extra_cpp_sources": " ".join(build_config.get("extra_cpp_sources", [])),
         "cpp_flags": " ".join(cpp_flags),

@@ -30,6 +30,8 @@
 #define PIN_SPEAKER_2 0
 #define OLED_PIXELS_NORMAL 0xA6
 #define OLED_PIXELS_INVERTED 0xA7
+#define OLED_ALL_PIXELS_ON 0xA5
+#define RGB_ON 0
 
 struct Point {
     constexpr Point(std::int16_t x_value = 0, std::int16_t y_value = 0) noexcept
@@ -59,6 +61,8 @@ public:
 
 class Arduboy2 {
 public:
+    static constexpr std::uint8_t width() noexcept { return WIDTH; }
+    static constexpr std::uint8_t height() noexcept { return HEIGHT; }
     // 上游 Arduboy2Base 允许低开销绘图代码直接访问页面布局缓冲区；指针始终指向
     // ArduGirl 唯一的 1024 字节核心 framebuffer，不建立第二份画面存储。
     static std::uint8_t* sBuffer;
@@ -95,18 +99,31 @@ public:
     void boot() noexcept {}
     void bootLogoSpritesSelfMasked() noexcept {}
     void initRandomSeed() noexcept { randomSeed(micros()); }
+    std::uint32_t generateRandomSeed() noexcept { return micros(); }
+    void delayShort(std::uint16_t duration) noexcept { delay(duration); }
+    std::uint8_t cpuLoad() const noexcept { return 0; }
     void blank() noexcept { clear(); }
     void flashlight() noexcept {}
     void systemButtons() noexcept {}
     void exitToBootloader() noexcept {}
     void setFrameRate(std::uint8_t rate) noexcept;
     bool nextFrame() noexcept;
+    bool nextFrameDEV() noexcept { return nextFrame(); }
     bool everyXFrames(std::uint8_t frames) const noexcept {
         return frames != 0 && frameCount % frames == 0;
     }
     void clear() noexcept;
     void fillScreen(std::uint8_t color = WHITE) noexcept;
     void display(bool clear_buffer = false) noexcept;
+    void paintScreen(const std::uint8_t* image, bool clear_buffer = false) noexcept {
+        if (image != sBuffer) std::memcpy(sBuffer, image, WIDTH * HEIGHT / 8);
+        display(false);
+        if (clear_buffer && image != sBuffer) {
+            std::memset(const_cast<std::uint8_t*>(image), 0, WIDTH * HEIGHT / 8);
+        } else if (clear_buffer) {
+            clear();
+        }
+    }
     void setCursor(std::int16_t x, std::int16_t y) noexcept;
     std::size_t print(const char* text) noexcept;
     std::size_t print(const __FlashStringHelper* text) noexcept {
@@ -138,6 +155,11 @@ public:
     std::int16_t getCursorY() const noexcept { return cursor_y; }
     void setRGBled(std::uint8_t, std::uint8_t, std::uint8_t) noexcept {}
     void sendLCDCommand(std::uint8_t) noexcept {}
+    void invert(bool enabled) noexcept {
+        sendLCDCommand(enabled ? OLED_PIXELS_INVERTED : OLED_PIXELS_NORMAL);
+    }
+    void digitalWriteRGB(std::uint8_t, std::uint8_t, std::uint8_t) noexcept {}
+    void idle() noexcept { delay(1); }
     void setTextSize(std::uint8_t size) noexcept { textSize = size == 0 ? 1 : size; }
     std::uint8_t getTextSize() const noexcept { return textSize; }
     void setTextWrap(bool wrap) noexcept { textWrap = wrap; }
@@ -171,6 +193,10 @@ public:
 
     void drawPixel(std::int16_t x, std::int16_t y,
                    std::uint8_t color = WHITE) noexcept;
+    std::uint8_t getPixel(std::uint8_t x, std::uint8_t y) const noexcept {
+        if (x >= WIDTH || y >= HEIGHT) return BLACK;
+        return (sBuffer[x + (y / 8U) * WIDTH] >> (y & 7U)) & 1U;
+    }
     void drawLine(std::int16_t x0, std::int16_t y0,
                   std::int16_t x1, std::int16_t y1,
                   std::uint8_t color = WHITE) noexcept;
@@ -232,6 +258,8 @@ protected:
     bool textWrap = true;
     std::uint8_t textColor = WHITE;
     std::uint8_t textBackground = BLACK;
+    std::uint8_t currentButtonState = 0;
+    std::uint8_t previousButtonState = 0;
 
 private:
     void drawCharacter(char character) noexcept;
@@ -239,8 +267,6 @@ private:
     std::uint8_t frame_rate_ = 60;
     std::uint8_t text_color_ = WHITE;
     std::uint8_t text_background_ = BLACK;
-    std::uint8_t current_buttons_ = 0;
-    std::uint8_t previous_buttons_ = 0;
     std::uint8_t audio_channels_ = 0;
     std::uint32_t tone_end_ms_ = 0;
 };

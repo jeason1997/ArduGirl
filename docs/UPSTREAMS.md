@@ -15,11 +15,11 @@ ArduGirl 的主仓库通过 Git 子模块 gitlink 固定每个上游的完整 co
 | Sunfire | `third_party/Sunfire` | `e99fff73e2d7ba974b8fbef90f7adf90c764397b` | ATMlib 太空飞行射击游戏 | 仅按用户明确要求更新 |
 | Twotris | `third_party/Twotris` | `73391606ba4b8e4e18e9838eb130aff410310599` | 双人下落方块与组合输入样本 | 仅按用户明确要求更新 |
 | Rooftop Rescue | `third_party/Rooftop` | `cb8e9203f62f5ce49423742aa3fb7bc6e1ca3847` | 待移植的直升机救援游戏 | 仅按用户明确要求更新 |
-| Ravine Despoiler | `third_party/Ravine-Despoiler` | `c48915c69c92c1f2e070775558866d84cd70b91b` | 待移植的街机投弹游戏 | 仅按用户明确要求更新 |
-| Evade 2 | `third_party/Evade2` | `bc6fa60203afc35266b5d4c5c5140ce6a714334d` | 待移植的街机躲避游戏 | 仅按用户明确要求更新 |
-| Blackjack | `third_party/Blackjack` | `72a6b1b7c583971568d92eca39c81b8cb99def29` | 待移植的卡牌游戏 | 仅按用户明确要求更新 |
-| Waternet | `third_party/Waternet` | `2f5e8ce47f9bb292a8c30fdf04f91988f0c2a300` | 待移植的管线谜题 | 仅按用户明确要求更新 |
-| LayingPipe | `third_party/LayingPipe` | `d3c0279079ef0a5c7161cbf39d2375e4d5a7aa25` | 待移植的连线谜题 | 仅按用户明确要求更新 |
+| Ravine Despoiler | `third_party/Ravine-Despoiler` | `c48915c69c92c1f2e070775558866d84cd70b91b` | 已接入的街机投弹游戏 | 仅按用户明确要求更新 |
+| Evade 2 | `third_party/Evade2` | `bc6fa60203afc35266b5d4c5c5140ce6a714334d` | 已接入的街机躲避游戏 | 仅按用户明确要求更新 |
+| Blackjack | `third_party/Blackjack` | `72a6b1b7c583971568d92eca39c81b8cb99def29` | 已接入的卡牌游戏 | 仅按用户明确要求更新 |
+| Waternet | `third_party/Waternet` | `2f5e8ce47f9bb292a8c30fdf04f91988f0c2a300` | 已接入的管线谜题 | 仅按用户明确要求更新 |
+| LayingPipe | `third_party/LayingPipe` | `d3c0279079ef0a5c7161cbf39d2375e4d5a7aa25` | 已接入的连线谜题 | 仅按用户明确要求更新 |
 | LATE | `third_party/LATE` | `643440bf49257cf070cd54ab6e24e5e8122c7442` | 待移植的三合一休闲谜题 | 仅按用户明确要求更新 |
 | Glove | `third_party/Glove` | `81e9988fea3fc68edc984260b17d6f52beb5d497` | 待移植的迷宫动作冒险 | 仅按用户明确要求更新 |
 | Kong | `third_party/Kong` | `ec95141029a2a401edcf97b4b8d0f121139a2d15` | 待移植的 Game & Watch 式街机游戏 | 仅按用户明确要求更新 |

@@ -1,5 +1,7 @@
 #include "Arduboy2.h"
 #include "ArduboyTones.h"
+#include "FixedPoints.h"
+#include "Print.h"
 
 #include "ardugirl/framebuffer.hpp"
 #include "ardugirl/runtime.hpp"
@@ -10,6 +12,17 @@
 #include <cstdint>
 
 namespace {
+
+class TestPrint : public Print {
+public:
+    std::size_t write(std::uint8_t value) override {
+        if (length < sizeof(buffer) - 1) buffer[length++] = static_cast<char>(value);
+        return 1;
+    }
+
+    char buffer[16]{};
+    std::size_t length = 0;
+};
 
 std::uint32_t clock_us = 1234567;
 std::uint16_t wave_rate = 0;
@@ -54,6 +67,12 @@ bool storage_write(std::uint16_t offset, const void* source, std::uint16_t size)
 int main() {
     static_assert(std::is_same_v<Arduboy2Base, Arduboy2>);
     assert(Arduboy2Base::sBuffer == ardugirl::framebuffer().data().data());
+    static_assert(Arduboy2::width() == 128 && Arduboy2::height() == 64);
+    constexpr SQ7x8 fixed = 1.5;
+    static_assert((fixed + SQ7x8{1}).getInteger() == 2);
+    TestPrint printer;
+    printer.print(123);
+    assert(std::strcmp(printer.buffer, "123") == 0);
     struct SaveData {
         std::uint8_t health;
         std::uint16_t score;
@@ -126,6 +145,9 @@ int main() {
     arduboy.initRandomSeed();
     arduboy.bootLogoSpritesSelfMasked();
 
+    arduboy.clear();
+    arduboy.drawPixel(127, 63);
+    assert(arduboy.getPixel(127, 63) == WHITE);
     arduboy.clear();
     arduboy.drawTriangle(1, 1, 8, 1, 4, 6);
     assert(ardugirl::framebuffer().pixel(1, 1));

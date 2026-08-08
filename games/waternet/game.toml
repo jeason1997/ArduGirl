@@ -1,0 +1,20 @@
+id = "waternet"
+name = "Waternet"
+source = "https://github.com/joyrider3774/waternet_arduboy"
+revision = "2f5e8ce47f9bb292a8c30fdf04f91988f0c2a300"
+entry = "third_party/Waternet/source/waternet/waternet.ino"
+
+[compat]
+level = "B"
+status = "partial"
+libraries = ["Arduboy2", "ArduboyTones", "Arduboy2Beep", "EEPROM"]
+
+[test]
+smoke_frames = 300
+
+[port]
+patches = ["patches/0001-build-use-portable-include-separators.patch"]
+notes = [
+    "EEPROM 使用固定宽度数组和选项字节保存进度",
+    "最小补丁仅把主入口的 Windows 路径分隔符改为可移植形式"
+]

@@ -1,0 +1,17 @@
+id = "ravine-despoiler"
+name = "Ravine Despoiler"
+source = "https://github.com/unwiredben/arduboy-ravine-despoiler"
+revision = "c48915c69c92c1f2e070775558866d84cd70b91b"
+entry = "third_party/Ravine-Despoiler/RavineDespoiler/RavineDespoiler.ino"
+
+[compat]
+level = "B"
+status = "partial"
+libraries = ["Arduboy2", "ArduboyTones", "FixedPoints"]
+
+[test]
+smoke_frames = 300
+
+[port]
+patches = []
+notes = ["静态扫描未发现 AVR 寄存器、ISR、内联汇编或动态分配"]

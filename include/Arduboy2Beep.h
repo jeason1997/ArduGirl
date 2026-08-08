@@ -28,3 +28,5 @@ public:
 private:
     std::uint8_t remaining_ = 0;
 };
+
+using BeepPin2 = BeepPin1;

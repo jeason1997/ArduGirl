@@ -1,0 +1,5 @@
+--- a/Evade2/Sound.cpp
++++ b/Evade2/Sound.cpp
+@@ -4,3 +4,3 @@
+-#ifdef ENABLE_AUDIO
++#if defined(ENABLE_AUDIO) && defined(__AVR__)

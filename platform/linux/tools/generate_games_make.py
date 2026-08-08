@@ -77,7 +77,7 @@ def emit_game(path: Path, data: dict) -> list[str]:
     ]
     c_sources = [
         (generated_dir / source).as_posix()
-        for source in source_paths(entry, ".c", set())
+        for source in source_paths(entry, ".c", excluded)
     ]
     flags = list(build.get("cpp_flags", []))
     for condition in build.get("defines_if_contains", []):

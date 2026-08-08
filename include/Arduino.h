@@ -6,11 +6,22 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
+#include <cctype>
+#include <cstdarg>
 #include <type_traits>
 
 using byte = std::uint8_t;
 using boolean = bool;
 class __FlashStringHelper {};
+using PGM_P = const char*;
+
+#ifndef BLACK
+#define BLACK 0
+#define WHITE 1
+#define INVERT 2
+#endif
+
+#define ARDUBOY_NO_USB
 
 // 非 AVR 平台使用统一地址空间，字符串常量不需要放入独立的程序存储区。
 #define F(text) (reinterpret_cast<const __FlashStringHelper*>(text))

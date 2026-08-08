@@ -1,0 +1,97 @@
+--- a/LayingPipe.ino
++++ b/LayingPipe.ino
+@@ -127,6 +127,43 @@
+ byte frame = 0;
+ 
++void initEEPROM();
++void updateEEPROM(byte puzzleLevel, byte index);
++void drawSplash();
++bool splashAnimation(byte x, byte y, const uint8_t *bitmap, uint8_t frame, bool skip);
++bool splashDelay(int delayLength, bool skip);
++void splashWaitForever();
++void levelSelect();
++void renderLevelDetail(byte x, byte y, byte level, byte highlight);
++void puzzleSelect();
++void renderPuzzleOption(byte x, byte y, const char* message, byte highlight);
++void play_InitGame();
++void play_NoSelection();
++void play_NodeSelected();
++void updatePipeWhenReversing(byte x, byte y);
++bool validMove(byte direction, Node selectedNode, int x, int y);
++void gameOver();
++void gameOverDelay(int delayLength);
++void renderBoard(int xOffset, int yOffset, byte topRow);
++void playClearSelectionTune();
++void playSelectNodeTune();
++void playMatchNodeTune();
++void playSplashTune();
++void playPuzzleSolved();
++void initBoard(byte puzzleType, byte puzzleNumber);
++bool nodeAlreadyPlayed(byte value);
++void clearBoard(byte nodeValue);
++bool isNode(byte x, byte y);
++bool isPipe(byte x, byte y);
++void setCellValue(byte x, byte y, byte pipeValue, byte nodeValue);
++void clearSelection();
++void clearHighlightAndSelection();
++bool isPuzzleComplete();
++void toggleSoundSettings();
++void drawHorizontalDottedLine(int x1, int x2, int y);
++void screenShot();
++byte leftValue(byte val);
++byte rightValue(byte val);
++byte getNodeValue(byte x, byte y);
++byte getPipeValue(byte x, byte y);
++byte getNumberOfPuzzles(byte puzzleLevel);
++byte readEEPROM(byte puzzleLevel);
++byte calculateTopRow();
++
+ 
+ /* ----------------------------------------------------------------------------
+@@ -191,8 +228,17 @@
+   arduboy.display();
+ 
+ }
++
++#include "Eeprom.ino"
++#include "GameOver.ino"
++#include "LevelSelect.ino"
++#include "Play.ino"
++#include "Render.ino"
++#include "Sounds.ino"
++#include "Splash.ino"
++#include "Utils.ino"
+--- a/LevelSelect.ino
++++ b/LevelSelect.ino
+@@ -271,7 +271,7 @@
+-void renderPuzzleOption(byte x, byte y, String message, byte highlight) {
++void renderPuzzleOption(byte x, byte y, const char* message, byte highlight) {
+--- a/Eeprom.ino
++++ b/Eeprom.ino
+@@ -19,3 +19,3 @@
+-bool initEEPROM() {
++void initEEPROM() {
+--- a/Splash.ino
++++ b/Splash.ino
+@@ -144,21 +144,3 @@
+ void splashWaitForever() {
+-
+-  while (true) {
+-
+-    arduboy.pollButtons();
+-
+-    if (arduboy.justPressed(A_BUTTON)) { break; }
+-
+-    if (arduboy.justPressed(B_BUTTON)) { 
+-
+-      toggleSoundSettings();
+-      sprites.drawOverwrite(120, 56, (arduboy.audio.enabled() ? sound_icon : no_sound_icon), frame);
+-      arduboy.display();
+-       
+-    }
+-    
+-    arduboy.delayShort(5);  
+-
+-  }
+-  
+ }

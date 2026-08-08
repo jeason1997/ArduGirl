@@ -1,0 +1,25 @@
+id = "evade-2"
+name = "Evade 2"
+source = "https://github.com/ArduboyCollection/evade2"
+revision = "bc6fa60203afc35266b5d4c5c5140ce6a714334d"
+entry = "third_party/Evade2/Evade2/Evade2.ino"
+
+[compat]
+level = "C"
+status = "partial"
+libraries = ["Arduboy2", "ATMlib2"]
+
+[test]
+smoke_frames = 300
+
+[build]
+cpp_flags = ["-Wno-narrowing"]
+exclude_sources = ["ATMlib.cpp", "WMath.cpp", "main.cpp", "atm_synth.c", "cmd_parse.c", "osc.c", "hooks.c", "wiring.c"]
+
+[port]
+patches = [
+    "patches/0001-platform-use-portable-random-seed.patch",
+    "patches/0002-graphics-use-portable-cpp-path.patch",
+    "patches/0003-audio-use-silent-portable-fallback.patch"
+]
+notes = ["随机种子改用公共微秒时间；图形操作在非 AVR 平台选择上游 C++ 实现；ATMLib2 AVR 音频暂以静音路径运行"]

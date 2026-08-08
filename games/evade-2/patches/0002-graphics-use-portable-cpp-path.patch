@@ -1,0 +1,22 @@
+--- a/Evade2/Graphics.cpp
++++ b/Evade2/Graphics.cpp
+@@ -34,3 +34,3 @@
+-#if FALSE
++#if !defined(__AVR__)
+@@ -91,3 +91,3 @@
+-#if FALSE
++#if !defined(__AVR__)
+@@ -450,6 +450,11 @@
+   // local variable for screen buffer pointer,
+   // which can be declared a read-write operand
++#if !defined(__AVR__)
++  memset(sBuffer, color == BLACK ? 0x00 : 0xFF, WIDTH * HEIGHT / 8);
++#else
+   uint8_t *bPtr = sBuffer;
+ 
+   asm volatile(
+@@ -479,3 +484,4 @@
+       :
+       :);
++#endif
+ }

@@ -1,0 +1,18 @@
+--- a/Utils.ino
++++ b/Utils.ino
+@@ -74,9 +74,11 @@
+ 	  x++;
+ 
+-    puzzle.board[y][x] = 0;
+-	  
+-	  if ((x <= puzzle.maximum.x) && rightValue(z) > 0) {
++    if (x < puzzle.maximum.x) {
++      puzzle.board[y][x] = 0;
++
++      if (rightValue(z) > 0) {
+ 		  
+-		  puzzle.board[y][x] = 0xF0 | rightValue(z);
++        puzzle.board[y][x] = 0xF0 | rightValue(z);
++      }
+ 		  
+ 	  }

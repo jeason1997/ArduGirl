@@ -177,18 +177,18 @@ bool Arduboy2::notPressed(std::uint8_t requested) const noexcept {
 }
 
 void Arduboy2::pollButtons() noexcept {
-    previous_buttons_ = current_buttons_;
-    current_buttons_ = ardugirl::buttons();
+    previousButtonState = currentButtonState;
+    currentButtonState = ardugirl::buttons();
 }
 
 bool Arduboy2::justPressed(std::uint8_t requested) const noexcept {
-    return (current_buttons_ & requested) != 0 &&
-           (previous_buttons_ & requested) == 0;
+    return (currentButtonState & requested) != 0 &&
+           (previousButtonState & requested) == 0;
 }
 
 bool Arduboy2::justReleased(std::uint8_t requested) const noexcept {
-    return (current_buttons_ & requested) == 0 &&
-           (previous_buttons_ & requested) != 0;
+    return (currentButtonState & requested) == 0 &&
+           (previousButtonState & requested) != 0;
 }
 
 std::uint8_t Arduboy2::buttonsState() const noexcept { return ardugirl::buttons(); }

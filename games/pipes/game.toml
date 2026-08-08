@@ -1,0 +1,24 @@
+id = "pipes"
+name = "Pipes"
+source = "https://github.com/ArduboyCollection/LayingPipe"
+revision = "d3c0279079ef0a5c7161cbf39d2375e4d5a7aa25"
+entry = "third_party/LayingPipe/LayingPipe.ino"
+
+[compat]
+level = "B"
+status = "partial"
+libraries = ["Arduboy2", "ArduboyTones", "EEPROM"]
+
+[test]
+smoke_frames = 300
+
+[port]
+patches = [
+    "patches/0001-build-declare-and-include-sketch-tabs.patch",
+    "patches/0002-game-guard-odd-board-padding.patch"
+]
+notes = [
+    "静态扫描未发现 AVR 寄存器、ISR、内联汇编或动态分配",
+    "最小补丁显式声明并包含 Arduino IDE 自动拼接的多个 sketch 标签页",
+    "奇数棋盘最后一个填充半字节不会再写入 board[y][width]"
+]

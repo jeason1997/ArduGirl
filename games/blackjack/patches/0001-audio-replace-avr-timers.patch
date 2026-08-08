@@ -1,0 +1,45 @@
+--- a/Blackjack/src/Game.cpp
++++ b/Blackjack/src/Game.cpp
+@@ -23,12 +23,6 @@
+-#ifdef SOUND
+-	long t;
+-	uint8_t hpISR = 46;
+-
+-	ISR(TIMER3_COMPA_vect) {
+-		t++;
+-		OCR4A = ((t*(t>>8|t>>9)&hpISR&t>>8))^(t&t>>13|t>>6); // by xpansive
+-	}
+-#endif
+ 
+ void Game::setup(void) {
+@@ -36,14 +30,6 @@
+-	#ifdef SOUND
+-
+-	 	// set up Timer 3
+-		TCCR3A = 0; // set normal mode (which disconnects the pin)
+-	 	TCCR3B = _BV(WGM32) | _BV(CS31); // CTC mode. Divide by 8 clock prescale
+-
+-	 	//set up Timer 4
+-	 	TCCR4A = 0;
+-	 	TCCR4B = _BV(CS40); // 62500Hz
+-	 	OCR4C = 0xFF; // Resolution to 8-bit (TOP=0xFF)
+-
+-	#endif
+ 
+ 	auto & arduboy = this->context.arduboy;
+--- a/Blackjack/src/states/SplashScreenState.cpp
++++ b/Blackjack/src/states/SplashScreenState.cpp
+@@ -39,8 +39,7 @@
+-    TCCR3A = _BV(COM3A0); // set toggle on compare mode (which connects the pin)
+-    OCR3A = 3905; // 128 Hz
++    arduboy.playTone(128, 50);
+@@ -50,11 +49,9 @@
+       case 2:     
+-        OCR3A = 18000;    
++        arduboy.playTone(28, 50);
+         break;
+ 
+       case 5:     
+-        TCCR3A = 0;       
++        arduboy.stopTone();
+         break;

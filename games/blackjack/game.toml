@@ -1,0 +1,20 @@
+id = "blackjack"
+name = "Blackjack"
+source = "https://github.com/Press-Play-On-Tape/Blackjack"
+revision = "72a6b1b7c583971568d92eca39c81b8cb99def29"
+entry = "third_party/Blackjack/Blackjack/Blackjack.ino"
+
+[compat]
+level = "C"
+status = "partial"
+libraries = ["Arduboy2", "FixedPoints"]
+
+[test]
+smoke_frames = 300
+
+[build]
+exclude_sources = ["wiring.c"]
+
+[port]
+patches = ["patches/0001-audio-replace-avr-timers.patch"]
+notes = ["最小补丁用公共音频 API 替代启动音效对 AVR Timer3/Timer4 的直接访问"]

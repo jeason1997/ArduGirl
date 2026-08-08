@@ -45,6 +45,11 @@
 | 24 | ✅ 已移植 | Sunfire | 太空射击 | [上游源码](https://github.com/Team-ARG-Museum/ID-50-Sunfire) | ATMlib、固定输入冒烟和三阶段截图通过，完整波次仍为 partial |
 | 25 | ✅ 已移植 | Twotris | 双人下落方块 | [上游源码](https://github.com/skaterced/Twotris) | SDL2 与 PY32 冷构建通过；固定输入进入双人玩法，标题、菜单和玩法三张截图通过 |
 | 26 | ✅ 已移植 | Rooftop Rescue | 直升机救援 | [上游源码](https://github.com/BertVeer/Rooftop) | SDL2 与 PY32 冷构建、ArduboyTones、固定输入换楼与放绳回放、三阶段截图通过 |
+| 27 | ✅ 已移植 | Ravine Despoiler | 街机投弹 | [上游源码](https://github.com/unwiredben/arduboy-ravine-despoiler) | SDL2 冷构建、FixedPoints、固定输入和标题/说明/投弹截图通过，完整关卡仍为 partial |
+| 28 | ✅ 已移植 | Evade 2 | 街机躲避 | [上游源码](https://github.com/ArduboyCollection/evade2) | SDL2 冷构建、可移植图形路径、固定输入与三阶段截图通过，ATMLib2 音频仍为 partial |
+| 29 | ✅ 已移植 | Blackjack | 卡牌 | [上游源码](https://github.com/Press-Play-On-Tape/Blackjack) | SDL2 冷构建、FixedPoints/Print、下注固定输入与三阶段截图通过，完整牌局仍为 partial |
+| 30 | ✅ 已移植 | Waternet | 管线谜题 | [上游源码](https://github.com/joyrider3774/waternet_arduboy) | SDL2 冷构建、EEPROM、固定输入与标题/难度/关卡截图通过，完整解谜仍为 partial |
+| 31 | ✅ 已移植 | Pipes | 连线谜题 | [上游源码](https://github.com/ArduboyCollection/LayingPipe) | SDL2 冷构建、多 sketch 拼接、固定输入与关卡/玩法截图通过，完整解谜仍为 partial |
 
 以上游戏均已进入源码级移植流程并能在 ArduGirl 运行；`✅ 已移植` 不代表完整流程、全部音频和长期存档已经验收，具体完成度以各游戏 README 为准。
 
@@ -52,11 +57,6 @@
 
 | 原优先级 | 游戏 | 类型 | 源码 | 预估等级 | 排序理由 |
 |---:|---|---|---|---|---|
-| 4 | Ravine Despoiler | 街机投弹 | [上游源码](https://github.com/unwiredben/arduboy-ravine-despoiler) | A/B | 未导入、未构建；源码入口独立，适合作为低风险 Arduboy2 样本 |
-| 5 | Evade 2 | 街机躲避 | [上游源码](https://github.com/ArduboyCollection/evade2) | A/B | 未导入、未构建；官方精选作品，循环简单，适合验证帧率和碰撞 |
-| 7 | Blackjack | 卡牌 | [上游源码](https://github.com/Press-Play-On-Tape/Blackjack) | B | 未导入、未构建；适合验证文本、随机数、按钮边沿和存档 |
-| 8 | Waternet | 管线谜题 | [上游源码](https://github.com/joyrider3774/waternet_arduboy) | B | 未导入、未构建；玩家高频推荐，可覆盖关卡数据和 EEPROM 进度 |
-| 9 | Pipes | 连线谜题 | [上游源码](https://github.com/ArduboyCollection/LayingPipe) | B | 未导入、未构建；适合验证多尺寸棋盘、文本和 EEPROM |
 | 10 | LATE | 三合一休闲谜题 | [上游源码](https://github.com/core1024/LATE) | B | 未导入、未构建；含俄罗斯方块、1010 和 Stick Hero 三种模式，需要分别建立冒烟路径 |
 | 12 | Glove | 迷宫动作冒险 | [上游源码](https://github.com/ArduboyCollection/glove) | B | 未导入、未构建；官方精选，适合综合验证 Sprites、碰撞和 EEPROM |
 | 14 | Kong | Game & Watch 式街机 | [上游源码](https://github.com/Press-Play-On-Tape/Kong) | B | 未导入、未构建；状态机和动画有代表性，程序规模可控 |
