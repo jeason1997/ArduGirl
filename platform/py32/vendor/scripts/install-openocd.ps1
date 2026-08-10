@@ -10,7 +10,7 @@ $OpenOcdSha256 = "F2CB432E5C6AC65FA3B26F6A8441F3F54E53242335FBE5DA3B075CDF061520
 
 $CommonRoot = Split-Path -Parent $PSScriptRoot
 $ToolsRoot = Join-Path $CommonRoot "tools"
-$OpenOcdRoot = Join-Path $ToolsRoot "openocd"
+$OpenOcdRoot = Join-Path $ToolsRoot "openocd-windows"
 $OpenOcd = Join-Path $OpenOcdRoot "bin\openocd.exe"
 
 if (Test-Path -LiteralPath $OpenOcd) {
@@ -18,7 +18,7 @@ if (Test-Path -LiteralPath $OpenOcd) {
     exit 0
 }
 
-$InstallRoot = Join-Path $ToolsRoot ".openocd-install"
+$InstallRoot = Join-Path $ToolsRoot ".openocd-windows-install"
 $Archive = Join-Path $InstallRoot "openocd-0.12.0.zip"
 $Expanded = Join-Path $InstallRoot "openocd-0.12.0"
 

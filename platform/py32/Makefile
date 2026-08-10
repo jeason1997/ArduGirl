@@ -32,16 +32,16 @@ CC := "$(TOOLCHAIN_DIR)/arm-none-eabi-gcc.exe"
 CXX := "$(TOOLCHAIN_DIR)/arm-none-eabi-g++.exe"
 OBJCOPY := "$(TOOLCHAIN_DIR)/arm-none-eabi-objcopy.exe"
 SIZE := "$(TOOLCHAIN_DIR)/arm-none-eabi-size.exe"
-OPENOCD := $(VENDOR_DIR)/tools/openocd/bin/openocd.exe
-OPENOCD_SCRIPTS := $(VENDOR_DIR)/tools/openocd/scripts
+OPENOCD := $(VENDOR_DIR)/tools/openocd-windows/bin/openocd.exe
+OPENOCD_SCRIPTS := $(VENDOR_DIR)/tools/openocd-windows/scripts
 OPENOCD_INSTALL := powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(VENDOR_DIR)/scripts/install-openocd.ps1"
 else
 CC := arm-none-eabi-gcc
 CXX := arm-none-eabi-g++
 OBJCOPY := arm-none-eabi-objcopy
 SIZE := arm-none-eabi-size
-OPENOCD := $(VENDOR_DIR)/tools/openocd/bin/openocd
-OPENOCD_SCRIPTS := $(VENDOR_DIR)/tools/openocd/share/openocd/scripts
+OPENOCD := $(VENDOR_DIR)/tools/openocd-linux/bin/openocd
+OPENOCD_SCRIPTS := $(VENDOR_DIR)/tools/openocd-linux/share/openocd/scripts
 OPENOCD_INSTALL := sh "$(VENDOR_DIR)/scripts/install-openocd.sh"
 endif
 
@@ -156,6 +156,7 @@ flash: all openocd
 		-f $(OPENOCD_TARGET) -c "program $(TARGET).elf verify reset exit"
 
 clean:
+	# 只清理当前游戏固件；OpenOCD 是昂贵的持久工具缓存，不属于 clean 范围。
 	@rm -rf $(OUTPUT_DIR)
 
 -include $(DEPS)
