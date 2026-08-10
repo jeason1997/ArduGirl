@@ -105,6 +105,7 @@ std::uint32_t millis() noexcept;
 std::uint32_t micros() noexcept;
 void delay(unsigned long duration) noexcept;
 void randomSeed(unsigned long seed) noexcept;
+long random() noexcept;
 long random(long maximum) noexcept;
 long random(long minimum, long maximum) noexcept;
 long map(long value, long from_low, long from_high,

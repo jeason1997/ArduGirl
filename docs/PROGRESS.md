@@ -18,6 +18,8 @@
 
 ## 最近验证
 
+- 2026-08-10：修复 Evade 2 在 PY32 LTO 下复制跨编译单元 framebuffer 指针所产生的静态初始化顺序风险；游戏改为直接引用 Arduboy2 公共 framebuffer，PY32 冷构建为 `text=26152`、`data=116`、`bss=3476`，Linux 定向构建及 300 帧无头冒烟通过，仍待重新烧录确认实机画面。
+- 2026-08-10：Linux SDL 窗口和渲染器改为先于可选音频初始化；无头模式不再探测声卡，WSLg 检测到 PulseAudio socket 时优先使用 PulseAudio，避免无默认 ALSA 声卡时窗口启动前输出错误或阻塞。
 - 2026-08-10：修正 WSL 首次安装 Puya OpenOCD 时的 Autotools 生成文件、libusb/hidapi 依赖和新版 GCC `-Werror` 兼容问题；usbipd 转发 `c251:f001 DAPLink CMSIS-DAP` 后，Rooftop Rescue 已通过 PY32F002A 写入、校验和复位，OpenOCD 报告 `Verified OK`。
 - 2026-08-08：待移植清单前五款 Ravine Despoiler、Evade 2、Blackjack、Waternet、Pipes 完成源码级接入与 SDL2 冷构建；补齐 FixedPoints、Print、Arduboy2Core、Arduboy2Audio、Arduboy2Beep 和 ArduboyTones 音高兼容，固定输入生成并目视验收每款三张阶段截图。Evade 2 的 ATMLib2 音频、Blackjack 完整牌局、Waternet/Pipes 完整解谜仍标为 partial。
 - 2026-08-08：Rooftop Rescue SDL2 与 PY32F002A 冷构建通过；PY32 尺寸为 `text=29164`、`data=112`、`bss=3416`。新增公共 ArduboyTones 兼容层及序列推进测试；固定输入回放验证标题、进入玩法、直升机换楼和放绳，标题、玩法、游戏内菜单三张截图已目视验收并嵌入游戏 README。

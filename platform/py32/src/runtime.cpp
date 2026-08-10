@@ -13,6 +13,10 @@ extern "C" {
 volatile std::uint32_t g_ardugirl_frames = 0;
 }
 
+// 某些上游类型只有虚析构而不使用动态分配，GCC 仍会为删除析构函数引用此 ABI 符号。
+// PY32 不提供堆；保留空实现可让这类静态对象链接，同时不把动态分配变成平台必需能力。
+void operator delete(void*, unsigned int) noexcept {}
+
 namespace {
 void run_global_constructors() noexcept {
     // 厂商最小启动文件不链接 libc，因此由运行层显式执行 C++ 静态构造函数。

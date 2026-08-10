@@ -20,6 +20,7 @@ exclude_sources = ["ATMlib.cpp", "WMath.cpp", "main.cpp", "atm_synth.c", "cmd_pa
 patches = [
     "patches/0001-platform-use-portable-random-seed.patch",
     "patches/0002-graphics-use-portable-cpp-path.patch",
-    "patches/0003-audio-use-silent-portable-fallback.patch"
+    "patches/0003-audio-use-silent-portable-fallback.patch",
+    "patches/0004-graphics-share-framebuffer.patch"
 ]
-notes = ["随机种子改用公共微秒时间；图形操作在非 AVR 平台选择上游 C++ 实现；ATMLib2 AVR 音频暂以静音路径运行"]
+notes = ["随机种子改用公共微秒时间；图形操作在非 AVR 平台选择上游 C++ 实现并复用 Arduboy2 framebuffer；ATMLib2 AVR 音频暂以静音路径运行"]

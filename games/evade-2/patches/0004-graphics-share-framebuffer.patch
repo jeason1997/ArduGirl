@@ -1,0 +1,5 @@
+--- a/Evade2/Graphics.cpp
++++ b/Evade2/Graphics.cpp
+@@ -9 +9 @@
+-static UBYTE sBuffer[WIDTH * HEIGHT / 8];
++#define sBuffer (Arduboy2::sBuffer)

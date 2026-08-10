@@ -118,6 +118,30 @@ void audio_callback(void*, Uint8* stream, int length) noexcept {
     }
 }
 
+void init_optional_audio() noexcept {
+    if (headless) return;
+
+    // WSLg 通过 PulseAudio socket 提供声音，但部分 SDL 构建仍会先选择没有默认声卡的 ALSA。
+    // 尊重用户显式选择；仅在未指定驱动且检测到 WSLg/PulseAudio 环境时优先使用 pulseaudio。
+    const auto* requested_driver = SDL_getenv("SDL_AUDIODRIVER");
+    const auto* pulse_server = SDL_getenv("PULSE_SERVER");
+    const auto initialized = requested_driver == nullptr && pulse_server != nullptr
+        ? SDL_AudioInit("pulseaudio")
+        : SDL_InitSubSystem(SDL_INIT_AUDIO);
+    if (initialized != 0) return;
+
+    SDL_AudioSpec desired{};
+    desired.freq = 48000;
+    desired.format = AUDIO_S16SYS;
+    desired.channels = 1;
+    desired.samples = 512;
+    desired.callback = audio_callback;
+    audio_device = SDL_OpenAudioDevice(nullptr, 0, &desired, nullptr, 0);
+    if (audio_device != 0) {
+        SDL_PauseAudioDevice(audio_device, 0);
+    }
+}
+
 } // 匿名命名空间
 
 bool init(const Config& config) noexcept {
@@ -151,19 +175,6 @@ bool init(const Config& config) noexcept {
     counter_frequency = SDL_GetPerformanceFrequency();
     start_counter = SDL_GetPerformanceCounter();
 
-    // 音频不可用不应阻止无声游戏启动，因此音频子系统采用可选初始化。
-    if (SDL_InitSubSystem(SDL_INIT_AUDIO) == 0) {
-        SDL_AudioSpec desired{};
-        desired.freq = 48000;
-        desired.format = AUDIO_S16SYS;
-        desired.channels = 1;
-        desired.samples = 512;
-        desired.callback = audio_callback;
-        audio_device = SDL_OpenAudioDevice(nullptr, 0, &desired, nullptr, 0);
-        if (audio_device != 0) {
-            SDL_PauseAudioDevice(audio_device, 0);
-        }
-    }
     if (headless) {
         return true;
     }
@@ -201,6 +212,8 @@ bool init(const Config& config) noexcept {
         shutdown();
         return false;
     }
+    // 窗口和渲染器先完成初始化，音频探测失败不得阻塞或隐藏游戏窗口。
+    init_optional_audio();
     return true;
 }
 

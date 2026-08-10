@@ -81,6 +81,10 @@ extern "C" void srand(unsigned int seed) noexcept {
     random_state = seed != 0 ? static_cast<std::uint32_t>(seed) : 1u;
 }
 
+long random() noexcept {
+    return static_cast<long>(next_random() & 0x7FFFFFFFu);
+}
+
 long random(long maximum) noexcept {
     return maximum > 0
         ? static_cast<long>(next_random() % static_cast<unsigned long>(maximum))
